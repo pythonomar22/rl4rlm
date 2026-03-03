@@ -86,7 +86,9 @@ class RLModel:
 
         if adapter_path:
             logger.info(f"Loading LoRA adapter: {adapter_path}")
-            self.model = PeftModel.from_pretrained(self.model, adapter_path)
+            self.model = PeftModel.from_pretrained(
+                self.model, adapter_path, is_trainable=True,
+            )
 
         self.device = device
         self.max_new_tokens = max_new_tokens
