@@ -72,31 +72,135 @@ ARTICLE_TEMPLATES = {
 NAMES = ["Smith", "Chen", "Rodriguez", "Patel", "Kim", "Johnson", "Williams", "Garcia", "Brown", "Davis"]
 UNIVERSITIES = ["MIT", "Stanford", "Oxford", "Cambridge", "ETH Zurich", "Tokyo University", "Tsinghua"]
 COMPANIES = ["TechCorp", "GlobalVentures", "Nextera", "Pinnacle Systems", "Atlas Industries", "Meridian Corp"]
-CITIES = ["Geneva", "Singapore", "Berlin", "Tokyo", "New York", "London", "Sydney", "Dubai"]
+CITIES = ["Geneva", "Singapore", "Berlin", "Tokyo", "New York", "London", "Sydney", "Dubai", "Boston", "Seoul"]
 JOURNALS = ["Nature", "Science", "The Lancet", "IEEE Transactions", "PNAS", "Cell"]
+TEAMS = ["the Lakers", "Manchester United", "the Eagles", "Bayern Munich", "the Warriors", "Real Madrid"]
+PLAYERS = ["James Martinez", "Alex Thompson", "Maria Santos", "Tyler Brooks", "Sofia Lee", "David Park"]
+SPORTS = ["basketball", "football", "soccer", "tennis", "baseball", "hockey"]
+COUNTRIES = ["France", "Japan", "Brazil", "India", "Australia", "Canada", "Germany", "South Korea"]
+ORGS = ["the WHO", "the UN", "Doctors Without Borders", "the Red Cross", "UNICEF"]
+FIELDS = ["genetics", "quantum computing", "neuroscience", "climate science", "materials science"]
+ORGANISMS = ["butterfly", "deep-sea fish", "plant", "fungus", "beetle"]
+TREATMENTS = ["gene therapy", "monoclonal antibody", "vaccine", "drug", "surgical technique"]
+CONDITIONS = ["diabetes", "Alzheimer's disease", "heart disease", "chronic pain", "rare blood disorder"]
+PRODUCTS = ["smartphone", "AI chip", "wearable device", "electric vehicle", "robot assistant"]
+THREATS = ["ransomware strain", "zero-day exploit", "phishing campaign", "supply chain attack"]
+INDUSTRIES = ["technology", "healthcare", "finance", "energy", "automotive", "retail"]
+
+# Map placeholder names to specific value pools
+PLACEHOLDER_MAP = {
+    "team": TEAMS, "opponent": TEAMS,
+    "player": PLAYERS, "player2": PLAYERS, "rival": PLAYERS, "coach": PLAYERS,
+    "sport": SPORTS, "event": ["championship game", "tournament final", "league match", "playoffs"],
+    "tournament": ["Grand Slam", "World Cup qualifier", "National Championship", "Olympic trials"],
+    "play": ["goal", "touchdown", "three-pointer", "home run"],
+    "categories": ["individual and team events", "3 weight classes", "men's and women's divisions"],
+    "venue": ["Madison Square Garden", "Wembley Stadium", "Tokyo Dome", "Olympic Park"],
+    "attendance": ["45,000", "72,000", "28,000", "95,000"],
+    "rule_change": ["a new video review system", "expanded rosters", "modified scoring"],
+    "end_date": ["next Sunday", "March 20", "the end of the month"],
+    "achievements": ["12 championship titles", "3 MVP awards", "multiple record-breaking seasons"],
+    "country": COUNTRIES, "country2": COUNTRIES,
+    "leader": ["President Nakamura", "Prime Minister Clarke", "Chancellor Weber"],
+    "party": ["the National Alliance", "the Democratic Front", "the Reform Party"],
+    "summit": ["G20 Summit", "Climate Conference", "Peace Summit", "Economic Forum"],
+    "disaster": ["severe flooding", "a major earthquake", "widespread drought"],
+    "aid": ["food, water, and medical supplies", "emergency shelter and medicine"],
+    "issue": ["climate change", "trade policy", "regional security", "migration"],
+    "goal": ["binding emissions targets", "a ceasefire agreement", "trade reform"],
+    "dispute": ["carbon reduction timelines", "border security", "resource allocation"],
+    "demand": ["stronger action on climate", "an end to the conflict", "democratic reforms"],
+    "policy": ["foreign trade", "environmental regulation", "defense spending"],
+    "situation": ["single-party rule", "coalition government", "political deadlock"],
+    "regions": ["the northern provinces", "the coastal areas", "three major cities"],
+    "gap": ["$200 million", "$50 million", "$1.5 billion"],
+    "cause": ["prolonged heavy rainfall", "a shift in global markets", "policy changes"],
+    "timeline": ["two weeks ago", "last month", "earlier this year"],
+    "org": ORGS,
+    "field": FIELDS,
+    "finding": ["a novel protein structure", "unexpected correlations in patient data",
+                 "a new mechanism for cellular repair"],
+    "result": ["a 40% reduction in symptoms", "significant improvement in key metrics",
+               "outcomes that exceeded expectations"],
+    "implication": ["this could change standard treatment protocols",
+                    "further research is urgently needed",
+                    "patients may benefit within a few years"],
+    "condition": CONDITIONS,
+    "recommendation": ["regular screening for at-risk groups",
+                       "updated vaccination schedules",
+                       "increased physical activity"],
+    "treatment": TREATMENTS,
+    "mechanism": ["blocking a specific receptor", "targeting faulty genes",
+                  "stimulating the immune response"],
+    "side_effects": ["generally mild and temporary", "comparable to existing treatments"],
+    "demographic": ["adults over 50", "children under 12", "healthcare workers"],
+    "action": ["get regular check-ups", "follow updated guidelines", "maintain preventive care"],
+    "prevention": ["regular exercise and balanced diet", "vaccination and hygiene practices"],
+    "response": ["expanded capacity", "activated emergency protocols"],
+    "trend": ["a significant decline", "a notable increase", "stable patterns"],
+    "product": PRODUCTS,
+    "feature": ["a neural processing unit", "holographic display", "quantum encryption"],
+    "capability": ["the device processes natural language in real time",
+                   "it adapts to user behavior automatically"],
+    "technology": ["machine learning algorithm", "energy storage system", "quantum sensor"],
+    "method": ["deep reinforcement learning", "advanced spectroscopy", "CRISPR gene editing"],
+    "improvement": ["a factor of ten", "35%", "three orders of magnitude"],
+    "application": ["medical diagnostics", "autonomous vehicles", "renewable energy"],
+    "conference": ["NeurIPS 2025", "CES", "the ACM Conference"],
+    "companies": ["major tech firms including Google and Apple", "several Fortune 500 companies"],
+    "threat": THREATS,
+    "target": ["enterprise networks", "mobile devices", "financial institutions"],
+    "impact": ["unauthorized access to sensitive data", "widespread service disruption"],
+    "mitigation": ["update software immediately", "enable two-factor authentication"],
+    "industry": INDUSTRIES,
+    "division": ["cloud services", "consumer electronics", "enterprise software"],
+    "strategy": ["aggressive expansion into new markets", "cost optimization and AI integration"],
+    "plan": ["expand operations to 15 new countries", "launch a new product line"],
+    "investment": ["$2.5 billion", "$800 million", "$5 billion"],
+    "company2": COMPANIES,
+    "description": ["technology conglomerate", "healthcare provider", "financial services firm"],
+    "observation": ["consumer confidence remains cautious", "innovation spending is accelerating"],
+    "forecast": ["moderate growth of 3-5%", "continued uncertainty", "recovery by Q3"],
+    "caveat": ["geopolitical instability", "supply chain disruption", "inflation"],
+    "cosmic_location": ["the Andromeda galaxy", "a distant nebula", "the galactic center"],
+    "phenomenon": ["gravitational waves", "a gamma-ray burst", "unusual radio signals"],
+    "discovery": ["dark matter interaction", "a new type of stellar object"],
+    "instrument": ["infrared imaging", "radio interferometry", "X-ray spectroscopy"],
+    "observatory": ["the James Webb Space Telescope", "the European Southern Observatory",
+                     "the Atacama Large Millimeter Array"],
+    "topic": ["stellar evolution", "neurodegenerative disease", "ecosystem dynamics"],
+    "funder": ["National Science Foundation", "European Research Council"],
+    "next_step": ["clinical trials", "larger-scale experiments", "field deployments"],
+    "species_name": ["Chromis Stellaris", "Dendroicus Novus", "Mycena Luminosa"],
+    "trait": ["bioluminescence", "extreme heat tolerance", "a symbiotic relationship with algae"],
+    "environment": ["deep ocean thermal vents", "high-altitude environments"],
+    "organism": ORGANISMS,
+    "location": CITIES,
+}
 
 
 def _fill_template(template: str, rng: random.Random) -> str:
     """Fill a template with random placeholder values."""
-    # Replace each {placeholder} with a contextually reasonable value
     result = template
-    used_names = []
+    used_values: dict[str, list] = {}  # Track used values per placeholder type
 
     while "{" in result:
         start = result.index("{")
         end = result.index("}", start)
         placeholder = result[start + 1:end]
 
-        if "name" in placeholder.lower():
+        # Look up in placeholder map
+        val = None
+        if placeholder in PLACEHOLDER_MAP:
+            pool = PLACEHOLDER_MAP[placeholder]
+            val = rng.choice(pool)
+        elif "name" in placeholder.lower():
             val = rng.choice(NAMES)
-            while val in used_names and len(used_names) < len(NAMES):
-                val = rng.choice(NAMES)
-            used_names.append(val)
         elif "university" in placeholder or "institution" in placeholder:
             val = rng.choice(UNIVERSITIES)
         elif "company" in placeholder or "firm" in placeholder:
             val = rng.choice(COMPANIES)
-        elif "city" in placeholder or "location" in placeholder or "region" in placeholder:
+        elif "city" in placeholder:
             val = rng.choice(CITIES)
         elif "journal" in placeholder:
             val = rng.choice(JOURNALS)
@@ -121,19 +225,13 @@ def _fill_template(template: str, rng: random.Random) -> str:
         elif "growth" in placeholder or "stock_change" in placeholder:
             val = str(rng.randint(3, 35))
         elif "record" in placeholder:
-            val = f"{rng.randint(10, 50)} wins"
+            val = f"{rng.randint(10, 50)} career records"
         elif "position" in placeholder:
             val = rng.choice(["first", "second", "third", "fourth"])
         elif "turnout" in placeholder:
             val = str(rng.randint(55, 92))
         else:
-            # Generic filler for any other placeholder
-            val = rng.choice([
-                "the proposed initiative", "recent developments", "key stakeholders",
-                "the ongoing effort", "significant progress", "a new approach",
-                "the current situation", "improved methods", "careful analysis",
-                "sustainable growth", "modern techniques", "comprehensive planning",
-            ])
+            val = rng.choice(["the initiative", "several key factors", "ongoing developments"])
 
         result = result[:start] + val + result[end + 1:]
 
