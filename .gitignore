@@ -1,0 +1,39 @@
+# Data and results (never commit)
+data/
+results/
+eval/data/
+
+# Model weights
+*.pt
+*.safetensors
+*.bin
+*.gguf
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Environment
+.venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs (keep in results/, not root)
+*.log
+
+# HuggingFace cache
+.cache/
