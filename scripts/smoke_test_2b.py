@@ -96,7 +96,7 @@ def main():
     logger.info("=" * 70)
 
     # Check if model is already downloaded
-    model_name = "Qwen/Qwen3.5-2B-Instruct"
+    model_name = "Qwen/Qwen3-1.7B"
     logger.info(f"Loading {model_name}...")
 
     t0 = time.time()

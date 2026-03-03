@@ -12,10 +12,19 @@ Two implementations:
 from __future__ import annotations
 
 import logging
+import re
 import time
 from typing import Any
 
 logger = logging.getLogger(__name__)
+
+
+def strip_think_tags(text: str) -> str:
+    """Strip <think>...</think> tags from Qwen3 model output.
+    Preserves the content after the thinking block."""
+    # Remove <think>...</think> blocks (including empty ones)
+    cleaned = re.sub(r"<think>.*?</think>\s*", "", text, flags=re.DOTALL)
+    return cleaned.strip()
 
 
 class MockModel:
@@ -69,7 +78,7 @@ class HFModel:
 
     def __init__(
         self,
-        model_name: str = "Qwen/Qwen3.5-2B-Instruct",
+        model_name: str = "Qwen/Qwen3-1.7B",
         device: str = "cuda:0",
         max_new_tokens: int = 2048,
         temperature: float = 0.7,
@@ -86,7 +95,7 @@ class HFModel:
         )
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            torch_dtype=torch.bfloat16,
+            dtype=torch.bfloat16,
             device_map=device,
             trust_remote_code=True,
         )
@@ -134,7 +143,8 @@ class HFModel:
 
         # Decode only the new tokens
         new_tokens = outputs[0][input_len:]
-        response = self.tokenizer.decode(new_tokens, skip_special_tokens=True)
+        raw_response = self.tokenizer.decode(new_tokens, skip_special_tokens=True)
+        response = strip_think_tags(raw_response)
         elapsed = time.time() - t0
 
         self.generation_log.append({
@@ -142,6 +152,7 @@ class HFModel:
             "input_tokens": input_len,
             "output_tokens": len(new_tokens),
             "time": elapsed,
+            "raw_response": raw_response[:500],
         })
 
         logger.debug(f"Generated {len(new_tokens)} tokens in {elapsed:.2f}s")
@@ -176,7 +187,8 @@ class HFModel:
             )
 
         new_tokens = outputs[0][input_len:]
-        response = self.tokenizer.decode(new_tokens, skip_special_tokens=True)
+        raw_response = self.tokenizer.decode(new_tokens, skip_special_tokens=True)
+        response = strip_think_tags(raw_response)
         elapsed = time.time() - t0
 
         self.generation_log.append({
