@@ -1,8 +1,10 @@
-# Reinforcement Learning for Recursive Language Models
+# Training Native Recursive Language Models
 
 Training [Recursive Language Models](https://arxiv.org/abs/2502.14155) (RLMs) via reinforcement learning. We train Qwen3-1.7B to solve long-context tasks by writing Python code in a REPL, decomposing inputs programmatically via `llm_query()` sub-calls.
 
 **Key result:** RL (DPO, GRPO) improves multi-needle retrieval from 58% to 88% over SFT — but only after fixing two subtle implementation bugs. Naive GRPO catastrophically regresses to 41%.
+
+**[Paper](icmltemplate/final_report.pdf)** | **[Models on HuggingFace](https://huggingface.co/collections/omar81939)**
 
 ## Results
 
@@ -77,8 +79,6 @@ data/              # Checkpoints, trajectories, training data
   filtered/        # Cleaned SFT training samples
 
 results/           # Evaluation results (JSON)
-
-ideas/             # Experiment records (hypothesis → results → conclusion)
 ```
 
 ## Setup
@@ -147,15 +147,14 @@ CUDA_VISIBLE_DEVICES=0 uv run python eval/run_eval.py \
 
 ## Checkpoints
 
-All checkpoints are LoRA adapters (67MB each) on top of `Qwen/Qwen3-1.7B`:
+All checkpoints are LoRA adapters (67MB each) on top of [`Qwen/Qwen3-1.7B`](https://huggingface.co/Qwen/Qwen3-1.7B). Available directly in this repo under `data/sft/` or on HuggingFace:
 
-| Checkpoint | Description | Avg |
-|-----------|-------------|-----|
-| `data/sft/lora_v2/final` | SFT on 87 self-bootstrap trajectories | 76.8 |
-| `data/sft/lora_v3/final` | STaR (iterative SFT, 132 trajectories) | 76.3 |
-| `data/sft/rl_v3/final` | GRPO-v3 (buggy, degenerate outputs) | 71.8 |
-| `data/sft/dpo_v1/final` | DPO (best model) | **84.5** |
-| `data/sft/rl_v4/final` | GRPO-v4 (fixed) | 83.4 |
+| Model | Repo Path | HuggingFace | Description | Avg |
+|-------|-----------|-------------|-------------|-----|
+| SFT | `data/sft/lora_v2/final` | [omar81939/rl4rlm-sft](https://huggingface.co/omar81939/rl4rlm-sft) | SFT on 87 self-bootstrap trajectories | 76.8 |
+| STaR | `data/sft/lora_v3/final` | [omar81939/rl4rlm-star](https://huggingface.co/omar81939/rl4rlm-star) | Iterative SFT, 132 trajectories | 76.3 |
+| **DPO** | `data/sft/dpo_v1/final` | [omar81939/rl4rlm-dpo](https://huggingface.co/omar81939/rl4rlm-dpo) | DPO (best model) | **84.5** |
+| GRPO-v4 | `data/sft/rl_v4/final` | [omar81939/rl4rlm-grpo-v4](https://huggingface.co/omar81939/rl4rlm-grpo-v4) | GRPO-v4 (fixed) | 83.4 |
 
 ## Benchmarks
 
@@ -166,9 +165,9 @@ All checkpoints are LoRA adapters (67MB each) on top of `Qwen/Qwen3-1.7B`:
 ## Citation
 
 ```bibtex
-@misc{omar2026rlrlm,
-  title={Reinforcement Learning for Training Natively Recursive Language Models on Long-Context Tasks},
-  author={Simon Omar},
+@misc{abulhassan2026rlm,
+  title={Training Native Recursive Language Models},
+  author={Abul-Hassan, Omar and Villanueva, Miguel and Bowden, Josh},
   year={2026},
   howpublished={CS234 Final Project, Stanford University}
 }
