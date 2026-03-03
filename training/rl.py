@@ -194,6 +194,24 @@ def multi_niah_reward(predicted: str | None, expected_answers: list[str],
     return 0.9 * recall + 0.1 * fmt_bonus
 
 
+def compute_anchor_regularization(model: RLModel, ref_weights: dict[str, torch.Tensor]) -> torch.Tensor:
+    """
+    Compute anchor regularization: L2 distance between current and reference LoRA weights.
+
+    This is a first-order approximation to KL(pi_theta || pi_ref) for LoRA,
+    analogous to the elastic weight consolidation term. It prevents the policy
+    from drifting too far from the SFT reference, addressing the training
+    instability observed in RL-v2.
+    """
+    l2_sum = torch.tensor(0.0, device=next(iter(ref_weights.values())).device)
+    n_params = 0
+    for name, p in model.model.named_parameters():
+        if p.requires_grad and name in ref_weights:
+            l2_sum = l2_sum + (p - ref_weights[name]).pow(2).sum()
+            n_params += p.numel()
+    return l2_sum / max(n_params, 1)
+
+
 def grpo_step(
     model: RLModel,
     optimizer: torch.optim.Optimizer,
@@ -201,9 +219,11 @@ def grpo_step(
     expected_answers: list,  # list[str] for NIAH, list[list[str]] for multi-NIAH
     system_prompt: str,
     reward_fn: str = "composite",  # "composite" or "multi_niah"
+    reward_fn_per_task: list[str] | None = None,  # per-task reward fn for mixed mode
     k: int = 4,
     clip_eps: float = 0.2,
-    kl_coeff: float = 0.01,
+    kl_coeff: float = 0.0,
+    ref_weights: dict[str, torch.Tensor] | None = None,
 ) -> dict:
     """
     One GRPO update step.
@@ -212,20 +232,24 @@ def grpo_step(
     1. Generate K trajectories
     2. Score with reward
     3. Compute group-relative advantages
-    4. Update policy
+    4. Update policy with optional KL regularization
 
-    Note: This is a simplified GRPO that works at the trajectory level.
-    Full token-level GRPO would require saving per-token log probs during generation.
-    This version uses REINFORCE-style updates on the full trajectory.
+    When kl_coeff > 0, adds anchor regularization to prevent policy drift
+    from the SFT reference (addresses RL-v2 instability).
     """
     all_rewards = []
     all_trajectories = []
     step_stats = {"correct": 0, "total": 0, "avg_reward": 0, "avg_turns": 0}
 
     # 1. Generate K trajectories per prompt
-    for prompt, expected in zip(task_prompts, expected_answers):
+    for idx, (prompt, expected) in enumerate(zip(task_prompts, expected_answers)):
         group_rewards = []
         group_trajs = []
+
+        # Determine reward function for this task
+        task_reward_fn = reward_fn
+        if reward_fn_per_task is not None and idx < len(reward_fn_per_task):
+            task_reward_fn = reward_fn_per_task[idx]
 
         for _ in range(k):
             traj = rlm(
@@ -236,7 +260,7 @@ def grpo_step(
                 verbose=False,
             )
 
-            if reward_fn == "multi_niah":
+            if task_reward_fn == "multi_niah":
                 reward = multi_niah_reward(
                     traj.answer, expected, trajectory_to_dict(traj),
                 )
@@ -267,11 +291,10 @@ def grpo_step(
         group_advantages = [(r - mean_r) / std_r for r in group_rewards]
         advantages.append(group_advantages)
 
-    # 3. Policy gradient update
-    # Simplified: for each trajectory with positive advantage,
-    # do a gradient step to increase likelihood of that trajectory's code.
+    # 3. Policy gradient update with optional KL regularization
     model.model.train()
-    total_loss = 0.0
+    total_policy_loss = 0.0
+    total_kl_loss = 0.0
     n_updates = 0
 
     for group_idx, (group_trajs, group_advs) in enumerate(zip(all_trajectories, advantages)):
@@ -297,9 +320,18 @@ def grpo_step(
                 loss = outputs.loss
 
                 # Scale by advantage (positive = reinforce, negative = discourage)
-                scaled_loss = -adv * loss  # Negative because we want to maximize
-                scaled_loss.backward()
-                total_loss += scaled_loss.item()
+                policy_loss = -adv * loss
+
+                # Add KL regularization if enabled
+                if kl_coeff > 0 and ref_weights is not None:
+                    kl_loss = compute_anchor_regularization(model, ref_weights)
+                    total_step_loss = policy_loss + kl_coeff * kl_loss
+                    total_kl_loss += kl_loss.item()
+                else:
+                    total_step_loss = policy_loss
+
+                total_step_loss.backward()
+                total_policy_loss += policy_loss.item()
                 n_updates += 1
 
     if n_updates > 0:
@@ -313,7 +345,8 @@ def grpo_step(
     ) / max(1, sum(len(g) for g in all_trajectories))
 
     step_stats["avg_turns"] = avg_turns
-    step_stats["policy_loss"] = total_loss / max(1, n_updates)
+    step_stats["policy_loss"] = total_policy_loss / max(1, n_updates)
+    step_stats["kl_loss"] = total_kl_loss / max(1, n_updates)
     step_stats["n_updates"] = n_updates
 
     return step_stats
@@ -341,8 +374,12 @@ def main():
                         default=[5000, 10000, 20000],
                         help="Document lengths for NIAH training tasks")
     parser.add_argument("--task-type", default="niah",
-                        choices=["niah", "multi_niah"],
-                        help="Task type for training")
+                        choices=["niah", "multi_niah", "mixed"],
+                        help="Task type for training (mixed = NIAH + multi-NIAH)")
+    parser.add_argument("--kl-coeff", type=float, default=0.0,
+                        help="KL regularization coefficient (0 = disabled). "
+                             "Penalizes weight drift from SFT reference to prevent "
+                             "policy oscillation observed in RL-v2.")
     args = parser.parse_args()
 
     assert torch.cuda.device_count() <= 2
@@ -371,7 +408,13 @@ def main():
 
     # Generate task pool
     import random as _random
-    if args.task_type == "multi_niah":
+    if args.task_type == "mixed":
+        niah_tasks = generate_niah_suite(n_tasks=args.n_tasks, doc_lengths=args.doc_lengths)
+        mniah_tasks = generate_multi_niah_suite(n_tasks=max(12, args.n_tasks // 2))
+        reward_fn = "mixed"
+        logger.info(f"  Task type: mixed (NIAH + multi-NIAH)")
+        logger.info(f"  NIAH tasks: {len(niah_tasks)}, multi-NIAH tasks: {len(mniah_tasks)}")
+    elif args.task_type == "multi_niah":
         tasks = generate_multi_niah_suite(n_tasks=args.n_tasks)
         reward_fn = "multi_niah"
         logger.info(f"  Task type: multi_niah (O(K) needle search)")
@@ -381,26 +424,53 @@ def main():
         logger.info(f"  Task type: niah")
         logger.info(f"  Doc lengths: {args.doc_lengths}")
 
+    # Save reference weights for KL regularization
+    ref_weights = None
+    if args.kl_coeff > 0:
+        ref_weights = {
+            name: p.data.clone()
+            for name, p in rl_model.model.named_parameters()
+            if p.requires_grad
+        }
+        logger.info(f"  KL regularization: coeff={args.kl_coeff}, "
+                     f"saved {len(ref_weights)} reference weight tensors")
+
     # Training loop
     logger.info(f"\nStarting GRPO training:")
     logger.info(f"  K={args.k} trajectories per prompt")
     logger.info(f"  {args.batch_prompts} prompts per step")
     logger.info(f"  {args.steps} steps")
-    logger.info(f"  {args.n_tasks} total tasks in pool")
+    if args.task_type != "mixed":
+        logger.info(f"  {args.n_tasks} total tasks in pool")
     logger.info(f"  Reward function: {reward_fn}")
+    logger.info(f"  KL coeff: {args.kl_coeff}")
 
     training_log = []
     t0 = time.time()
 
     for step in range(args.steps):
         # Sample batch of tasks
-        batch_tasks = _random.sample(tasks, min(args.batch_prompts, len(tasks)))
-        batch_prompts = [t.prompt for t in batch_tasks]
+        if args.task_type == "mixed":
+            # Mix NIAH and multi-NIAH tasks
+            n_niah = max(1, args.batch_prompts // 2)
+            n_mniah = args.batch_prompts - n_niah
+            batch_niah = _random.sample(niah_tasks, min(n_niah, len(niah_tasks)))
+            batch_mniah = _random.sample(mniah_tasks, min(n_mniah, len(mniah_tasks)))
 
-        if args.task_type == "multi_niah":
-            batch_expected = [t.expected_answers for t in batch_tasks]
+            batch_prompts = [t.prompt for t in batch_niah] + [t.prompt for t in batch_mniah]
+            batch_expected = [t.expected_answer for t in batch_niah] + \
+                             [t.expected_answers for t in batch_mniah]
+            reward_fn_per_task = ["composite"] * len(batch_niah) + \
+                                 ["multi_niah"] * len(batch_mniah)
         else:
-            batch_expected = [t.expected_answer for t in batch_tasks]
+            batch_tasks = _random.sample(tasks, min(args.batch_prompts, len(tasks)))
+            batch_prompts = [t.prompt for t in batch_tasks]
+            reward_fn_per_task = None
+
+            if args.task_type == "multi_niah":
+                batch_expected = [t.expected_answers for t in batch_tasks]
+            else:
+                batch_expected = [t.expected_answer for t in batch_tasks]
 
         # GRPO step
         stats = grpo_step(
@@ -409,19 +479,23 @@ def main():
             task_prompts=batch_prompts,
             expected_answers=batch_expected,
             system_prompt=QWEN_2B_SYSTEM_PROMPT,
-            reward_fn=reward_fn,
+            reward_fn=reward_fn if reward_fn != "mixed" else "composite",
+            reward_fn_per_task=reward_fn_per_task,
             k=args.k,
+            kl_coeff=args.kl_coeff,
+            ref_weights=ref_weights,
         )
 
         training_log.append({"step": step, **stats})
 
         if (step + 1) % args.log_interval == 0:
             elapsed = time.time() - t0
+            kl_str = f" | KL: {stats.get('kl_loss', 0):.6f}" if args.kl_coeff > 0 else ""
             logger.info(
                 f"Step {step + 1}/{args.steps} | "
                 f"Reward: {stats['avg_reward']:.3f} | "
                 f"Correct: {stats['correct']}/{stats['total']} | "
-                f"Loss: {stats['policy_loss']:.4f} | "
+                f"Loss: {stats['policy_loss']:.4f}{kl_str} | "
                 f"Updates: {stats['n_updates']} | "
                 f"Turns: {stats['avg_turns']:.1f} | "
                 f"Time: {elapsed:.0f}s"
@@ -433,7 +507,8 @@ def main():
             sample_dir.mkdir(parents=True, exist_ok=True)
 
             # Run 3 tasks and save full trajectories
-            for i, task in enumerate(tasks[:3]):
+            sample_tasks = (niah_tasks[:2] + mniah_tasks[:1]) if args.task_type == "mixed" else tasks[:3]
+            for i, task in enumerate(sample_tasks):
                 traj = rlm(
                     prompt=task.prompt,
                     model=rl_model,
@@ -444,7 +519,7 @@ def main():
                 with open(sample_dir / f"traj_{i}.json", "w") as f:
                     json.dump(trajectory_to_dict(traj), f, indent=2, default=str)
 
-                if args.task_type == "multi_niah":
+                if hasattr(task, 'expected_answers'):
                     scores = score_multi_niah(traj.answer, task.expected_answers)
                     logger.info(
                         f"  Sample {i}: recall={scores['recall']:.2f} "
