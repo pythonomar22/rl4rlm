@@ -1,0 +1,9 @@
+usage: run_eval.py [-h] [--model MODEL] [--adapter ADAPTER]
+                   [--benchmark {niah,multi_niah,doc_classify,all}]
+                   [--n-tasks N_TASKS] [--max-iterations MAX_ITERATIONS]
+                   [--experiment-name EXPERIMENT_NAME]
+                   [--doc-lengths DOC_LENGTHS [DOC_LENGTHS ...]]
+                   [--positions POSITIONS [POSITIONS ...]]
+                   [--seed-offset SEED_OFFSET] [--verbose]
+                   [--system-prompt SYSTEM_PROMPT]
+run_eval.py: error: unrecognized arguments: --output-dir results/comprehensive_dpo_v1

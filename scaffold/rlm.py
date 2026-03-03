@@ -36,6 +36,7 @@ class RLMTrajectory:
     terminated: bool = False
     total_time: float = 0.0
     model_stats: dict | None = None
+    messages: list[dict[str, str]] = field(default_factory=list)
 
 
 def parse_repl_code(response: str) -> str | None:
@@ -226,6 +227,7 @@ def rlm(
         trajectory.terminated = False
 
     trajectory.total_time = time.time() - t0
+    trajectory.messages = list(messages)
 
     # Collect model stats if available
     if hasattr(model, "total_stats"):

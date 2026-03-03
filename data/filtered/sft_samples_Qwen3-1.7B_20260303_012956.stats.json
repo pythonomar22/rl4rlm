@@ -1,0 +1,11 @@
+{
+  "total": 150,
+  "correct": 89,
+  "terminated": 148,
+  "passed_filter": 87,
+  "total_samples": 97,
+  "removed_reasons": {
+    "incorrect": 61,
+    "too_many_errors": 2
+  }
+}

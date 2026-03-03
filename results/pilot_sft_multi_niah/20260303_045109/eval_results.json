@@ -1,0 +1,250 @@
+{
+  "benchmark": "multi_niah",
+  "accuracy": 0.7333333333333334,
+  "n_tasks": 12,
+  "per_task": [
+    {
+      "task_id": "mniah_000_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "BH1-PEARL",
+        "YM2-BRONZE",
+        "0R9-CYAN"
+      ],
+      "predicted": "The document contains the following secret codes:\n\n1. SECRET_CODE_OSCAR: BH1-PEARL\n2. SECRET_CODE_BRAVO: YM2-BRONZE\n3. SECRET_CODE_FOXTROT: 0R9-CYAN\n\nThe values are:\n\nBH1-PEARL, YM2-BRONZE, 0R9-CYAN",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 3,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 7.630129098892212,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_001_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "4H7-PURPLE",
+        "8M4-GREEN",
+        "6T5-WHITE"
+      ],
+      "predicted": "The relevant sentences containing the secret codes are:\n\n1. SECRET_CODE_OSCAR: 4H7-PURPLE  \n2. SECRET_CODE_QUEBEC: 8M4-GREEN  \n3. SECRET_CODE_ECHO: 6T5-WHITE  \n\nThe values are:  \n**4H7-PURPLE, 8M4-GREEN, 6T5-WHITE**",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 3,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 7.948870897293091,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_002_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "UC7-CHROME",
+        "6T5-WHITE",
+        "BH1-PEARL"
+      ],
+      "predicted": "not found",
+      "recall": 0.0,
+      "f1": 0.0,
+      "found": 0,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 4.986799240112305,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_003_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "7X9-BLUE",
+        "VL2-JADE",
+        "XP5-SLATE"
+      ],
+      "predicted": "7X9-BLUE,VL2-JADE,XP5-SLATE",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 3,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 5.336862325668335,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_004_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "VL2-JADE",
+        "WN8-IVORY",
+        "BH1-PEARL",
+        "FS7-ONYX",
+        "0R9-CYAN"
+      ],
+      "predicted": "The document contains 5 hidden secret codes. Here are the values of the secret codes:\n\nSECRET_CODE_ECHO: VL2-JADE\nSECRET_CODE_ROMEO: WN8-IVORY\nSECRET_CODE_FOXTROT: BH1-PEARL\nSECRET_CODE_CHARLIE: FS7-ONYX\nSECRET_CODE_OSCAR: 0R9-CYAN\n\nThe values as a comma-separated list are: VL2-JADE, WN8-IVORY, BH1-PEARL, FS7-ONYX, 0R9-CYAN",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 9.70134425163269,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_005_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "BH1-PEARL",
+        "6T5-WHITE",
+        "FS7-ONYX",
+        "2W6-SILVER",
+        "DK6-AMBER"
+      ],
+      "predicted": "not found",
+      "recall": 0.0,
+      "f1": 0.0,
+      "found": 0,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 5.063292741775513,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_006_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "BH1-PEARL",
+        "XP5-SLATE",
+        "6T5-WHITE",
+        "9J3-ORANGE",
+        "4H7-PURPLE"
+      ],
+      "predicted": "3T5-WHITE, XP5-SLATE, 6T5-WHITE, 9J3-ORANGE, 4H7-PURPLE,SECRET_CODE_[NAME]: [VALUE]",
+      "recall": 0.8,
+      "f1": 0.8000000000000002,
+      "found": 4,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 6.925267457962036,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_007_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "UC7-CHROME",
+        "0R9-CYAN",
+        "1N8-BLACK",
+        "7X9-BLUE",
+        "DK6-AMBER"
+      ],
+      "predicted": "2023-01-01, 0R9-CYAN, 7X9-BLUE, DK6-AMBER, SECRET_CODE_NOVEMBER: UC7-CHROME, SECRET_CODE_DELTA: 0R9-CYAN, SECRET_CODE_BRAVO: 1N8-BLACK, SECRET_CODE_ROMEO: 7X9-BLUE, SECRET_CODE_TANGO: DK6-AMBER,normal activity levels: 1234567890\nThe conference attracted participants from numerous countries: 1234567890\nInternational partnerships were strengthened through diplomatic efforts: 1234567890\nRegional offices submitted their quarterly performance summaries: 1234567890\nQuality ass: 1234567890",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 11.770510196685791,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_008_50000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "BH1-PEARL",
+        "YM2-BRONZE",
+        "2W6-SILVER",
+        "1N8-BLACK",
+        "7X9-BLUE"
+      ],
+      "predicted": "The relevant sentence is:  \n**SECRET_CODE_NOVEMBER: BH1-PEARL**  \n**SECRET_CODE_HOTEL: YM2-BRONZE**\n\nThe values are:  \n**BH1-PEARL, YM2-BRONZE**  \n\nSo the final answer is:  \n**BH1-PEARL, YM2-BRONZE**,The relevant sentence is:  \n**SECRET_CODE_OSCAR: 2W6-SILVER**,SECRET_CODE_FOXTROT: 7X9-BLUE\n\nThis is the relevant sentence.",
+      "recall": 0.8,
+      "f1": 0.8000000000000002,
+      "found": 4,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 9.011417865753174,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_009_50000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "1N8-BLACK",
+        "WN8-IVORY",
+        "FS7-ONYX",
+        "6T5-WHITE",
+        "QZ4-RUBY"
+      ],
+      "predicted": "The secret codes are:\n\nSECRET_CODE_OSCAR: 1N8-BLACK  \nSECRET_CODE_ALPHA: WN8-IVORY  \n\nTheir values as a comma-separated list are:  \n1N8-BLACK,WN8-IVORY,SECRET_CODE_ECHO: FS7-ONYX,SECRET_CODE_MIKE: 6T5-WHITE,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,",
+      "recall": 0.8,
+      "f1": 0.8000000000000002,
+      "found": 4,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 43.5187087059021,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_010_50000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "GT3-CORAL",
+        "1N8-BLACK",
+        "7X9-BLUE",
+        "DK6-AMBER",
+        "2W6-SILVER"
+      ],
+      "predicted": "The relevant sentence is:  \n**SECRET_CODE_ALPHA: GT3-CORAL**  \n**SECRET_CODE_JULIET: 1N8-BLACK**\n\nThe values are:  \n**GT3-CORAL, 1N8-BLACK**,The relevant sentence is:  \n**SECRET_CODE_INDIA: 7X9-BLUE**,The relevant sentence is:  \n**\"SECRET_CODE_KILO: 2W6-SILVER\"**",
+      "recall": 0.8,
+      "f1": 0.8000000000000002,
+      "found": 4,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 8.676516056060791,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_011_50000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "FS7-ONYX",
+        "YM2-BRONZE",
+        "XP5-SLATE",
+        "DK6-AMBER",
+        "7X9-BLUE"
+      ],
+      "predicted": "The relevant sentence is:  \n**\"SECRET_CODE_KILO: XP5-SLATE\"**  \nand  \n**\"SECRET_CODE_ALPHA: DK6-AMBER\"**.,SECRET_CODE_OSCAR: 7X9-BLUE  \nNew policies were implemented to address emerging challenges.",
+      "recall": 0.6,
+      "f1": 0.6,
+      "found": 3,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 7.617575645446777,
+      "doc_length": 50000
+    }
+  ],
+  "by_doc_length": {
+    "10K": 0.75,
+    "20K": 0.7,
+    "50K": 0.75
+  },
+  "by_n_needles": {
+    "3 needles": 0.75,
+    "5 needles": 0.725
+  },
+  "avg_recall": 0.7333333333333334,
+  "avg_f1": 0.7333333333333334
+}

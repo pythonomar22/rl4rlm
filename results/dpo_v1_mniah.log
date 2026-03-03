@@ -1,0 +1,123 @@
+2026-03-03 20:12:10,072 eval INFO: CUDA_VISIBLE_DEVICES=6
+2026-03-03 20:12:10,073 eval INFO: GPU count: 1
+2026-03-03 20:12:10,073 eval INFO: Loading model: Qwen/Qwen3-1.7B
+2026-03-03 20:12:10,073 eval INFO: Loading LoRA adapter: data/sft/dpo_v1/final
+2026-03-03 20:12:11,433 rl INFO: Loading base model: Qwen/Qwen3-1.7B
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.94it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.62it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.20it/s]
+2026-03-03 20:12:13,302 rl INFO: Loading LoRA adapter: data/sft/dpo_v1/final
+2026-03-03 20:12:13,670 eval INFO: Model loaded in 3.6s
+2026-03-03 20:12:13,670 eval INFO: 
+============================================================
+2026-03-03 20:12:13,671 eval INFO: Running benchmark: multi_niah
+2026-03-03 20:12:13,671 eval INFO: ============================================================
+Multi-NIAH:   0%|          | 0/24 [00:00<?, ?it/s]2026-03-03 20:12:13,680 eval INFO: 
+Task: mniah_000_10000_3needles | 3 needles in 10000 chars
+2026-03-03 20:12:20,027 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: 3, BH1-PEARL, YM2-BRONZE, 0R9-CYAN | 6.3s
+Multi-NIAH:   4%|▍         | 1/24 [00:06<02:25,  6.35s/it]2026-03-03 20:12:20,027 eval INFO: 
+Task: mniah_001_10000_3needles | 3 needles in 10000 chars
+2026-03-03 20:12:25,757 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: 4H7-PURPLE, 8M4-GREEN, 6T5-WHITE | 5.7s
+Multi-NIAH:   8%|▊         | 2/24 [00:12<02:11,  5.98s/it]2026-03-03 20:12:25,758 eval INFO: 
+Task: mniah_002_10000_3needles | 3 needles in 10000 chars
+2026-03-03 20:12:31,785 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: 3, UC7-CHROME, 6T5-WHITE, BH1-PEARL | 6.0s
+Multi-NIAH:  12%|█▎        | 3/24 [00:18<02:06,  6.00s/it]2026-03-03 20:12:31,785 eval INFO: 
+Task: mniah_003_10000_3needles | 3 needles in 10000 chars
+2026-03-03 20:12:37,460 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: 3,7X9-BLUE,VL2-JADE,XP5-SLATE | 5.7s
+Multi-NIAH:  17%|█▋        | 4/24 [00:23<01:57,  5.87s/it]2026-03-03 20:12:37,460 eval INFO: 
+Task: mniah_004_20000_5needles | 5 needles in 20000 chars
+2026-03-03 20:12:43,930 eval INFO:   Found 4/5 | Recall: 0.80 | Answer: COMMA_SEPARATED_LIST: VL2-JADE,BH1-PEARL,FS7-ONYX,0R9-CYAN,SECRET_CODE_[NAME]: [VALUE] | 6.5s
+Multi-NIAH:  21%|██        | 5/24 [00:30<01:55,  6.09s/it]2026-03-03 20:12:43,931 eval INFO: 
+Task: mniah_005_20000_5needles | 5 needles in 20000 chars
+2026-03-03 20:12:51,263 eval INFO:   Found 4/5 | Recall: 0.80 | Answer: 31, 6T5-WHITE, FS7-ONYX, 2W6-SILVER, DK6-AMBER,SECRET_CODE_[NAME]: [VALUE]  
+SECRET_CODE_[NAME]: [VALUE]  
+SECRET_CODE_[ | 7.3s
+Multi-NIAH:  25%|██▌       | 6/24 [00:37<01:57,  6.51s/it]2026-03-03 20:12:51,263 eval INFO: 
+Task: mniah_006_20000_5needles | 5 needles in 20000 chars
+2026-03-03 20:12:58,859 eval INFO:   Found 3/5 | Recall: 0.60 | Answer: 3T5-WHITE, 6T5-SLATE, 9J3-ORANGE, 4H7-PURPLE, BH1-PEARL,SECRET_CODE_[NAME]: [VALUE]  
+SECRET_CODE_[NAME]: [VALUE]  
+SECR | 7.6s
+Multi-NIAH:  29%|██▉       | 7/24 [00:45<01:56,  6.87s/it]2026-03-03 20:12:58,859 eval INFO: 
+Task: mniah_007_20000_5needles | 5 needles in 20000 chars
+2026-03-03 20:13:06,900 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: COMMA_SEPARATED_LIST: UC7-CHROME,0R9-CYAN,1N8-BLACK,7X9-BLUE,DK6-AMBER,normal activity levels: 0
+The conference attracte | 8.0s
+Multi-NIAH:  33%|███▎      | 8/24 [00:53<01:55,  7.24s/it]2026-03-03 20:13:06,901 eval INFO: 
+Task: mniah_008_50000_5needles | 5 needles in 50000 chars
+2026-03-03 20:13:50,195 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: SECRET_CODE_[NAME]: [VALUE]
+
+SECRET_CODE_NOVEMBER: BH1-PEARL
+SECRET_CODE_HOTEL: YM2-BRONZE,SECRET_CODE_[NAME]: [VALUE]   | 43.3s
+Multi-NIAH:  38%|███▊      | 9/24 [01:36<04:37, 18.51s/it]2026-03-03 20:13:50,195 eval INFO: 
+Task: mniah_009_50000_5needles | 5 needles in 50000 chars
+2026-03-03 20:14:33,544 eval INFO:   Found 4/5 | Recall: 0.80 | Answer: COMMA_SEPARATED_LIST: 1N8-BLACK,WN8-IVORY,COMMA_SEPARATED_LIST: FS7-ONYX,6T5-WHITE,1234567890123456789012345678901234567 | 43.3s
+Multi-NIAH:  42%|████▏     | 10/24 [02:19<06:06, 26.18s/it]2026-03-03 20:14:33,544 eval INFO: 
+Task: mniah_010_50000_5needles | 5 needles in 50000 chars
+2026-03-03 20:14:40,731 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: 3-CORAL,1N8-BLACK,GT3-CORAL,1N8-BLACK,7X9-BLUE, DK6-AMBER,2W6-SILVER,SECRET_CODE_KILO: 2W6-SILVER | 7.2s
+Multi-NIAH:  46%|████▌     | 11/24 [02:27<04:24, 20.37s/it]2026-03-03 20:14:40,731 eval INFO: 
+Task: mniah_011_50000_5needles | 5 needles in 50000 chars
+2026-03-03 20:15:23,780 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: 3, YM2-BRONZE, FS7-ONYX, 4, YM2-BRONZE, 5, YM2-BRONZE,comma-separated list: XP5-SLATE, DK6-AMBER,7X9-BLUE,7X9-BLUE,7X9-B | 43.0s
+Multi-NIAH:  50%|█████     | 12/24 [03:10<05:27, 27.27s/it]2026-03-03 20:15:23,781 eval INFO: 
+Task: mniah_012_50000_8needles | 8 needles in 49999 chars
+2026-03-03 20:15:31,154 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: COMMA_SEPARATED_LIST: 5P1-GOLD,UC7-CHROME,BH1-PEARL,COMMA_SEPARATED_LIST: GT3-CORAL, DK6-AMBER, 8M4-GREEN,6T5-WHITE,1N8- | 7.4s
+Multi-NIAH:  54%|█████▍    | 13/24 [03:17<03:53, 21.24s/it]2026-03-03 20:15:31,154 eval INFO: 
+Task: mniah_013_50000_8needles | 8 needles in 50000 chars
+2026-03-03 20:16:14,146 eval INFO:   Found 7/8 | Recall: 0.88 | Answer: 1, 6T5-WHITE, 9J3-ORANGE,comma-separated list:
+
+2W6-SILVER,4H7-PURPLE,8M4-GREEN,DK6-AMBER,COMMA_SEPARATED_LIST: FS7-ONYX | 43.0s
+Multi-NIAH:  58%|█████▊    | 14/24 [04:00<04:38, 27.81s/it]2026-03-03 20:16:14,147 eval INFO: 
+Task: mniah_014_50000_8needles | 8 needles in 50000 chars
+2026-03-03 20:16:21,681 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: COMMA_SEPERATED_LIST: 5P1-GOLD,WN8-IVORY,XP5-SLATE,comma-separated list: VL2-JADE, 2W6-SILVER, 3K2-RED,COMMA_SEPARATED_L | 7.5s
+Multi-NIAH:  62%|██████▎   | 15/24 [04:08<03:15, 21.70s/it]2026-03-03 20:16:21,681 eval INFO: 
+Task: mniah_015_50000_8needles | 8 needles in 50000 chars
+2026-03-03 20:16:28,439 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: 3K2-RED, 6T5-WHITE, QZ4-RUBY,5P1-GOLD,1N8-BLACK,VL2-JADE,8M4-GREEN,GT3-CORAL | 6.8s
+Multi-NIAH:  67%|██████▋   | 16/24 [04:14<02:17, 17.20s/it]2026-03-03 20:16:28,439 eval INFO: 
+Task: mniah_016_100000_8needles | 8 needles in 100000 chars
+2026-03-03 20:17:12,048 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: COMMA_SEPARATED_LIST: WN8-IVORY,UC7-CHROME,comma-separated list:
+
+FS7-ONYX,2W6-SILVER,XP5-SLATE,0R9-CYAN,0R9-CYAN,0R9-CY | 43.6s
+Multi-NIAH:  71%|███████   | 17/24 [04:58<02:55, 25.14s/it]2026-03-03 20:17:12,049 eval INFO: 
+Task: mniah_017_100000_8needles | 8 needles in 100000 chars
+2026-03-03 20:17:56,510 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: 8M4-GREEN,7X9-BLUE,comma-separated list: FS7-ONYX, FS7-ONYX, FS7-ONYX, FS7-ONYX, FS7-ONYX, FS7-ONYX, FS7-ONYX, FS7-ONYX, | 44.5s
+Multi-NIAH:  75%|███████▌  | 18/24 [05:42<03:05, 30.95s/it]2026-03-03 20:17:56,511 eval INFO: 
+Task: mniah_018_100000_8needles | 8 needles in 100000 chars
+2026-03-03 20:19:02,642 eval INFO:   Found 2/8 | Recall: 0.25 | Answer: 3K2-RED,9J3-ORANGE | 66.1s
+Multi-NIAH:  79%|███████▉  | 19/24 [06:48<03:27, 41.51s/it]2026-03-03 20:19:02,642 eval INFO: 
+Task: mniah_019_100000_8needles | 8 needles in 100000 chars
+2026-03-03 20:20:08,610 eval INFO:   Found 3/8 | Recall: 0.38 | Answer: 3T5-WHITE,6T5-WHITE, BH1-PEARL,2023-04-15, UC7-CHROME, 2023-04-15, UC7-CHROME, 2023-04-15, UC7-CHROME, 2023-04-15, UC7-C | 66.0s
+Multi-NIAH:  83%|████████▎ | 20/24 [07:54<03:15, 48.86s/it]2026-03-03 20:20:08,610 eval INFO: 
+Task: mniah_020_100000_10needles | 10 needles in 100000 chars
+2026-03-03 20:20:52,558 eval INFO:   Found 8/10 | Recall: 0.80 | Answer: 24, 34, 45, 56, 67, 78, 89, 100, 111, 122, 133, 144, 155, 166, 177, 188, 199, 210, 221, 232, 243, 254, 265, 276, 287, 29 | 43.9s
+Multi-NIAH:  88%|████████▊ | 21/24 [08:38<02:22, 47.38s/it]2026-03-03 20:20:52,558 eval INFO: 
+Task: mniah_021_100000_10needles | 10 needles in 100000 chars
+2026-03-03 20:21:37,268 eval INFO:   Found 8/10 | Recall: 0.80 | Answer: 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,4 | 44.7s
+Multi-NIAH:  92%|█████████▏| 22/24 [09:23<01:33, 46.58s/it]2026-03-03 20:21:37,269 eval INFO: 
+Task: mniah_022_100000_10needles | 10 needles in 100000 chars
+2026-03-03 20:22:20,850 eval INFO:   Found 10/10 | Recall: 1.00 | Answer: 3, FS7-ONYX, YM2-BRONZE, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 2 | 43.6s
+Multi-NIAH:  96%|█████████▌| 23/24 [10:07<00:45, 45.68s/it]2026-03-03 20:22:20,850 eval INFO: 
+Task: mniah_023_100000_10needles | 10 needles in 100000 chars
+2026-03-03 20:22:29,141 eval INFO:   Found 10/10 | Recall: 1.00 | Answer: 4H7-PURPLE,2W6-SILVER,3K2-RED,BH1-PEARL,9J3-ORANGE, DK6-AMBER,SECRET_CODE_SIERRA: YM2-BRONZE
+SECRET_CODE_INDIA: 7X9-BLUE | 8.3s
+Multi-NIAH: 100%|██████████| 24/24 [10:15<00:00, 34.46s/it]Multi-NIAH: 100%|██████████| 24/24 [10:15<00:00, 25.64s/it]
+2026-03-03 20:22:29,141 eval INFO: 
+--- multi_niah Results ---
+2026-03-03 20:22:29,141 eval INFO: Accuracy/Recall: 87.9%
+2026-03-03 20:22:29,141 eval INFO: Tasks: 24
+2026-03-03 20:22:29,141 eval INFO: By doc length:
+2026-03-03 20:22:29,141 eval INFO:   100K: 77.8%
+2026-03-03 20:22:29,141 eval INFO:   10K: 100.0%
+2026-03-03 20:22:29,141 eval INFO:   20K: 80.0%
+2026-03-03 20:22:29,141 eval INFO:   49K: 100.0%
+2026-03-03 20:22:29,141 eval INFO:   50K: 95.4%
+2026-03-03 20:22:29,141 eval INFO: By needle count:
+2026-03-03 20:22:29,141 eval INFO:   10 needles: 90.0%
+2026-03-03 20:22:29,141 eval INFO:   3 needles: 100.0%
+2026-03-03 20:22:29,141 eval INFO:   5 needles: 87.5%
+2026-03-03 20:22:29,141 eval INFO:   8 needles: 81.2%
+2026-03-03 20:22:29,141 eval INFO: Avg recall: 87.9%
+2026-03-03 20:22:29,141 eval INFO: Avg F1: 87.9%
+2026-03-03 20:22:29,150 eval INFO: 
+============================================================
+2026-03-03 20:22:29,150 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-03 20:22:29,150 eval INFO: ============================================================
+2026-03-03 20:22:29,150 eval INFO:   multi_niah: 87.9% (24 tasks)
+2026-03-03 20:22:29,150 eval INFO: Total time: 615.5s
+2026-03-03 20:22:29,150 eval INFO: Model stats: {'root_calls': 27, 'sub_calls': 77, 'total_input_tokens': 190891, 'total_output_tokens': 15982}
+2026-03-03 20:22:29,150 eval INFO: Results saved to: results/comprehensive_dpo_v1/20260303_201210

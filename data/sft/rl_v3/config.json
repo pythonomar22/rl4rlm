@@ -1,0 +1,22 @@
+{
+  "base_model": "Qwen/Qwen3-1.7B",
+  "model": "data/sft/lora_v2/final",
+  "k": 4,
+  "n_tasks": 20,
+  "steps": 40,
+  "batch_prompts": 2,
+  "lr": 5e-06,
+  "output": "data/sft/rl_v3",
+  "log_interval": 3,
+  "save_interval": 10,
+  "sample_trajectories_interval": 10,
+  "doc_lengths": [
+    5000,
+    10000,
+    20000,
+    50000
+  ],
+  "task_type": "mixed",
+  "kl_coeff": 0.02,
+  "timestamp": "20260303_083046"
+}

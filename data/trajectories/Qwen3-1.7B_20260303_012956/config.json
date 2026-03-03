@@ -1,0 +1,17 @@
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "n_tasks": 50,
+  "trajectories_per_task": 3,
+  "total_trajectories": 150,
+  "correct_trajectories": 89,
+  "accuracy": 0.5933333333333334,
+  "collection_time": 2312.0068044662476,
+  "model_stats": {
+    "root_calls": 216,
+    "sub_calls": 166,
+    "total_input_tokens": 456650,
+    "total_output_tokens": 122766,
+    "total_time": 2310.752903699875
+  },
+  "timestamp": "20260303_012956"
+}

@@ -1,0 +1,28 @@
+{
+  "base_model": "Qwen/Qwen3-1.7B",
+  "model": "data/sft/lora_v3/final",
+  "output": "data/sft/rl_v4",
+  "k": 8,
+  "batch_prompts": 2,
+  "steps": 30,
+  "lr": 5e-06,
+  "kl_coeff": 0.05,
+  "task_type": "mixed",
+  "doc_lengths": [
+    5000,
+    10000,
+    20000,
+    50000
+  ],
+  "n_tasks": 20,
+  "log_interval": 3,
+  "save_interval": 10,
+  "sample_interval": 10,
+  "timestamp": "20260303_180715",
+  "version": "grpo_v4",
+  "fixes": [
+    "conditioned_log_probs",
+    "token_level_kl",
+    "k=8"
+  ]
+}

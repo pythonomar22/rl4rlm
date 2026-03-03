@@ -1,0 +1,14 @@
+{
+  "base_model": "Qwen/Qwen3-1.7B",
+  "model": "data/sft/lora_v2/final",
+  "k": 4,
+  "n_tasks": 20,
+  "steps": 20,
+  "batch_prompts": 2,
+  "lr": 5e-06,
+  "output": "data/rl/grpo_v1",
+  "log_interval": 2,
+  "save_interval": 10,
+  "sample_trajectories_interval": 5,
+  "timestamp": "20260303_023954"
+}

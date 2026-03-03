@@ -1,0 +1,22 @@
+{
+  "base_model": "Qwen/Qwen3-1.7B",
+  "adapter": "data/sft/lora_v2/final",
+  "total": 60,
+  "correct": 45,
+  "by_type": {
+    "niah": {
+      "total": 20,
+      "correct": 18
+    },
+    "multi_niah": {
+      "total": 20,
+      "correct": 9
+    },
+    "doc_classify": {
+      "total": 20,
+      "correct": 18
+    }
+  },
+  "collection_time": 916.1215648651123,
+  "timestamp": "20260303_085015"
+}

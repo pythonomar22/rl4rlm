@@ -1,0 +1,483 @@
+2026-03-03 07:53:26,166 eval INFO: CUDA_VISIBLE_DEVICES=7
+2026-03-03 07:53:26,166 eval INFO: GPU count: 1
+2026-03-03 07:53:26,166 eval INFO: Loading model: Qwen/Qwen3-1.7B
+2026-03-03 07:53:26,166 eval INFO: Loading LoRA adapter: data/rl/grpo_v1/final
+2026-03-03 07:53:27,571 rl INFO: Loading base model: Qwen/Qwen3-1.7B
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.98it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.38it/s]
+2026-03-03 07:53:29,641 rl INFO: Loading LoRA adapter: data/rl/grpo_v1/final
+2026-03-03 07:53:29,950 eval INFO: Model loaded in 3.8s
+2026-03-03 07:53:29,950 eval INFO: 
+============================================================
+2026-03-03 07:53:29,950 eval INFO: Running benchmark: niah
+2026-03-03 07:53:29,950 eval INFO: ============================================================
+NIAH:   0%|          | 0/100 [00:00<?, ?it/s]2026-03-03 07:53:29,967 eval INFO: 
+Task: niah_20000_5000_0.1 | Q: What is the critical deadline? | Expected: September 3 2024
+2026-03-03 07:53:33,194 eval INFO:   Score: 1.0 | Answer: The relevant sentence is: "The critical deadline is September 3 2024." | 3.2s
+NIAH:   1%|          | 1/100 [00:03<05:19,  3.23s/it]2026-03-03 07:53:33,194 eval INFO: 
+Task: niah_20001_5000_0.1 | Q: What is the budget total? | Expected: March 15 2025
+2026-03-03 07:53:37,186 eval INFO:   Score: 1.0 | Answer: The budget total is **March 15, 2025**.
+
+This is explicitly stated in the provided document:
+
+> **"T | 4.0s
+NIAH:   2%|▏         | 2/100 [00:07<06:00,  3.68s/it]2026-03-03 07:53:37,186 eval INFO: 
+Task: niah_20002_5000_0.1 | Q: Who is the key contact person? | Expected: $12.7 billion
+2026-03-03 07:53:42,239 eval INFO:   Score: 1.0 | Answer: The key contact person is **$12.7 billion**. 
+
+This is the only mention of a "key contact person" in | 5.1s
+NIAH:   3%|▎         | 3/100 [00:12<06:57,  4.31s/it]2026-03-03 07:53:42,240 eval INFO: 
+Task: niah_20003_5000_0.1 | Q: What is the secret code? | Expected: DELTA-88
+2026-03-03 07:53:47,191 eval INFO:   Score: 1.0 | Answer: The secret code is DELTA-88. | 5.0s
+NIAH:   4%|▍         | 4/100 [00:17<07:17,  4.56s/it]2026-03-03 07:53:47,192 eval INFO: 
+Task: niah_20004_5000_0.2 | Q: What is the vault password? | Expected: ALPHA-7
+2026-03-03 07:53:51,014 eval INFO:   Score: 1.0 | Answer: The relevant sentence is: "The password for the vault is ALPHA-7." | 3.8s
+NIAH:   5%|▌         | 5/100 [00:21<06:47,  4.29s/it]2026-03-03 07:53:51,015 eval INFO: 
+Task: niah_20005_5000_0.2 | Q: What is the vault password? | Expected: $4.2 million
+2026-03-03 07:53:54,810 eval INFO:   Score: 1.0 | Answer: The relevant sentence is: "The password for the vault is $4.2 million." | 3.8s
+NIAH:   6%|▌         | 6/100 [00:24<06:27,  4.12s/it]2026-03-03 07:53:54,810 eval INFO: 
+Task: niah_20006_5000_0.2 | Q: What is the secret code? | Expected: ALPHA-7
+2026-03-03 07:54:01,828 eval INFO:   Score: 1.0 | Answer: The secret code is **ALPHA-7**.
+
+**Reasoning:**
+- The phrase **"The secret code is ALPHA-7"** appear | 7.0s
+NIAH:   7%|▋         | 7/100 [00:31<07:51,  5.07s/it]2026-03-03 07:54:01,828 eval INFO: 
+Task: niah_20007_5000_0.2 | Q: When is the meeting scheduled? | Expected: BRAVO-42
+2026-03-03 07:54:05,638 eval INFO:   Score: 1.0 | Answer: The meeting is scheduled for **BRAVO-42**.
+
+This is explicitly stated in the provided text:  
+**"The | 3.8s
+NIAH:   8%|▊         | 8/100 [00:35<07:09,  4.67s/it]2026-03-03 07:54:05,638 eval INFO: 
+Task: niah_20008_5000_0.5 | Q: What is the assigned location? | Expected: Sector 9 North Wing
+2026-03-03 07:54:09,241 eval INFO:   Score: 1.0 | Answer: The assigned location is Sector 9 North Wing. | 3.6s
+NIAH:   9%|▉         | 9/100 [00:39<06:34,  4.34s/it]2026-03-03 07:54:09,241 eval INFO: 
+Task: niah_20009_5000_0.5 | Q: Who is the key contact person? | Expected: FOXTROT-11
+2026-03-03 07:54:12,568 eval INFO:   Score: 1.0 | Answer: The key contact person is **FOXTROT-11**.
+
+This is explicitly stated in the document:  
+**"The key c | 3.3s
+NIAH:  10%|█         | 10/100 [00:42<06:02,  4.02s/it]2026-03-03 07:54:12,568 eval INFO: 
+Task: niah_20010_5000_0.5 | Q: What is the budget total? | Expected: CHARLIE-19
+2026-03-03 07:54:20,454 eval INFO:   Score: 1.0 | Answer: The budget total is **CHARLIE-19**.
+
+**Reasoning:**  
+The document contains a variety of statements  | 7.9s
+NIAH:  11%|█         | 11/100 [00:50<07:43,  5.21s/it]2026-03-03 07:54:20,454 eval INFO: 
+Task: niah_20011_5000_0.5 | Q: What is the secret code? | Expected: CHARLIE-19
+2026-03-03 07:54:28,038 eval INFO:   Score: 1.0 | Answer: The secret code is **CHARLIE-19**.
+
+This is inferred from the repeated mention of **"Quality assuran | 7.6s
+NIAH:  12%|█▏        | 12/100 [00:58<08:41,  5.93s/it]2026-03-03 07:54:28,038 eval INFO: 
+Task: niah_20012_5000_0.8 | Q: What is the project codename? | Expected: September 3 2024
+2026-03-03 07:54:31,646 eval INFO:   Score: 1.0 | Answer: The project codename is **September 3 2024**.
+
+**Answer:** September 3 2024 | 3.6s
+NIAH:  13%|█▎        | 13/100 [01:01<07:34,  5.23s/it]2026-03-03 07:54:31,646 eval INFO: 
+Task: niah_20013_5000_0.8 | Q: When is the meeting scheduled? | Expected: DELTA-88
+2026-03-03 07:54:36,610 eval INFO:   Score: 1.0 | Answer: The meeting is scheduled for **DELTA-88**.
+
+### Explanation:
+The question is asking **"When is the m | 5.0s
+NIAH:  14%|█▍        | 14/100 [01:06<07:22,  5.15s/it]2026-03-03 07:54:36,610 eval INFO: 
+Task: niah_20014_5000_0.8 | Q: What is the vault password? | Expected: January 22 2026
+2026-03-03 07:54:43,645 eval INFO:   Score: 1.0 | Answer: The relevant sentence is: "The password for the vault is January 22 2026." | 7.0s
+NIAH:  15%|█▌        | 15/100 [01:13<08:05,  5.72s/it]2026-03-03 07:54:43,645 eval INFO: 
+Task: niah_20015_5000_0.8 | Q: What is the budget total? | Expected: BRAVO-42
+2026-03-03 07:54:47,812 eval INFO:   Score: 1.0 | Answer: The **budget total** is **BRAVO-42**.
+
+This is explicitly stated in the document:
+
+> **"The budget t | 4.2s
+NIAH:  16%|█▌        | 16/100 [01:17<07:21,  5.25s/it]2026-03-03 07:54:47,813 eval INFO: 
+Task: niah_20016_5000_0.9 | Q: What is the secret code? | Expected: INDIA-33
+2026-03-03 07:54:54,441 eval INFO:   Score: 1.0 | Answer: The secret code is **INDIA-33**.
+
+This is indicated in the final lines of the provided document:
+
+>  | 6.6s
+NIAH:  17%|█▋        | 17/100 [01:24<07:50,  5.66s/it]2026-03-03 07:54:54,441 eval INFO: 
+Task: niah_20017_5000_0.9 | Q: Who is the key contact person? | Expected: ALPHA-7
+2026-03-03 07:54:56,780 eval INFO:   Score: 1.0 | Answer: The key contact person is **ALPHA-7**. | 2.3s
+NIAH:  18%|█▊        | 18/100 [01:26<06:22,  4.67s/it]2026-03-03 07:54:56,780 eval INFO: 
+Task: niah_20018_5000_0.9 | Q: When is the meeting scheduled? | Expected: Agent Sarah Miller
+2026-03-03 07:55:06,341 eval INFO:   Score: 0.0 | Answer: The meeting is scheduled **on the date of the annual planning session**.
+
+### Explanation:
+The docum | 9.6s
+NIAH:  19%|█▉        | 19/100 [01:36<08:16,  6.14s/it]2026-03-03 07:55:06,342 eval INFO: 
+Task: niah_20019_5000_0.9 | Q: Who is the key contact person? | Expected: BRAVO-42
+2026-03-03 07:55:08,724 eval INFO:   Score: 1.0 | Answer: The key contact person is **BRAVO-42**. | 2.4s
+NIAH:  20%|██        | 20/100 [01:38<06:40,  5.01s/it]2026-03-03 07:55:08,724 eval INFO: 
+Task: niah_20020_10000_0.1 | Q: What is the assigned location? | Expected: Professor James Chen
+2026-03-03 07:55:12,162 eval INFO:   Score: 1.0 | Answer: The relevant sentence is: "The assigned location is Professor James Chen." | 3.4s
+NIAH:  21%|██        | 21/100 [01:42<05:58,  4.54s/it]2026-03-03 07:55:12,163 eval INFO: 
+Task: niah_20021_10000_0.1 | Q: What is the project codename? | Expected: September 3 2024
+2026-03-03 07:55:15,466 eval INFO:   Score: 1.0 | Answer: The project codename is **September 3 2024**. | 3.3s
+NIAH:  22%|██▏       | 22/100 [01:45<05:25,  4.17s/it]2026-03-03 07:55:15,466 eval INFO: 
+Task: niah_20022_10000_0.1 | Q: What is the project codename? | Expected: Professor James Chen
+2026-03-03 07:55:20,968 eval INFO:   Score: 1.0 | Answer: The project codename is **Professor James Chen**.
+
+**Reasoning:**  
+The document contains multiple i | 5.5s
+NIAH:  23%|██▎       | 23/100 [01:51<05:51,  4.57s/it]2026-03-03 07:55:20,969 eval INFO: 
+Task: niah_20023_10000_0.1 | Q: What is the secret code? | Expected: $12.7 billion
+2026-03-03 07:55:29,372 eval INFO:   Score: 0.0 | Answer: Not found | 8.4s
+NIAH:  24%|██▍       | 24/100 [01:59<07:14,  5.72s/it]2026-03-03 07:55:29,372 eval INFO: 
+Task: niah_20024_10000_0.2 | Q: What is the secret code? | Expected: CHARLIE-19
+2026-03-03 07:55:35,372 eval INFO:   Score: 1.0 | Answer: The secret code is **CHARLIE-19**.
+
+This is inferred from the repeated mention of **"Environmental m | 6.0s
+NIAH:  25%|██▌       | 25/100 [02:05<07:15,  5.80s/it]2026-03-03 07:55:35,372 eval INFO: 
+Task: niah_20025_10000_0.2 | Q: Who is the key contact person? | Expected: $850,000
+2026-03-03 07:55:37,770 eval INFO:   Score: 1.0 | Answer: The key contact person is $850,000. | 2.4s
+NIAH:  26%|██▌       | 26/100 [02:07<05:53,  4.78s/it]2026-03-03 07:55:37,770 eval INFO: 
+Task: niah_20026_10000_0.2 | Q: What is the secret code? | Expected: $850,000
+2026-03-03 07:55:47,489 eval INFO:   Score: 1.0 | Answer: The secret code is **$850,000**.
+
+---
+
+**Explanation:**
+
+The document contains a large amount of adm | 9.7s
+NIAH:  27%|██▋       | 27/100 [02:17<07:37,  6.26s/it]2026-03-03 07:55:47,489 eval INFO: 
+Task: niah_20027_10000_0.2 | Q: When is the meeting scheduled? | Expected: CHARLIE-19
+2026-03-03 07:55:51,876 eval INFO:   Score: 1.0 | Answer: The scheduled date of the meeting is **CHARLIE-19**.
+
+**Reason:** The only mention of a meeting date | 4.4s
+NIAH:  28%|██▊       | 28/100 [02:21<06:50,  5.70s/it]2026-03-03 07:55:51,876 eval INFO: 
+Task: niah_20028_10000_0.5 | Q: What is the project codename? | Expected: March 15 2025
+2026-03-03 07:55:57,980 eval INFO:   Score: 1.0 | Answer: The project codename is **March 15 2025**.
+
+**Answer:** March 15 2025 | 6.1s
+NIAH:  29%|██▉       | 29/100 [02:28<06:53,  5.82s/it]2026-03-03 07:55:57,980 eval INFO: 
+Task: niah_20029_10000_0.5 | Q: What is the vault password? | Expected: Building 7 Room 304
+2026-03-03 07:56:03,095 eval INFO:   Score: 1.0 | Answer: The password for the vault is Building 7 Room 304. | 5.1s
+NIAH:  30%|███       | 30/100 [02:33<06:32,  5.61s/it]2026-03-03 07:56:03,096 eval INFO: 
+Task: niah_20030_10000_0.5 | Q: What is the budget total? | Expected: GOLF-77
+2026-03-03 07:56:13,273 eval INFO:   Score: 1.0 | Answer: The budget total is **GOLF-77**.
+
+**Explanation:**  
+The document contains a number of entries relat | 10.2s
+NIAH:  31%|███       | 31/100 [02:43<08:01,  6.98s/it]2026-03-03 07:56:13,273 eval INFO: 
+Task: niah_20031_10000_0.5 | Q: What is the vault password? | Expected: $4.2 million
+2026-03-03 07:56:16,793 eval INFO:   Score: 1.0 | Answer: The password for the vault is $4.2 million.
+
+**Answer:** $4.2 million | 3.5s
+NIAH:  32%|███▏      | 32/100 [02:46<06:44,  5.94s/it]2026-03-03 07:56:16,793 eval INFO: 
+Task: niah_20032_10000_0.8 | Q: What is the project codename? | Expected: March 15 2025
+2026-03-03 07:56:21,541 eval INFO:   Score: 1.0 | Answer: The project codename is **March 15 2025**.
+
+**Answer:** March 15 2025. | 4.7s
+NIAH:  33%|███▎      | 33/100 [02:51<06:14,  5.58s/it]2026-03-03 07:56:21,541 eval INFO: 
+Task: niah_20033_10000_0.8 | Q: What is the critical deadline? | Expected: HOTEL-256
+2026-03-03 07:56:26,986 eval INFO:   Score: 1.0 | Answer: The critical deadline is HOTEL-256.
+
+**Relevant sentence:**  
+The critical deadline is HOTEL-256. | 5.4s
+NIAH:  34%|███▍      | 34/100 [02:57<06:05,  5.54s/it]2026-03-03 07:56:26,986 eval INFO: 
+Task: niah_20034_10000_0.8 | Q: Who is the key contact person? | Expected: DELTA-88
+2026-03-03 07:56:30,467 eval INFO:   Score: 1.0 | Answer: The relevant sentence is: **"The key contact person is DELTA-88."**
+
+Therefore, the answer is: **The | 3.5s
+NIAH:  35%|███▌      | 35/100 [03:00<05:20,  4.92s/it]2026-03-03 07:56:30,468 eval INFO: 
+Task: niah_20035_10000_0.8 | Q: What is the critical deadline? | Expected: Professor James Chen
+2026-03-03 07:56:35,801 eval INFO:   Score: 1.0 | Answer: The critical deadline is Professor James Chen.
+
+**Relevant sentence:**  
+"The critical deadline is P | 5.3s
+NIAH:  36%|███▌      | 36/100 [03:05<05:22,  5.05s/it]2026-03-03 07:56:35,801 eval INFO: 
+Task: niah_20036_10000_0.9 | Q: What is the assigned location? | Expected: CHARLIE-19
+2026-03-03 07:56:40,893 eval INFO:   Score: 1.0 | Answer: The assigned location is CHARLIE-19. | 5.1s
+NIAH:  37%|███▋      | 37/100 [03:10<05:18,  5.06s/it]2026-03-03 07:56:40,893 eval INFO: 
+Task: niah_20037_10000_0.9 | Q: What is the vault password? | Expected: CHARLIE-19
+2026-03-03 07:56:44,371 eval INFO:   Score: 1.0 | Answer: The password for the vault is CHARLIE-19. | 3.5s
+NIAH:  38%|███▊      | 38/100 [03:14<04:44,  4.59s/it]2026-03-03 07:56:44,371 eval INFO: 
+Task: niah_20038_10000_0.9 | Q: Who is the key contact person? | Expected: GOLF-77
+2026-03-03 07:56:46,722 eval INFO:   Score: 1.0 | Answer: The key contact person is **GOLF-77**. | 2.4s
+NIAH:  39%|███▉      | 39/100 [03:16<03:58,  3.92s/it]2026-03-03 07:56:46,722 eval INFO: 
+Task: niah_20039_10000_0.9 | Q: What is the critical deadline? | Expected: Dr. Elena Rodriguez
+2026-03-03 07:56:53,802 eval INFO:   Score: 0.0 | Answer: Not found | 7.1s
+NIAH:  40%|████      | 40/100 [03:23<04:51,  4.86s/it]2026-03-03 07:56:53,802 eval INFO: 
+Task: niah_20040_20000_0.1 | Q: What is the assigned location? | Expected: DELTA-88
+2026-03-03 07:57:02,647 eval INFO:   Score: 1.0 | Answer: The assigned location is **DELTA-88**.
+
+**Reason:** The only mention of an assigned location in the  | 8.8s
+NIAH:  41%|████      | 41/100 [03:32<05:57,  6.06s/it]2026-03-03 07:57:02,647 eval INFO: 
+Task: niah_20041_20000_0.1 | Q: What is the vault password? | Expected: JULIET-99
+2026-03-03 07:57:08,691 eval INFO:   Score: 1.0 | Answer: The password for the vault is JULIET-99.
+The relevant sentence is: "mittee met to discuss various ad | 6.0s
+NIAH:  42%|████▏     | 42/100 [03:38<05:51,  6.05s/it]2026-03-03 07:57:08,691 eval INFO: 
+Task: niah_20042_20000_0.1 | Q: What is the secret code? | Expected: Lab Complex Alpha
+2026-03-03 07:57:12,470 eval INFO:   Score: 1.0 | Answer: The relevant sentence is: "The secret code is Lab Complex Alpha." | 3.8s
+NIAH:  43%|████▎     | 43/100 [03:42<05:06,  5.37s/it]2026-03-03 07:57:12,470 eval INFO: 
+Task: niah_20043_20000_0.1 | Q: What is the secret code? | Expected: FOXTROT-11
+2026-03-03 07:57:23,323 eval INFO:   Score: 1.0 | Answer: The secret code is **FOXTROT-11**.
+
+**Explanation:**
+
+The document contains a series of statements a | 10.9s
+NIAH:  44%|████▍     | 44/100 [03:53<06:32,  7.02s/it]2026-03-03 07:57:23,323 eval INFO: 
+Task: niah_20044_20000_0.2 | Q: What is the vault password? | Expected: FOXTROT-11
+2026-03-03 07:57:30,715 eval INFO:   Score: 1.0 | Answer: The relevant sentence is: "The password for the vault is FOXTROT-11." | 7.4s
+NIAH:  45%|████▌     | 45/100 [04:00<06:32,  7.13s/it]2026-03-03 07:57:30,716 eval INFO: 
+Task: niah_20045_20000_0.2 | Q: What is the secret code? | Expected: FOXTROT-11
+2026-03-03 07:57:43,581 eval INFO:   Score: 1.0 | Answer: The secret code is **FOXTROT-11**.
+
+### Explanation:
+- The document contains a series of unrelated s | 12.9s
+NIAH:  46%|████▌     | 46/100 [04:13<07:57,  8.85s/it]2026-03-03 07:57:43,582 eval INFO: 
+Task: niah_20046_20000_0.2 | Q: What is the secret code? | Expected: ALPHA-7
+2026-03-03 07:57:50,632 eval INFO:   Score: 1.0 | Answer: The secret code is ALPHA-7.
+
+Relevant sentence: "The secret code is ALPHA-7." | 7.0s
+NIAH:  47%|████▋     | 47/100 [04:20<07:20,  8.31s/it]2026-03-03 07:57:50,632 eval INFO: 
+Task: niah_20047_20000_0.2 | Q: What is the vault password? | Expected: Agent Sarah Miller
+2026-03-03 07:57:53,992 eval INFO:   Score: 1.0 | Answer: The password for the vault is Agent Sarah Miller. | 3.4s
+NIAH:  48%|████▊     | 48/100 [04:24<05:54,  6.83s/it]2026-03-03 07:57:53,993 eval INFO: 
+Task: niah_20048_20000_0.5 | Q: What is the critical deadline? | Expected: Sector 9 North Wing
+2026-03-03 07:58:01,465 eval INFO:   Score: 1.0 | Answer: The critical deadline is Sector 9 North Wing.
+
+**Relevant sentence:**  
+The critical deadline is Sec | 7.5s
+NIAH:  49%|████▉     | 49/100 [04:31<05:57,  7.02s/it]2026-03-03 07:58:01,465 eval INFO: 
+Task: niah_20049_20000_0.5 | Q: What is the assigned location? | Expected: ALPHA-7
+2026-03-03 07:58:09,720 eval INFO:   Score: 1.0 | Answer: The assigned location is ALPHA-7. | 8.3s
+NIAH:  50%|█████     | 50/100 [04:39<06:09,  7.39s/it]2026-03-03 07:58:09,721 eval INFO: 
+Task: niah_20050_20000_0.5 | Q: When is the meeting scheduled? | Expected: DELTA-88
+2026-03-03 07:58:17,241 eval INFO:   Score: 0.0 | Answer: Not found | 7.5s
+NIAH:  51%|█████     | 51/100 [04:47<06:04,  7.43s/it]2026-03-03 07:58:17,241 eval INFO: 
+Task: niah_20051_20000_0.5 | Q: Who is the key contact person? | Expected: FOXTROT-11
+2026-03-03 07:58:24,415 eval INFO:   Score: 1.0 | Answer: The key contact person is **FOXTROT-11**. | 7.2s
+NIAH:  52%|█████▏    | 52/100 [04:54<05:52,  7.35s/it]2026-03-03 07:58:24,415 eval INFO: 
+Task: niah_20052_20000_0.8 | Q: Who is the key contact person? | Expected: Dr. Elena Rodriguez
+2026-03-03 07:58:30,316 eval INFO:   Score: 1.0 | Answer: The key contact person is Dr. Elena Rodriguez.
+The query is incomplete and does not provide enough c | 5.9s
+NIAH:  53%|█████▎    | 53/100 [05:00<05:25,  6.92s/it]2026-03-03 07:58:30,316 eval INFO: 
+Task: niah_20053_20000_0.8 | Q: Who is the key contact person? | Expected: DELTA-88
+2026-03-03 07:58:38,471 eval INFO:   Score: 1.0 | Answer: The key contact person is **DELTA-88**. | 8.2s
+NIAH:  54%|█████▍    | 54/100 [05:08<05:35,  7.29s/it]2026-03-03 07:58:38,472 eval INFO: 
+Task: niah_20054_20000_0.8 | Q: What is the project codename? | Expected: Building 7 Room 304
+2026-03-03 07:58:41,945 eval INFO:   Score: 1.0 | Answer: The project codename is **Building 7 Room 304**. | 3.5s
+NIAH:  55%|█████▌    | 55/100 [05:11<04:36,  6.14s/it]2026-03-03 07:58:41,945 eval INFO: 
+Task: niah_20055_20000_0.8 | Q: What is the secret code? | Expected: Agent Sarah Miller
+2026-03-03 07:58:53,398 eval INFO:   Score: 1.0 | Answer: The secret code is **Agent Sarah Miller**.
+
+**Reasoning:**  
+The document contains a series of unrel | 11.5s
+NIAH:  56%|█████▌    | 56/100 [05:23<05:40,  7.74s/it]2026-03-03 07:58:53,398 eval INFO: 
+Task: niah_20056_20000_0.9 | Q: What is the critical deadline? | Expected: $850,000
+2026-03-03 07:59:02,336 eval INFO:   Score: 0.0 | Answer: The query is incomplete and contains some unclear or fragmented text. It mentions "s confirmed compl | 8.9s
+NIAH:  57%|█████▋    | 57/100 [05:32<05:48,  8.10s/it]2026-03-03 07:59:02,336 eval INFO: 
+Task: niah_20057_20000_0.9 | Q: What is the vault password? | Expected: CHARLIE-19
+2026-03-03 07:59:08,037 eval INFO:   Score: 1.0 | Answer: The vault password is **CHARLIE-19**.
+
+**Reasoning:**  
+The password is explicitly stated in the fin | 5.7s
+NIAH:  58%|█████▊    | 58/100 [05:38<05:09,  7.38s/it]2026-03-03 07:59:08,037 eval INFO: 
+Task: niah_20058_20000_0.9 | Q: What is the budget total? | Expected: Professor James Chen
+2026-03-03 07:59:17,347 eval INFO:   Score: 0.0 | Answer: The query is incomplete and contains a typo. It appears you intended to ask about a specific program | 9.3s
+NIAH:  59%|█████▉    | 59/100 [05:47<05:26,  7.96s/it]2026-03-03 07:59:17,347 eval INFO: 
+Task: niah_20059_20000_0.9 | Q: When is the meeting scheduled? | Expected: JULIET-99
+2026-03-03 07:59:22,709 eval INFO:   Score: 1.0 | Answer: The scheduled date of the meeting is **JULIET-99**.
+
+**Reason:** The only mention of a meeting date  | 5.4s
+NIAH:  60%|██████    | 60/100 [05:52<04:47,  7.18s/it]2026-03-03 07:59:22,709 eval INFO: 
+Task: niah_20060_50000_0.1 | Q: What is the assigned location? | Expected: Building 7 Room 304
+2026-03-03 07:59:33,882 eval INFO:   Score: 1.0 | Answer: The assigned location is Building 7 Room 304.
+Based on the provided text, the assigned location is * | 11.2s
+NIAH:  61%|██████    | 61/100 [06:03<05:26,  8.38s/it]2026-03-03 07:59:33,882 eval INFO: 
+Task: niah_20061_50000_0.1 | Q: What is the project codename? | Expected: INDIA-33
+2026-03-03 07:59:39,670 eval INFO:   Score: 1.0 | Answer: The project codename is **INDIA-33**.
+
+**Reason:** The codename is explicitly mentioned in the text: | 5.8s
+NIAH:  62%|██████▏   | 62/100 [06:09<04:48,  7.60s/it]2026-03-03 07:59:39,671 eval INFO: 
+Task: niah_20062_50000_0.1 | Q: When is the meeting scheduled? | Expected: ALPHA-7
+2026-03-03 07:59:42,716 eval INFO:   Score: 1.0 | Answer: The meeting is scheduled for **ALPHA-7**. | 3.0s
+NIAH:  63%|██████▎   | 63/100 [06:12<03:50,  6.23s/it]2026-03-03 07:59:42,716 eval INFO: 
+Task: niah_20063_50000_0.1 | Q: What is the critical deadline? | Expected: INDIA-33
+2026-03-03 07:59:49,872 eval INFO:   Score: 1.0 | Answer: The critical deadline is INDIA-33.
+
+**Relevant sentence:**  
+The critical deadline is INDIA-33.
+The  | 7.2s
+NIAH:  64%|██████▍   | 64/100 [06:19<03:54,  6.51s/it]2026-03-03 07:59:49,872 eval INFO: 
+Task: niah_20064_50000_0.2 | Q: What is the project codename? | Expected: $4.2 million
+2026-03-03 08:00:06,679 eval INFO:   Score: 0.0 | Answer: The project codename is **"Project Alpha"**.
+
+**Explanation**:  
+The text contains repeated mentions | 16.8s
+NIAH:  65%|██████▌   | 65/100 [06:36<05:35,  9.60s/it]2026-03-03 08:00:06,679 eval INFO: 
+Task: niah_20065_50000_0.2 | Q: When is the meeting scheduled? | Expected: $12.7 billion
+2026-03-03 08:00:10,332 eval INFO:   Score: 1.0 | Answer: The meeting is scheduled for **$12.7 billion**. 
+
+This is the only mention of a meeting in the provi | 3.7s
+NIAH:  66%|██████▌   | 66/100 [06:40<04:25,  7.82s/it]2026-03-03 08:00:10,333 eval INFO: 
+Task: niah_20066_50000_0.2 | Q: What is the vault password? | Expected: Building 7 Room 304
+2026-03-03 08:00:16,729 eval INFO:   Score: 1.0 | Answer: The password for the vault is Building 7 Room 304.
+The vault password is: **"Quality assurance proto | 6.4s
+NIAH:  67%|██████▋   | 67/100 [06:46<04:03,  7.39s/it]2026-03-03 08:00:16,729 eval INFO: 
+Task: niah_20067_50000_0.2 | Q: What is the critical deadline? | Expected: September 3 2024
+2026-03-03 08:00:25,073 eval INFO:   Score: 1.0 | Answer: The critical deadline is September 3 2024.
+
+**Relevant sentence:** The critical deadline is Septembe | 8.3s
+NIAH:  68%|██████▊   | 68/100 [06:55<04:05,  7.68s/it]2026-03-03 08:00:25,073 eval INFO: 
+Task: niah_20068_50000_0.5 | Q: When is the meeting scheduled? | Expected: September 3 2024
+2026-03-03 08:00:28,334 eval INFO:   Score: 1.0 | Answer: The meeting is scheduled for **September 3, 2024**.
+
+This information is explicitly stated in the do | 3.3s
+NIAH:  69%|██████▉   | 69/100 [06:58<03:16,  6.35s/it]2026-03-03 08:00:28,334 eval INFO: 
+Task: niah_20069_50000_0.5 | Q: Who is the key contact person? | Expected: $850,000
+2026-03-03 08:00:34,364 eval INFO:   Score: 1.0 | Answer: The key contact person is $850,000. | 6.0s
+NIAH:  70%|███████   | 70/100 [07:04<03:07,  6.26s/it]2026-03-03 08:00:34,364 eval INFO: 
+Task: niah_20070_50000_0.5 | Q: What is the vault password? | Expected: DELTA-88
+2026-03-03 08:00:41,574 eval INFO:   Score: 1.0 | Answer: The password for the vault is DELTA-88.
+The vault password is: **"budget allocations were reviewed d | 7.2s
+NIAH:  71%|███████   | 71/100 [07:11<03:09,  6.54s/it]2026-03-03 08:00:41,574 eval INFO: 
+Task: niah_20071_50000_0.5 | Q: What is the budget total? | Expected: $12.7 billion
+2026-03-03 08:00:47,712 eval INFO:   Score: 0.0 | Answer: The document contains a series of statements about various activities and events, but there is no me | 6.1s
+NIAH:  72%|███████▏  | 72/100 [07:17<02:59,  6.42s/it]2026-03-03 08:00:47,713 eval INFO: 
+Task: niah_20072_50000_0.8 | Q: Who is the key contact person? | Expected: $850,000
+2026-03-03 08:00:53,622 eval INFO:   Score: 1.0 | Answer: The key contact person is $850,000. | 5.9s
+NIAH:  73%|███████▎  | 73/100 [07:23<02:49,  6.27s/it]2026-03-03 08:00:53,623 eval INFO: 
+Task: niah_20073_50000_0.8 | Q: Who is the key contact person? | Expected: January 22 2026
+2026-03-03 08:01:00,418 eval INFO:   Score: 1.0 | Answer: The key contact person is January 22 2026.
+
+**Relevant sentence:**  
+"January 22 2026." | 6.8s
+NIAH:  74%|███████▍  | 74/100 [07:30<02:47,  6.43s/it]2026-03-03 08:01:00,418 eval INFO: 
+Task: niah_20074_50000_0.8 | Q: When is the meeting scheduled? | Expected: $12.7 billion
+2026-03-03 08:01:05,993 eval INFO:   Score: 0.0 | Answer: The question is: **"When is the meeting scheduled?"**
+
+### Analysis:
+The provided text contains a ** | 5.6s
+NIAH:  75%|███████▌  | 75/100 [07:36<02:34,  6.17s/it]2026-03-03 08:01:05,994 eval INFO: 
+Task: niah_20075_50000_0.8 | Q: What is the budget total? | Expected: January 22 2026
+2026-03-03 08:01:16,325 eval INFO:   Score: 1.0 | Answer: The budget total is January 22 2026. | 10.3s
+NIAH:  76%|███████▌  | 76/100 [07:46<02:58,  7.42s/it]2026-03-03 08:01:16,325 eval INFO: 
+Task: niah_20076_50000_0.9 | Q: What is the vault password? | Expected: September 3 2024
+2026-03-03 08:01:25,294 eval INFO:   Score: 1.0 | Answer: The password for the vault is **September 3 2024**. | 9.0s
+NIAH:  77%|███████▋  | 77/100 [07:55<03:01,  7.88s/it]2026-03-03 08:01:25,294 eval INFO: 
+Task: niah_20077_50000_0.9 | Q: What is the project codename? | Expected: Dr. Elena Rodriguez
+2026-03-03 08:01:29,177 eval INFO:   Score: 1.0 | Answer: The project codename is **Dr. Elena Rodriguez**. | 3.9s
+NIAH:  78%|███████▊  | 78/100 [07:59<02:27,  6.68s/it]2026-03-03 08:01:29,177 eval INFO: 
+Task: niah_20078_50000_0.9 | Q: Who is the key contact person? | Expected: ECHO-365
+2026-03-03 08:01:39,402 eval INFO:   Score: 1.0 | Answer: The key contact person is **ECHO-365**. | 10.2s
+NIAH:  79%|███████▉  | 79/100 [08:09<02:42,  7.75s/it]2026-03-03 08:01:39,402 eval INFO: 
+Task: niah_20079_50000_0.9 | Q: What is the secret code? | Expected: GOLF-77
+2026-03-03 08:01:45,364 eval INFO:   Score: 0.0 | Answer: The secret code is: "The research team published their findings in the quarterly report."
+
+**Relevan | 6.0s
+NIAH:  80%|████████  | 80/100 [08:15<02:24,  7.21s/it]2026-03-03 08:01:45,364 eval INFO: 
+Task: niah_20080_100000_0.1 | Q: What is the critical deadline? | Expected: January 22 2026
+2026-03-03 08:01:54,828 eval INFO:   Score: 1.0 | Answer: The critical deadline is January 22 2026.
+
+**Relevant sentence:**  
+The critical deadline is January | 9.5s
+NIAH:  81%|████████  | 81/100 [08:24<02:29,  7.89s/it]2026-03-03 08:01:54,828 eval INFO: 
+Task: niah_20081_100000_0.1 | Q: What is the vault password? | Expected: September 3 2024
+2026-03-03 08:02:06,788 eval INFO:   Score: 1.0 | Answer: The password for the vault is September 3 2024.
+The relevant sentence is: "Quality assurance protoco | 12.0s
+NIAH:  82%|████████▏ | 82/100 [08:36<02:43,  9.11s/it]2026-03-03 08:02:06,789 eval INFO: 
+Task: niah_20082_100000_0.1 | Q: When is the meeting scheduled? | Expected: GOLF-77
+2026-03-03 08:02:10,584 eval INFO:   Score: 1.0 | Answer: The scheduled date of the meeting is **GOLF-77**. | 3.8s
+NIAH:  83%|████████▎ | 83/100 [08:40<02:07,  7.51s/it]2026-03-03 08:02:10,584 eval INFO: 
+Task: niah_20083_100000_0.1 | Q: When is the meeting scheduled? | Expected: ECHO-365
+2026-03-03 08:02:17,074 eval INFO:   Score: 1.0 | Answer: The meeting is scheduled for **ECHO-365**. 
+
+This is explicitly stated in the provided text, even th | 6.5s
+NIAH:  84%|████████▍ | 84/100 [08:47<01:55,  7.21s/it]2026-03-03 08:02:17,074 eval INFO: 
+Task: niah_20084_100000_0.2 | Q: When is the meeting scheduled? | Expected: HOTEL-256
+2026-03-03 08:02:22,828 eval INFO:   Score: 1.0 | Answer: Based on the provided text, the **meeting is scheduled for HOTEL-256**.
+
+This is explicitly stated i | 5.8s
+NIAH:  85%|████████▌ | 85/100 [08:52<01:41,  6.77s/it]2026-03-03 08:02:22,828 eval INFO: 
+Task: niah_20085_100000_0.2 | Q: What is the assigned location? | Expected: January 22 2026
+2026-03-03 08:02:57,699 eval INFO:   Score: 1.0 | Answer: The assigned location is January 22 2026. | 34.9s
+NIAH:  86%|████████▌ | 86/100 [09:27<03:32, 15.20s/it]2026-03-03 08:02:57,700 eval INFO: 
+Task: niah_20086_100000_0.2 | Q: Who is the key contact person? | Expected: ALPHA-7
+2026-03-03 08:03:05,349 eval INFO:   Score: 1.0 | Answer: The key contact person is ALPHA-7. | 7.6s
+NIAH:  87%|████████▋ | 87/100 [09:35<02:48, 12.94s/it]2026-03-03 08:03:05,349 eval INFO: 
+Task: niah_20087_100000_0.2 | Q: What is the secret code? | Expected: JULIET-99
+2026-03-03 08:03:15,939 eval INFO:   Score: 1.0 | Answer: The secret code is: "Infrastructure improvements were planned for the upcoming fiscal year."
+
+**Rele | 10.6s
+NIAH:  88%|████████▊ | 88/100 [09:45<02:26, 12.23s/it]2026-03-03 08:03:15,939 eval INFO: 
+Task: niah_20088_100000_0.5 | Q: What is the budget total? | Expected: BRAVO-42
+2026-03-03 08:03:18,980 eval INFO:   Score: 1.0 | Answer: The **budget total** is **BRAVO-42**. | 3.0s
+NIAH:  89%|████████▉ | 89/100 [09:49<01:44,  9.47s/it]2026-03-03 08:03:18,981 eval INFO: 
+Task: niah_20089_100000_0.5 | Q: Who is the key contact person? | Expected: BRAVO-42
+2026-03-03 08:03:21,664 eval INFO:   Score: 1.0 | Answer: The key contact person is **BRAVO-42**. | 2.7s
+NIAH:  90%|█████████ | 90/100 [09:51<01:14,  7.44s/it]2026-03-03 08:03:21,665 eval INFO: 
+Task: niah_20090_100000_0.5 | Q: What is the vault password? | Expected: $12.7 billion
+2026-03-03 08:03:32,083 eval INFO:   Score: 1.0 | Answer: The vault password is: **"Communication systems operated within expected parameters."**
+
+This senten | 10.4s
+NIAH:  91%|█████████ | 91/100 [10:02<01:14,  8.33s/it]2026-03-03 08:03:32,083 eval INFO: 
+Task: niah_20091_100000_0.5 | Q: Who is the key contact person? | Expected: Professor James Chen
+2026-03-03 08:03:34,589 eval INFO:   Score: 1.0 | Answer: The key contact person is Professor James Chen. | 2.5s
+NIAH:  92%|█████████▏| 92/100 [10:04<00:52,  6.58s/it]2026-03-03 08:03:34,589 eval INFO: 
+Task: niah_20092_100000_0.8 | Q: What is the critical deadline? | Expected: ALPHA-7
+2026-03-03 08:03:45,867 eval INFO:   Score: 1.0 | Answer: The relevant sentence is: **"The research team published their findings in the quarterly report."**
+ | 11.3s
+NIAH:  93%|█████████▎| 93/100 [10:15<00:55,  7.99s/it]2026-03-03 08:03:45,867 eval INFO: 
+Task: niah_20093_100000_0.8 | Q: What is the assigned location? | Expected: ECHO-365
+2026-03-03 08:04:03,670 eval INFO:   Score: 1.0 | Answer: The assigned location is **ECHO-365**.
+The query is incomplete and contains some errors. The phrase  | 17.8s
+NIAH:  94%|█████████▍| 94/100 [10:33<01:05, 10.94s/it]2026-03-03 08:04:03,671 eval INFO: 
+Task: niah_20094_100000_0.8 | Q: What is the project codename? | Expected: Professor James Chen
+2026-03-03 08:04:07,420 eval INFO:   Score: 1.0 | Answer: The project codename is **Professor James Chen**. | 3.7s
+NIAH:  95%|█████████▌| 95/100 [10:37<00:43,  8.78s/it]2026-03-03 08:04:07,420 eval INFO: 
+Task: niah_20095_100000_0.8 | Q: What is the critical deadline? | Expected: CHARLIE-19
+2026-03-03 08:04:18,680 eval INFO:   Score: 1.0 | Answer: The critical deadline is **"Budget allocations were reviewed during the annual planning session."**  | 11.3s
+NIAH:  96%|█████████▌| 96/100 [10:48<00:38,  9.52s/it]2026-03-03 08:04:18,680 eval INFO: 
+Task: niah_20096_100000_0.9 | Q: What is the budget total? | Expected: September 3 2024
+2026-03-03 08:04:34,463 eval INFO:   Score: 1.0 | Answer: The relevant sentence is: **"Budget allocations were reviewed during the annual planning session."** | 15.8s
+NIAH:  97%|█████████▋| 97/100 [11:04<00:34, 11.40s/it]2026-03-03 08:04:34,463 eval INFO: 
+Task: niah_20097_100000_0.9 | Q: What is the secret code? | Expected: ALPHA-7
+2026-03-03 08:04:38,318 eval INFO:   Score: 1.0 | Answer: The secret code is ALPHA-7. | 3.9s
+NIAH:  98%|█████████▊| 98/100 [11:08<00:18,  9.14s/it]2026-03-03 08:04:38,318 eval INFO: 
+Task: niah_20098_100000_0.9 | Q: What is the budget total? | Expected: BRAVO-42
+2026-03-03 08:05:01,699 eval INFO:   Score: 1.0 | Answer: The budget total is **BRAVO-42**.
+The query is incomplete and contains a typo. It appears you may ha | 23.4s
+NIAH:  99%|█████████▉| 99/100 [11:31<00:13, 13.41s/it]2026-03-03 08:05:01,699 eval INFO: 
+Task: niah_20099_100000_0.9 | Q: What is the vault password? | Expected: ALPHA-7
+2026-03-03 08:05:11,246 eval INFO:   Score: 1.0 | Answer: The vault password is: **"compliance with all regulations"**.
+
+Relevant sentence:  
+**"Safety inspec | 9.5s
+NIAH: 100%|██████████| 100/100 [11:41<00:00, 12.25s/it]NIAH: 100%|██████████| 100/100 [11:41<00:00,  7.01s/it]
+2026-03-03 08:05:11,246 eval INFO: 
+--- niah Results ---
+2026-03-03 08:05:11,246 eval INFO: Accuracy/Recall: 90.0%
+2026-03-03 08:05:11,246 eval INFO: Tasks: 100
+2026-03-03 08:05:11,246 eval INFO: By doc length:
+2026-03-03 08:05:11,246 eval INFO:   100K: 100.0%
+2026-03-03 08:05:11,246 eval INFO:   10K: 90.0%
+2026-03-03 08:05:11,246 eval INFO:   20K: 85.0%
+2026-03-03 08:05:11,246 eval INFO:   50K: 80.0%
+2026-03-03 08:05:11,246 eval INFO:   5K: 95.0%
+2026-03-03 08:05:11,246 eval INFO: By needle position:
+2026-03-03 08:05:11,246 eval INFO:   0.10: 95.0%
+2026-03-03 08:05:11,246 eval INFO:   0.25: 95.0%
+2026-03-03 08:05:11,246 eval INFO:   0.50: 90.0%
+2026-03-03 08:05:11,246 eval INFO:   0.75: 95.0%
+2026-03-03 08:05:11,246 eval INFO:   0.90: 75.0%
+2026-03-03 08:05:11,246 eval INFO: 
+============================================================
+2026-03-03 08:05:11,246 eval INFO: Running benchmark: multi_niah
+2026-03-03 08:05:11,246 eval INFO: ============================================================
+Multi-NIAH:   0%|          | 0/24 [00:00<?, ?it/s]2026-03-03 08:05:11,254 eval INFO: 
+Task: mniah_000_10000_3needles | 3 needles in 10000 chars
+2026-03-03 08:05:16,027 eval INFO:   Found 0/3 | Recall: 0.00 | Answer:  | 4.8s
+Multi-NIAH:   4%|▍         | 1/24 [00:04<01:49,  4.77s/it]2026-03-03 08:05:16,027 eval INFO: 
+Task: mniah_001_10000_3needles | 3 needles in 10000 chars
+2026-03-03 08:05:22,275 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: 4H7-PURPLE, 8M4-GREEN, 6T5-WHITE | 6.2s
+Multi-NIAH:   8%|▊         | 2/24 [00:11<02:04,  5.64s/it]2026-03-03 08:05:22,275 eval INFO: 
+Task: mniah_002_10000_3needles | 3 needles in 10000 chars
+2026-03-03 08:05:27,800 eval INFO:   Found 2/3 | Recall: 0.67 | Answer: 3, 6T5-WHITE, BH1-PEARL | 5.5s
+Multi-NIAH:  12%|█▎        | 3/24 [00:16<01:57,  5.59s/it]2026-03-03 08:05:27,801 eval INFO: 
+Task: mniah_003_10000_3needles | 3 needles in 10000 chars
+2026-03-03 08:05:34,121 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: SECRET_CODE_QUEBEC: 7X9-BLUE
+SECRET_CODE_SIERRA: VL2-JADE
+SECRET_CODE_NOVEMBER: XP5-SLATE | 6.3s
+Multi-NIAH:  17%|█▋        | 4/24 [00:22<01:57,  5.88s/it]2026-03-03 08:05:34,121 eval INFO: 
+Task: mniah_004_20000_5needles | 5 needles in 20000 chars

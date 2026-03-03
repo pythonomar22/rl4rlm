@@ -1,0 +1,47 @@
+2026-03-03 04:56:04,529 rl INFO: Loading base model: Qwen/Qwen3-1.7B
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.97it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.37it/s]
+2026-03-03 04:56:06,418 rl INFO: Loading LoRA adapter: data/sft/lora_v2/final
+2026-03-03 04:56:06,708 rl INFO: Trainable parameters: 17.4M
+2026-03-03 04:56:06,715 rl INFO:   Task type: multi_niah (O(K) needle search)
+2026-03-03 04:56:06,715 rl INFO: 
+Starting GRPO training:
+2026-03-03 04:56:06,715 rl INFO:   K=4 trajectories per prompt
+2026-03-03 04:56:06,715 rl INFO:   2 prompts per step
+2026-03-03 04:56:06,715 rl INFO:   30 steps
+2026-03-03 04:56:06,715 rl INFO:   30 total tasks in pool
+2026-03-03 04:56:06,715 rl INFO:   Reward function: multi_niah
+2026-03-03 05:05:50,675 rl INFO: Step 3/30 | Reward: 0.418 | Correct: 3/8 | Loss: 0.6417 | Updates: 11 | Turns: 1.4 | Time: 584s
+2026-03-03 05:13:11,553 rl INFO: Step 6/30 | Reward: 0.544 | Correct: 4/8 | Loss: 0.0342 | Updates: 8 | Turns: 1.0 | Time: 1025s
+2026-03-03 05:21:37,128 rl INFO: Step 9/30 | Reward: 0.528 | Correct: 4/8 | Loss: -0.1405 | Updates: 8 | Turns: 1.0 | Time: 1530s
+2026-03-03 05:27:47,796 rl INFO:   Sample 0: recall=0.00 (0/3) answer=not found
+2026-03-03 05:27:55,378 rl INFO:   Sample 1: recall=1.00 (3/3) answer=The relevant sentences are:
+
+1. SECRET_CODE_OSCAR: 4H7-PURPLE  
+2. SECRET_CODE_Q
+2026-03-03 05:28:00,360 rl INFO:   Sample 2: recall=0.00 (0/3) answer=
+2026-03-03 05:28:00,782 rl INFO:   Saved checkpoint: data/rl/grpo_v2/checkpoint-10
+2026-03-03 05:32:22,096 rl INFO: Step 12/30 | Reward: 0.730 | Correct: 7/8 | Loss: 0.0274 | Updates: 8 | Turns: 1.0 | Time: 2175s
+2026-03-03 05:42:06,174 rl INFO: Step 15/30 | Reward: 0.710 | Correct: 6/8 | Loss: -0.0077 | Updates: 8 | Turns: 1.0 | Time: 2759s
+2026-03-03 05:48:36,181 rl INFO: Step 18/30 | Reward: 0.505 | Correct: 3/8 | Loss: -0.0181 | Updates: 7 | Turns: 1.0 | Time: 3149s
+2026-03-03 05:55:37,205 rl INFO:   Sample 0: recall=0.00 (0/3) answer=not found
+2026-03-03 05:55:42,911 rl INFO:   Sample 1: recall=1.00 (3/3) answer=4H7-PURPLE, 8M4-GREEN, 6T5-WHITE,SECRET_CODE_[NAME]: [VALUE]
+2026-03-03 05:55:47,820 rl INFO:   Sample 2: recall=0.00 (0/3) answer=not found
+2026-03-03 05:55:48,144 rl INFO:   Saved checkpoint: data/rl/grpo_v2/checkpoint-20
+2026-03-03 05:59:48,963 rl INFO: Step 21/30 | Reward: 0.390 | Correct: 3/8 | Loss: 0.7568 | Updates: 13 | Turns: 1.6 | Time: 3822s
+2026-03-03 06:09:35,280 rl INFO: Step 24/30 | Reward: 0.213 | Correct: 2/8 | Loss: -0.1360 | Updates: 4 | Turns: 1.0 | Time: 4409s
+2026-03-03 06:15:12,113 rl INFO: Step 27/30 | Reward: 0.573 | Correct: 6/8 | Loss: 0.0323 | Updates: 8 | Turns: 1.0 | Time: 4745s
+2026-03-03 06:24:01,335 rl INFO: Step 30/30 | Reward: 0.761 | Correct: 7/8 | Loss: 0.7476 | Updates: 9 | Turns: 1.1 | Time: 5275s
+2026-03-03 06:24:06,024 rl INFO:   Sample 0: recall=0.00 (0/3) answer=Not found
+2026-03-03 06:24:14,203 rl INFO:   Sample 1: recall=1.00 (3/3) answer=The relevant sentences are:
+
+1. **SECRET_CODE_OSCAR: 4H7-PURPLE**  
+2. **SECRET_
+2026-03-03 06:24:18,986 rl INFO:   Sample 2: recall=0.00 (0/3) answer=
+2026-03-03 06:24:19,321 rl INFO:   Saved checkpoint: data/rl/grpo_v2/checkpoint-30
+2026-03-03 06:24:19,706 rl INFO: 
+============================================================
+2026-03-03 06:24:19,706 rl INFO: RL TRAINING COMPLETE
+2026-03-03 06:24:19,706 rl INFO: ============================================================
+2026-03-03 06:24:19,706 rl INFO: Final avg reward: 0.761
+2026-03-03 06:24:19,706 rl INFO: Total time: 5293s (1.47 GPU-hours)
+2026-03-03 06:24:19,706 rl INFO: Saved to: data/rl/grpo_v2/final

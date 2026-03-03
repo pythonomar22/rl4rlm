@@ -1,0 +1,22 @@
+{
+  "base_model": "Qwen/Qwen3-1.7B",
+  "model": "data/sft/lora_v3/final",
+  "output": "data/sft/dpo_v1",
+  "k": 8,
+  "n_niah_tasks": 15,
+  "n_mniah_tasks": 20,
+  "min_reward_gap": 0.15,
+  "beta": 0.1,
+  "lr": 5e-06,
+  "epochs": 3,
+  "save_interval": 50,
+  "doc_lengths": [
+    5000,
+    10000,
+    20000,
+    50000
+  ],
+  "skip_generation": false,
+  "pairs_file": null,
+  "timestamp": "20260303_180713"
+}

@@ -1,15 +1,4 @@
-# Data and results (never commit)
-data/
-results/
-eval/data/
-
-# Model weights
-*.pt
-*.safetensors
-*.bin
-*.gguf
-
-# Python
+# Python build artifacts
 __pycache__/
 *.pyc
 *.pyo
@@ -18,8 +7,13 @@ dist/
 build/
 .eggs/
 
-# Environment
+# Virtual environment
 .venv/
+
+# HuggingFace cache
+.cache/
+
+# Environment secrets
 .env
 
 # IDE
@@ -32,8 +26,12 @@ build/
 .DS_Store
 Thumbs.db
 
-# Logs (keep in results/, not root)
-*.log
+# Internal docs (not for public repo)
+CLAUDE.md
+CLUSTER_SAFETY.md
+paper.md
+PAPER_REFERENCE.md
+RLM.md
+icmltemplate/
+ideas/
 
-# HuggingFace cache
-.cache/

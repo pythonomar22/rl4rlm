@@ -1,0 +1,103 @@
+{
+  "results": [
+    {
+      "task": "needle_in_haystack",
+      "question": "Find the secret code hidden in the context.",
+      "expected": "ALPHA-7",
+      "answer": "The secret code is ALPHA-7.  \n\"The secret code is ALPHA-7.\"",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 7.127417325973511,
+      "quality": {
+        "valid_code": true,
+        "uses_context": true,
+        "uses_llm_query": true,
+        "uses_FINAL": true,
+        "has_errors": false
+      },
+      "correct": true
+    },
+    {
+      "task": "count_lines",
+      "question": "How many lines are in the context?",
+      "expected": "100",
+      "answer": "103",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 19.935680389404297,
+      "quality": {
+        "valid_code": true,
+        "uses_context": true,
+        "uses_llm_query": false,
+        "uses_FINAL": true,
+        "has_errors": true
+      },
+      "correct": false
+    },
+    {
+      "task": "first_and_last",
+      "question": "What is the first word and the last word of the context?",
+      "expected": "FIRST_WORD",
+      "answer": "QUESTION: LAST_WORD",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 31.776975870132446,
+      "quality": {
+        "valid_code": true,
+        "uses_context": true,
+        "uses_llm_query": false,
+        "uses_FINAL": true,
+        "has_errors": true
+      },
+      "correct": false
+    },
+    {
+      "task": "simple_extraction",
+      "question": "What is the person's name and city?",
+      "expected": "Alice",
+      "answer": "The document content is missing. Please provide the specific text you'd like me to analyze, and I'll extract the name and city from it.",
+      "terminated": true,
+      "num_turns": 4,
+      "total_time": 52.63871431350708,
+      "quality": {
+        "valid_code": true,
+        "uses_context": true,
+        "uses_llm_query": true,
+        "uses_FINAL": true,
+        "has_errors": true
+      },
+      "correct": false
+    },
+    {
+      "task": "length_check",
+      "question": "How many characters are in the context?",
+      "expected": "5000",
+      "answer": "5061",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 14.37200117111206,
+      "quality": {
+        "valid_code": true,
+        "uses_context": false,
+        "uses_llm_query": false,
+        "uses_FINAL": true,
+        "has_errors": true
+      },
+      "correct": false
+    }
+  ],
+  "diagnostics": {
+    "pct_valid_code": 100.0,
+    "pct_context": 80.0,
+    "pct_llm_query": 40.0,
+    "pct_final": 100.0,
+    "pct_correct": 20.0
+  },
+  "model_stats": {
+    "root_calls": 11,
+    "sub_calls": 4,
+    "total_input_tokens": 14183,
+    "total_output_tokens": 6695,
+    "total_time": 125.76988196372986
+  }
+}

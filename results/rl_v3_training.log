@@ -1,0 +1,69 @@
+2026-03-03 08:30:46,862 rl INFO: Loading base model: Qwen/Qwen3-1.7B
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.73it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.96it/s]
+2026-03-03 08:30:48,842 rl INFO: Loading LoRA adapter: data/sft/lora_v2/final
+2026-03-03 08:30:49,138 rl INFO: Trainable parameters: 17.4M
+2026-03-03 08:30:49,142 rl INFO:   Task type: mixed (NIAH + multi-NIAH)
+2026-03-03 08:30:49,142 rl INFO:   NIAH tasks: 20, multi-NIAH tasks: 12
+2026-03-03 08:30:49,147 rl INFO:   KL regularization: coeff=0.02, saved 392 reference weight tensors
+2026-03-03 08:30:49,147 rl INFO: 
+Starting GRPO training:
+2026-03-03 08:30:49,147 rl INFO:   K=4 trajectories per prompt
+2026-03-03 08:30:49,147 rl INFO:   2 prompts per step
+2026-03-03 08:30:49,147 rl INFO:   40 steps
+2026-03-03 08:30:49,147 rl INFO:   Reward function: mixed
+2026-03-03 08:30:49,147 rl INFO:   KL coeff: 0.02
+2026-03-03 08:33:44,518 rl INFO: Step 3/40 | Reward: 0.538 | Correct: 5/8 | Loss: 0.0782 | KL: 0.000000 | Updates: 4 | Turns: 1.0 | Time: 175s
+2026-03-03 08:38:33,123 rl INFO: Step 6/40 | Reward: 0.663 | Correct: 6/8 | Loss: -0.1596 | KL: 0.000000 | Updates: 8 | Turns: 1.0 | Time: 464s
+2026-03-03 08:40:56,411 rl INFO: Step 9/40 | Reward: 0.725 | Correct: 7/8 | Loss: 0.1576 | KL: 0.000000 | Updates: 3 | Turns: 1.0 | Time: 607s
+2026-03-03 08:41:54,913 rl INFO:   Sample 0: score=1.0 answer=The critical deadline is **Dr. Elena Rodriguez**.
+
+This is explicitly stated in 
+2026-03-03 08:42:01,331 rl INFO:   Sample 1: score=1.0 answer=The meeting is scheduled for **$12.7 billion**.
+
+**Explanation:**  
+The question
+2026-03-03 08:42:06,717 rl INFO:   Sample 2: recall=0.00 (0/3) answer=not found
+2026-03-03 08:42:07,069 rl INFO:   Saved checkpoint: data/sft/rl_v3/checkpoint-10
+2026-03-03 08:45:37,950 rl INFO: Step 12/40 | Reward: 0.663 | Correct: 6/8 | Loss: 0.0158 | KL: 0.000000 | Updates: 8 | Turns: 1.0 | Time: 889s
+2026-03-03 08:49:56,927 rl INFO: Step 15/40 | Reward: 0.763 | Correct: 8/8 | Loss: -0.1060 | KL: 0.000000 | Updates: 4 | Turns: 1.0 | Time: 1148s
+2026-03-03 08:54:22,657 rl INFO: Step 18/40 | Reward: 0.628 | Correct: 6/8 | Loss: 0.1587 | KL: 0.000000 | Updates: 4 | Turns: 1.0 | Time: 1414s
+2026-03-03 08:56:53,525 rl INFO:   Sample 0: score=1.0 answer=The critical deadline is **Dr. Elena Rodriguez**.
+
+This is explicitly stated in 
+2026-03-03 08:56:59,672 rl INFO:   Sample 1: score=0.0 answer=The question is asking for the **scheduled date of the meeting**. However, **non
+2026-03-03 08:57:06,238 rl INFO:   Sample 2: recall=1.00 (3/3) answer=The values are: BH1-PEARL, YM2-BRONZE, 0R9-CYAN.
+2026-03-03 08:57:06,541 rl INFO:   Saved checkpoint: data/sft/rl_v3/checkpoint-20
+2026-03-03 08:57:52,860 rl INFO: Step 21/40 | Reward: 0.515 | Correct: 5/8 | Loss: 0.0623 | KL: 0.000000 | Updates: 4 | Turns: 1.0 | Time: 1624s
+2026-03-03 09:01:24,846 rl INFO: Step 24/40 | Reward: 0.808 | Correct: 8/8 | Loss: 0.0634 | KL: 0.000000 | Updates: 4 | Turns: 1.0 | Time: 1836s
+2026-03-03 09:04:45,874 rl INFO: Step 27/40 | Reward: 0.425 | Correct: 4/8 | Loss: 0.0000 | KL: 0.000000 | Updates: 0 | Turns: 1.0 | Time: 2037s
+2026-03-03 09:11:10,504 rl INFO: Step 30/40 | Reward: 0.785 | Correct: 8/8 | Loss: 0.1319 | KL: 0.000000 | Updates: 2 | Turns: 1.0 | Time: 2421s
+2026-03-03 09:11:16,048 rl INFO:   Sample 0: score=1.0 answer=The relevant sentence is: **"The critical deadline is Dr. Elena Rodriguez."**
+2026-03-03 09:11:26,731 rl INFO:   Sample 1: score=1.0 answer=The meeting is scheduled for **$12.7 billion**.
+
+---
+
+**Explanation:**
+
+The ques
+2026-03-03 09:11:33,210 rl INFO:   Sample 2: recall=1.00 (3/3) answer=3, BH1-PEARL, YM2-BRONZE, 0R9-CYAN
+2026-03-03 09:11:33,540 rl INFO:   Saved checkpoint: data/sft/rl_v3/checkpoint-30
+2026-03-03 09:17:42,128 rl INFO: Step 33/40 | Reward: 0.653 | Correct: 6/8 | Loss: -0.0363 | KL: 0.000000 | Updates: 8 | Turns: 1.0 | Time: 2813s
+2026-03-03 09:21:23,532 rl INFO: Step 36/40 | Reward: 0.650 | Correct: 6/8 | Loss: -0.1346 | KL: 0.000000 | Updates: 4 | Turns: 1.0 | Time: 3034s
+2026-03-03 09:24:06,529 rl INFO: Step 39/40 | Reward: 0.613 | Correct: 6/8 | Loss: 0.0250 | KL: 0.000000 | Updates: 4 | Turns: 1.0 | Time: 3197s
+2026-03-03 09:25:33,126 rl INFO:   Sample 0: score=1.0 answer=The critical deadline is Dr. Elena Rodriguez.
+2026-03-03 09:25:40,153 rl INFO:   Sample 1: score=1.0 answer=The meeting is scheduled for **$12.7 billion**.
+
+---
+
+**Explanation:**
+
+The only
+2026-03-03 09:25:45,731 rl INFO:   Sample 2: recall=0.00 (0/3) answer=not found
+2026-03-03 09:25:46,208 rl INFO:   Saved checkpoint: data/sft/rl_v3/checkpoint-40
+2026-03-03 09:25:46,569 rl INFO: 
+============================================================
+2026-03-03 09:25:46,569 rl INFO: RL TRAINING COMPLETE
+2026-03-03 09:25:46,569 rl INFO: ============================================================
+2026-03-03 09:25:46,569 rl INFO: Final avg reward: 0.875
+2026-03-03 09:25:46,569 rl INFO: Total time: 3297s (0.92 GPU-hours)
+2026-03-03 09:25:46,569 rl INFO: Saved to: data/sft/rl_v3/final

@@ -1,0 +1,252 @@
+[
+  {
+    "task_idx": 4,
+    "task_type": "multi_niah",
+    "winner_reward": 0.7300000000000001,
+    "loser_reward": 0.010000000000000002,
+    "winner_answer": "COMMA_SEPARATED_VALUES: VL2-JADE,BH1-PEARL,FS7-ONYX,0R9-CYAN,SECRET_CODE_[NAME]: [VALUE]",
+    "loser_answer": "3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54,",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 0,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.010000000000000002,
+    "winner_answer": "SECRET_CODE_OSCAR: BH1-PEARL\nSECRET_CODE_BRAVO: YM2-BRONZE\nSECRET_CODE_FOXTROT: 0R9-CYAN",
+    "loser_answer": "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 13,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.46,
+    "winner_answer": "6T5-WHITE, 9J3-ORANGE, UC7-CHROME,COMMA_SEPARATED_LIST: 2W6-SILVER,4H7-PURPLE,8M4-GREEN,DK6-AMBER,COMMA_SEPARATED_LIST: FS7-ONYX,FS7-ONYX,FS7-ONYX,FS7-ONYX,FS7-ONYX,FS7-ONYX,FS7-ONYX,FS7-ONYX,FS7-ONYX",
+    "loser_answer": "COMMA_SEPARATED_LIST: 2W6-SILVER,4H7-PURPLE,8M4-GREEN,DK6-AMBER",
+    "winner_turns": 1,
+    "loser_turns": 2
+  },
+  {
+    "task_idx": 7,
+    "task_type": "niah",
+    "winner_reward": 0.8400000000000001,
+    "loser_reward": 0.04000000000000001,
+    "winner_answer": "The total budget is ECHO-365.\n\n**Relevant sentence:** The budget total is ECHO-365.",
+    "loser_answer": "",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 16,
+    "task_type": "multi_niah",
+    "winner_reward": 0.23500000000000001,
+    "loser_reward": 0.0,
+    "winner_answer": "XP5-SLATE,2W6-SILVER",
+    "loser_answer": "None",
+    "winner_turns": 5,
+    "loser_turns": 6
+  },
+  {
+    "task_idx": 4,
+    "task_type": "niah",
+    "winner_reward": 0.8400000000000001,
+    "loser_reward": 0.04000000000000001,
+    "winner_answer": "The project codename is **JULIET-99**.",
+    "loser_answer": "not found\n\nThe question asks for the \"project codename,\" but **no document** provides any information about a project codename. The text is a series of unrelated statements about conferences, budgets,",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 3,
+    "task_type": "niah",
+    "winner_reward": 0.8400000000000001,
+    "loser_reward": -0.04000000000000001,
+    "winner_answer": "The project codename is $12.7 billion.\n\n**Answer:** $12.7 billion.",
+    "loser_answer": "not found",
+    "winner_turns": 1,
+    "loser_turns": 5
+  },
+  {
+    "task_idx": 19,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.0,
+    "winner_answer": "3, 6T5-WHITE, BH1-PEARL,comma-separated list: UC7-CHROME,2023-10-01, QZ4-RUBY, 2023-11-01, WN8-IVORY,comma-separated list: FS7-ONYX, FS7-ONYX, FS7-ONYX, FS7-ONYX, FS7-ONYX, FS7-ONYX, FS7-ONYX, FS7-ONY",
+    "loser_answer": "None",
+    "winner_turns": 1,
+    "loser_turns": 6
+  },
+  {
+    "task_idx": 2,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.010000000000000002,
+    "winner_answer": "3, UC7-CHROME, 6T5-WHITE, BH1-PEARL",
+    "loser_answer": "not found",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 7,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.010000000000000002,
+    "winner_answer": "COMMA_SEPARATED_LIST: UC7-CHROME,0R9-CYAN,1N8-BLACK,7X9-BLUE,DK6-AMBER,SECRET_CODE_[NAME]: [VALUE]  \nnormal activity levels.  \nThe conference attracted participants from numerous countries.  \nInternat",
+    "loser_answer": "Not found",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 5,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.010000000000000002,
+    "winner_answer": "SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_QUEBEC: BH1-PEARL  \nSECRET_CODE_JULIET: 6T5-WHITE  \nSECRET_CODE_ECHO: FS7-ONYX  \nSECRET_CODE_CHARLIE: 2W6-SILVER  \nSECRET_CODE_MIKE: DK6-AMBER,SECRET_CODE_[NA",
+    "loser_answer": "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 12,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.46,
+    "winner_answer": "SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_QUEBEC: 5P1-GOLD  \nSECRET_CODE_MIKE: UC7-CHROME  \nSECRET_CODE_DELTA: BH1-PEARL,SECRET_CODE_PAPA: GT3-CORAL, SECRET_CODE_KILO: DK6-AMBER, SECRET_CODE_INDIA: 8M",
+    "loser_answer": "The relevant sentences are:\n\n1. SECRET_CODE_QUEBEC: 5P1-GOLD  \n2. SECRET_CODE_MIKE: UC7-CHROME  \n3. SECRET_CODE_DELTA: BH1-PEARL\n\nThe values are:  \n5P1-GOLD, UC7-CHROME, BH1-PEARL, The relevant senten",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 10,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.7300000000000001,
+    "winner_answer": "COMMA_SEPARATED_LIST: GT3-CORAL,1N8-BLACK,COMMA_SEPARATED_LIST: SECRET_CODE_INDIA: 7X9-BLUE,SECRET_CODE_NOVEMBER: DK6-AMBER,2W6-SILVER,SECRET_CODE_KILO: 2W6-SILVER",
+    "loser_answer": "3-CORAL,1N8-BLACK,7X9-BLUE, DK6-AMBER,2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SI",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 6,
+    "task_type": "niah",
+    "winner_reward": 0.8400000000000001,
+    "loser_reward": 0.04000000000000001,
+    "winner_answer": "The vault password is **Agent Sarah Miller**.\n\n**Reason:** The document contains the line:  \n**\"The password for the vault is Agent Sarah Miller.\"**\n\nThis is the only mention of a vault password in th",
+    "loser_answer": "",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 17,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.0,
+    "winner_answer": "8M4-GREEN,7X9-BLUE,SECRET_CODE_FS7-ONYX: 1,SECRET_CODE_CHARLIE: 1,SECRET_CODE_[NAME]: 1,SECRET_CODE_[VALUE]: 1,SECRET_CODE_[NAME]: 1,SECRET_CODE_[VALUE]: 1,SECRET_CODE_[NAME]: 1,SECRET_CODE_[VALUE]: 1",
+    "loser_answer": "None",
+    "winner_turns": 1,
+    "loser_turns": 6
+  },
+  {
+    "task_idx": 1,
+    "task_type": "niah",
+    "winner_reward": 0.8400000000000001,
+    "loser_reward": 0.04000000000000001,
+    "winner_answer": "The meeting is scheduled for **$12.7 billion**.\n\n---\n\n**Note:** The text you provided appears to be a mix of unrelated information, including statements about communication systems, safety inspections",
+    "loser_answer": "Not found",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 13,
+    "task_type": "niah",
+    "winner_reward": 0.8400000000000001,
+    "loser_reward": 0.04000000000000001,
+    "winner_answer": "The key contact person is **JULIET-99**.",
+    "loser_answer": "Not found",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 6,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.37000000000000005,
+    "winner_answer": "COMMA_SEPARATED_VALUES: BH1-PEARL,XP5-SLATE,6T5-WHITE,9J3-ORANGE,4H7-PURPLE,SECRET_CODE_[NAME]: [VALUE]  \n1: rograms  \n2: were  \n3: expanded  \n4: to  \n5: include  \n6: additional  \n7: departments.  \n8:",
+    "loser_answer": "3T5-WHITE, 6T5-SLATE, 9J3-ORANGE, 4H7-PURPLE,SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VALUE]",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 15,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.1225,
+    "winner_answer": "3K2-RED, QZ4-RUBY, 6T5-WHITE,5P1-GOLD,1N8-BLACK,VL2-JADE,8M4-GREEN,GT3-CORAL",
+    "loser_answer": "SECRET_CODE_OSCAR: 5P1-GOLD\n\nThis is the relevant sentence.",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 14,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.5725,
+    "winner_answer": "COMMA_SEPARATED_VALUES: 5P1-GOLD,WN8-IVORY,XP5-SLATE,COMMA_SEPARATED_LIST: VL2-JADE,2W6-SILVER,3K2-RED,SECRET_CODE_KILO: YM2-BRONZE\nSECRET_CODE_ROMEO: 8M4-GREEN",
+    "loser_answer": "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 9,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.19000000000000003,
+    "winner_answer": "1N8-BLACK,WN8-IVORY,COMMA_SEPARATED_VALUES: FS7-ONYX,6T5-WHITE,33, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4",
+    "loser_answer": "The relevant sentence is:  \n**SECRET_CODE_LIMA: QZ4-RUBY**",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 11,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.010000000000000002,
+    "winner_answer": "COMMA_SEPARATED_VALUES: FS7-ONYX, YM2-BRONZE,comma-separated list: XP5-SLATE, DK6-AMBER,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-",
+    "loser_answer": "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+    "winner_turns": 1,
+    "loser_turns": 4
+  },
+  {
+    "task_idx": 8,
+    "task_type": "niah",
+    "winner_reward": 0.8400000000000001,
+    "loser_reward": 0.04000000000000001,
+    "winner_answer": "The project codename is **September 3 2024**.\n\n**Answer:** September 3 2024.",
+    "loser_answer": "Not found",
+    "winner_turns": 1,
+    "loser_turns": 1
+  },
+  {
+    "task_idx": 8,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.0,
+    "winner_answer": "3, BH1-PEARL, YM2-BRONZE, 1, 2, 3, 4, 5,2W6-SILVER,1N8-BLACK,7X9-BLUE,SECRET_CODE_FOXTROT: 7X9-BLUE",
+    "loser_answer": "None",
+    "winner_turns": 1,
+    "loser_turns": 6
+  },
+  {
+    "task_idx": 18,
+    "task_type": "multi_niah",
+    "winner_reward": 0.91,
+    "loser_reward": 0.1225,
+    "winner_answer": "COMMA_SEPARATED_VALUES: DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AM",
+    "loser_answer": "SECRET_CODE_HOTEL: DK6-AMBER, TRAINING_PROGRAMS: EXPANDED, NEW_POLICIES: IMPLEMENTED, TECHNICAL_TEAM: RESOLVED, WEATHER: PLENTLY, BUDGET_ALLOCATIONS: REVIEWED, ANNUAL_REVIEW: HIGHLIGHTED, RESEARCH_TEA",
+    "winner_turns": 1,
+    "loser_turns": 3
+  }
+]

@@ -1,0 +1,849 @@
+{
+  "niah_info": [
+    {
+      "task_idx": 0,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "The critical deadline is **Dr. Elena Rodriguez**.\n\nThis is explicitly stated in the document:  \n**\"T",
+        "The critical deadline is **Dr. Elena Rodriguez**.\n\nThis is explicitly stated in the document:  \n**\"T",
+        "The critical deadline is **Dr. Elena Rodriguez**.\n\nThis is explicitly stated in the document:  \n**\"T",
+        "The critical deadline is Dr. Elena Rodriguez.",
+        "The critical deadline is **Dr. Elena Rodriguez**.\n\nThis is explicitly stated in the document:  \n**\"T",
+        "The critical deadline is **Dr. Elena Rodriguez**.\n\nThis is explicitly stated in the document:  \n**\"T",
+        "The critical deadline is Dr. Elena Rodriguez.\n\nThis is stated directly in the document.",
+        "The critical deadline is **Dr. Elena Rodriguez**.\n\nThis is explicitly stated in the document:  \n**\"T"
+      ]
+    },
+    {
+      "task_idx": 1,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.04000000000000001
+      ],
+      "answers": [
+        "The meeting is scheduled for **$12.7 billion**.\n\n---\n\n**Note:** The text you provided appears to be ",
+        "The meeting is scheduled for **$12.7 billion**.\n\n**Explanation:**\n\nThe question \"When is the meeting",
+        "The meeting is scheduled for **$12.7 billion**.\n\n**Explanation:**  \nThe question asks, \"When is the ",
+        "The meeting is scheduled for **$12.7 billion**.\n\nThis is explicitly stated in the provided text:  \n*",
+        "The meeting is scheduled for **$12.7 billion**.\n\n---\n\n**Note:** The phrase \"The meeting is scheduled",
+        "Based on the provided text, the only mention of a **meeting** is:\n\n> **\"The meeting is scheduled for",
+        "The meeting is scheduled for **$12.7 billion**.\n\n---\n\n**Explanation:**\n\nThe question asks, \"When is ",
+        "Not found"
+      ]
+    },
+    {
+      "task_idx": 2,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "The secret code is CHARLIE-19.\n\nRelevant sentence: \"The secret code is CHARLIE-19.\"",
+        "The secret code is **CHARLIE-19**.\n\nThis is inferred from the line:\n\n**\"The secret code is CHARLIE-1",
+        "The secret code is **CHARLIE-19**.\n\nThis is inferred from the line:\n\n**\"The secret code is CHARLIE-1",
+        "The secret code is **CHARLIE-19**.\n\nThis is determined from the document, which includes the line:\n\n",
+        "The relevant sentence is: **\"The secret code is CHARLIE-19.\"**\n\nThus, the answer is: **The secret co",
+        "The secret code is CHARLIE-19.",
+        "The secret code is CHARLIE-19.",
+        "The secret code is **CHARLIE-19**.\n\nThis is determined by looking for the phrase **\"CHARLIE-19\"** in"
+      ]
+    },
+    {
+      "task_idx": 3,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        -0.04000000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.04000000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "The project codename is $12.7 billion.\n\n**Answer:** $12.7 billion.",
+        "not found",
+        "The project codename is $12.7 billion.\n\n**Answer:** $12.7 billion.",
+        "The project codename is $12.7 billion.\n\n**Answer:** $12.7 billion.",
+        "The project codename is not found in the provided text.\n\n**Answer:** not found",
+        "The project codename is $12.7 billion.\n\nThis sentence is found in the document.",
+        "The project codename is $12.7 billion.\n\n**Answer:** $12.7 billion.",
+        "The project codename is $12.7 billion.\n\n**Answer:** $12.7 billion."
+      ]
+    },
+    {
+      "task_idx": 4,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.04000000000000001,
+        0.04000000000000001
+      ],
+      "answers": [
+        "The project codename is **JULIET-99**.",
+        "The project codename is **JULIET-99**.\n\n**Answer:** JULIET-99",
+        "The project codename is **JULIET-99**.\n\n**Answer:** JULIET-99",
+        "The project codename is **JULIET-99**.",
+        "The project codename is **JULIET-99**.\n\nThis is explicitly stated in the document:\n\n> **The project ",
+        "The project codename is **JULIET-99**.\n\n**Answer:** JULIET-99",
+        "not found\n\nThe question asks for the \"project codename,\" but **no document** provides any informatio",
+        "not found\n\nThe question asks for the \"project codename,\" but **no document** provides information ab"
+      ]
+    },
+    {
+      "task_idx": 5,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "The key contact person is September 3 2024.",
+        "The key contact person is September 3 2024.",
+        "The key contact person is September 3 2024.",
+        "The key contact person is **September 3 2024**.\n\nThis is explicitly stated in the document. No other",
+        "The key contact person is **September 3 2024**.\n\nThis is explicitly stated in the document.",
+        "The key contact person is September 3 2024.",
+        "The key contact person is September 3 2024.",
+        "The key contact person is **September 3 2024**.\n\n**Explanation:**  \nThe only mention of a \"key conta"
+      ]
+    },
+    {
+      "task_idx": 6,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.04000000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "The vault password is **Agent Sarah Miller**.\n\n**Reason:** The document contains the line:  \n**\"The ",
+        "The vault password is **Agent Sarah Miller**.\n\nThis is explicitly stated in the provided document.",
+        "The vault password is **Agent Sarah Miller**.\n\nThis is explicitly stated in the provided document.",
+        "",
+        "The vault password is **Agent Sarah Miller**.\n\nThis is explicitly stated in the provided document.",
+        "The password for the vault is Agent Sarah Miller.",
+        "The vault password is **Agent Sarah Miller**.\n\nThis is explicitly stated in the provided document.",
+        "The vault password is **Agent Sarah Miller**.\n\nThis is explicitly stated in the provided document."
+      ]
+    },
+    {
+      "task_idx": 7,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.04000000000000001,
+        0.04000000000000001
+      ],
+      "answers": [
+        "The total budget is ECHO-365.\n\n**Relevant sentence:** The budget total is ECHO-365.",
+        "The total budget is ECHO-365.",
+        "The total budget is ECHO-365.",
+        "The total budget is ECHO-365.",
+        "The total budget is ECHO-365.",
+        "The total budget is ECHO-365.\n\n**Relevant sentence:** The budget total is ECHO-365.",
+        "",
+        "The question is asking for the **budget total**, but the provided document does **not** contain any "
+      ]
+    },
+    {
+      "task_idx": 8,
+      "task_type": "niah",
+      "rewards": [
+        0.04000000000000001,
+        0.8400000000000001,
+        0.04000000000000001,
+        0.8400000000000001,
+        0.04000000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "Not found",
+        "The project codename is **September 3 2024**.\n\n**Answer:** September 3 2024.",
+        "not found",
+        "The project codename is **September 3 2024**.\n\n**Reason:** The phrase \"September 3 2024\" appears in ",
+        "not found",
+        "The project codename is **September 3 2024**.\n\n**Answer:** September 3 2024.",
+        "The project codename is **September 3 2024**.\n\n**Answer:** September 3 2024.",
+        "The project codename is **September 3 2024**.\n\n**Answer:** September 3 2024."
+      ]
+    },
+    {
+      "task_idx": 9,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "The assigned location is **Building 7 Room 304**.\n\n**Answer:** Building 7 Room 304",
+        "The assigned location is **Building 7 Room 304**.\n\n**Answer: Building 7 Room 304**",
+        "The assigned location is **Building 7 Room 304**.\n\n**Answer:** Building 7 Room 304",
+        "The assigned location is **Building 7 Room 304**.\n\n**Answer: Building 7 Room 304**.",
+        "The assigned location is **Building 7 Room 304**.\n\n**Answer:** Building 7 Room 304",
+        "The assigned location is **Building 7 Room 304**.\n\n**Reason:** The sentence \"The assigned location i",
+        "The assigned location is **Building 7 Room 304**.\n\n**Reasoning:**  \nThe sentence \"The assigned locat",
+        "The assigned location is **Building 7 Room 304**.\n\n**Answer:** Building 7 Room 304."
+      ]
+    },
+    {
+      "task_idx": 10,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "The secret code is **Dr. Elena Rodriguez**.\n\n**Reasoning:**\n- The document contains a series of stat",
+        "The secret code is Dr. Elena Rodriguez.\n\n**Relevant sentence:**  \nThe secret code is Dr. Elena Rodri",
+        "The secret code is **Dr. Elena Rodriguez**.\n\nThis is inferred from the document, which contains a fe",
+        "The secret code is **Dr. Elena Rodriguez**.\n\n**Reasoning:**  \nThe document contains a series of stat",
+        "The secret code is Dr. Elena Rodriguez.\n\nRelevant sentence: \"The secret code is Dr. Elena Rodriguez.",
+        "The secret code is **Dr. Elena Rodriguez**.\n\n**Reasoning:**\n- The document contains a series of repe",
+        "Based on the provided text, the **secret code** is:\n\n**Dr. Elena Rodriguez**\n\nThis is explicitly sta",
+        "The secret code is **Dr. Elena Rodriguez**.\n\n**Reasoning:**  \nThe document contains a series of repe"
+      ]
+    },
+    {
+      "task_idx": 11,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "The assigned location is $850,000.\n\n**Reason:** The only mention of an \"assigned location\" in the pr",
+        "The assigned location is $850,000.\n\n**Answer:** $850,000.",
+        "The assigned location is $850,000.\n\n**Answer: $850,000**",
+        "The assigned location is $850,000.\n\n**Answer:** $850,000.",
+        "The assigned location is $850,000.\n\n**Reasoning:**\n- The question asks for the \"assigned location.\"\n",
+        "The assigned location is $850,000.\n\n**Relevant sentence:** The assigned location is $850,000.",
+        "The assigned location is $850,000.",
+        "The assigned location is $850,000.\n\n**Answer:** $850,000"
+      ]
+    },
+    {
+      "task_idx": 12,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "The assigned location is INDIA-33.",
+        "The assigned location is INDIA-33.",
+        "The assigned location is INDIA-33.",
+        "The assigned location is INDIA-33.",
+        "The assigned location is INDIA-33.",
+        "The assigned location is INDIA-33.",
+        "The assigned location is INDIA-33.",
+        "The assigned location is INDIA-33."
+      ]
+    },
+    {
+      "task_idx": 13,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.04000000000000001,
+        0.04000000000000001
+      ],
+      "answers": [
+        "The key contact person is **JULIET-99**.",
+        "The key contact person is **JULIET-99**.\nThe query is incomplete and does not provide enough informa",
+        "The key contact person is **JULIET-99**.",
+        "The key contact person is JULIET-99.",
+        "The key contact person is JULIET-99.",
+        "The key contact person is **JULIET-99**.",
+        "Not found",
+        "Not found"
+      ]
+    },
+    {
+      "task_idx": 14,
+      "task_type": "niah",
+      "rewards": [
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001,
+        0.8400000000000001
+      ],
+      "answers": [
+        "The relevant sentence is: \"The password for the vault is Building 7 Room 304.\"",
+        "The password for the vault is Building 7 Room 304.",
+        "The relevant sentence is: \"The password for the vault is Building 7 Room 304.\"",
+        "The relevant sentence is: \"The password for the vault is Building 7 Room 304.\"",
+        "The vault password is **Building 7 Room 304**.\n\n**Answer:** Building 7 Room 304",
+        "The vault password is **Building 7 Room 304**.",
+        "The relevant sentence is: \"The password for the vault is Building 7 Room 304.\"",
+        "The vault password is **Building 7 Room 304**.\n\n**Answer:** Building 7 Room 304"
+      ]
+    }
+  ],
+  "mniah_info": [
+    {
+      "task_idx": 0,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.91,
+        0.61,
+        0.91,
+        0.010000000000000002,
+        0.010000000000000002,
+        0.010000000000000002,
+        0.010000000000000002,
+        0.91
+      ],
+      "answers": [
+        "SECRET_CODE_OSCAR: BH1-PEARL\nSECRET_CODE_BRAVO: YM2-BRONZE\nSECRET_CODE_FOXTROT: 0R9-CYAN",
+        "31, 0R9-CYAN, BH1-PEARL",
+        "3, BH1-PEARL, YM2-BRONZE, 0R9-CYAN",
+        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+        "not found",
+        "not found",
+        "not found",
+        "3, BH1-PEARL, YM2-BRONZE, 0R9-CYAN"
+      ]
+    },
+    {
+      "task_idx": 1,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91
+      ],
+      "answers": [
+        "4H7-PURPLE, 8M4-GREEN, 6T5-WHITE",
+        "4H7-PURPLE, 8M4-GREEN, 6T5-WHITE",
+        "4H7-PURPLE, 8M4-GREEN, 6T5-WHITE",
+        "4H7-PURPLE,8M4-GREEN,6T5-WHITE",
+        "The relevant sentences are:\n\n1. SECRET_CODE_OSCAR: 4H7-PURPLE  \n2. SECRET_CODE_QUEBEC: 8M4-GREEN  \n3",
+        "SECRET_CODE_OSCAR: 4H7-PURPLE\nSECRET_CODE_QUEBEC: 8M4-GREEN\nSECRET_CODE_ECHO: 6T5-WHITE",
+        "4H7-PURPLE,8M4-GREEN,6T5-WHITE",
+        "4H7-PURPLE, 8M4-GREEN, 6T5-WHITE"
+      ]
+    },
+    {
+      "task_idx": 2,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.91,
+        0.010000000000000002,
+        0.61,
+        0.91,
+        0.91,
+        0.61,
+        0.91,
+        0.61
+      ],
+      "answers": [
+        "3, UC7-CHROME, 6T5-WHITE, BH1-PEARL",
+        "not found",
+        "36, 6T5-WHITE, BH1-PEARL",
+        "3, UC7-CHROME, 6T5-WHITE, BH1-PEARL",
+        "3, UC7-CHROME, 6T5-WHITE, BH1-PEARL",
+        "4T5-WHITE, BH1-PEARL, UC7-CHROME",
+        "3, UC7-CHROME, 6T5-WHITE, BH1-PEARL",
+        "1000, 6T5-WHITE, BH1-PEARL"
+      ]
+    },
+    {
+      "task_idx": 3,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91
+      ],
+      "answers": [
+        "7X9-BLUE, VL2-JADE, XP5-SLATE",
+        "7X9-BLUE, VL2-JADE, XP5-SLATE",
+        "7X9-BLUE, VL2-JADE, XP5-SLATE",
+        "SECRET_CODE_QUEBEC: 7X9-BLUE\nSECRET_CODE_SIERRA: VL2-JADE\nSECRET_CODE_NOVEMBER: XP5-SLATE",
+        "The relevant sentences are:\n\n1. SECRET_CODE_QUEBEC: 7X9-BLUE  \n2. SECRET_CODE_SIERRA: VL2-JADE  \n3. ",
+        "7X9-BLUE,VL2-JADE,XP5-SLATE",
+        "SECRET_CODE_QUEBEC: 7X9-BLUE,SECRET_CODE_SIERRA: VL2-JADE,SECRET_CODE_NOVEMBER: XP5-SLATE",
+        "7X9-BLUE, VL2-JADE, XP5-SLATE"
+      ]
+    },
+    {
+      "task_idx": 4,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.010000000000000002,
+        0.010000000000000002,
+        0.010000000000000002,
+        0.010000000000000002,
+        0.010000000000000002,
+        0.7300000000000001,
+        0.010000000000000002,
+        0.010000000000000002
+      ],
+      "answers": [
+        "3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,",
+        "3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, ",
+        "3, 5, 7, 9, 11,res.ENVIRONMENTAL_MONITORING_SYSTEMS_RECORDS_NORMAL_ACTIVITY_LEVELS.WEATHER_WAS_PLENT",
+        "3, 5, 7, 9, 11,SECRET_CODE_[NAME]: [VALUE]",
+        "3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, ",
+        "COMMA_SEPARATED_VALUES: VL2-JADE,BH1-PEARL,FS7-ONYX,0R9-CYAN,SECRET_CODE_[NAME]: [VALUE]",
+        "3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,",
+        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+      ]
+    },
+    {
+      "task_idx": 5,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.7300000000000001,
+        0.7300000000000001,
+        0.010000000000000002,
+        0.91,
+        0.010000000000000002,
+        0.010000000000000002,
+        0.7300000000000001,
+        0.7300000000000001
+      ],
+      "answers": [
+        "31, 6T5-WHITE, FS7-ONYX, 2W6-SILVER, DK6-AMBER,SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VA",
+        "321, 6T5-WHITE, FS7-ONYX, 2W6-SILVER, DK6-AMBER,SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [V",
+        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+        "SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_QUEBEC: BH1-PEARL  \nSECRET_CODE_JULIET: 6T5-WHITE  \nSECRET",
+        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+        "not found",
+        "SECRET_CODE_[NAME]: [VALUE]\nBH1-PEARL,6T5-WHITE,2W6-SILVER,DK6-AMBER,SECRET_CODE_[NAME]: [VALUE]",
+        "46, 6T5-WHITE, 2W6-SILVER, DK6-AMBER, FS7-ONYX,SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VA"
+      ]
+    },
+    {
+      "task_idx": 6,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.37000000000000005,
+        0.37000000000000005,
+        0.37000000000000005,
+        0.37000000000000005,
+        0.37000000000000005,
+        0.91,
+        0.91,
+        0.91
+      ],
+      "answers": [
+        "3T5-WHITE, 6T5-SLATE, 9J3-ORANGE, 4H7-PURPLE,SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VALU",
+        "3T5-WHITE, 6T5-SLATE, 9J3-ORANGE, 4H7-PURPLE,SECRET_CODE_[NAME]: [VALUE]",
+        "3T5-WHITE, 6T5-SLATE, 9J3-ORANGE, 4H7-PURPLE,SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VALU",
+        "2T5-WHITE, 6T5-SLATE, 9J3-ORANGE, 4H7-PURPLE,SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VALU",
+        "3T5-WHITE, 6T5-SLATE, 9J3-ORANGE, 4H7-PURPLE,SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VALU",
+        "COMMA_SEPARATED_VALUES: BH1-PEARL,XP5-SLATE,6T5-WHITE,9J3-ORANGE,4H7-PURPLE,SECRET_CODE_[NAME]: [VAL",
+        "COMMA_SEPARATED_LIST: BH1-PEARL,XP5-SLATE,6T5-WHITE,9J3-ORANGE,4H7-PURPLE,SECRET_CODE_DEPARTMENT: LO",
+        "COMMA_SEPARATED_VALUES: BH1-PEARL,XP5-SLATE,6T5-WHITE,9J3-ORANGE,4H7-PURPLE,SECRET_CODE_[NAME]: [VAL"
+      ]
+    },
+    {
+      "task_idx": 7,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.91,
+        0.010000000000000002,
+        0.91,
+        0.91,
+        0.010000000000000002,
+        0.91,
+        0.7300000000000001,
+        0.7300000000000001
+      ],
+      "answers": [
+        "COMMA_SEPARATED_LIST: UC7-CHROME,0R9-CYAN,1N8-BLACK,7X9-BLUE,DK6-AMBER,SECRET_CODE_[NAME]: [VALUE]  ",
+        "Not found",
+        "COMMA_SEPERATED_VALUES: UC7-CHROME,0R9-CYAN,1N8-BLACK,7X9-BLUE,DK6-AMBER,SECRET_CODE_[NAME]: [VALUE]",
+        "SECRET_CODE_NOVEMBER: UC7-CHROME\nSECRET_CODE_DELTA: 0R9-CYAN\nSECRET_CODE_BRAVO: 1N8-BLACK\nSECRET_COD",
+        "not found",
+        "COMMA_SEPARATED_LIST: UC7-CHROME,0R9-CYAN,1N8-BLACK,7X9-BLUE,DK6-AMBER,SECRET_CODE_1: normal activit",
+        "38, 0R9-CYAN, 1N8-BLACK, 7X9-BLUE, DK6-AMBER,SECRET_CODE_1: normal activity levels\nSECRET_CODE_2: Th",
+        "325, 0R9-CYAN, 1N8-BLACK, 7X9-BLUE, DK6-AMBER,SECRET_CODE_[NAME]: [VALUE]  \nnormal activity levels: "
+      ]
+    },
+    {
+      "task_idx": 8,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.7300000000000001,
+        0.0,
+        0.7300000000000001,
+        0.91,
+        0.91,
+        0.91,
+        0.7300000000000001,
+        0.7300000000000001
+      ],
+      "answers": [
+        "The relevant sentence is:  \nSECRET_CODE_NOVEMBER: BH1-PEARL  \nSECRET_CODE_HOTEL: YM2-BRONZE  \n\nThe v",
+        "None",
+        "The relevant sentence is:  \nSECRET_CODE_NOVEMBER: BH1-PEARL  \nSECRET_CODE_HOTEL: YM2-BRONZE  \n\nThe v",
+        "3, BH1-PEARL, YM2-BRONZE, 1, 2, 3, 4, 5,2W6-SILVER,1N8-BLACK,7X9-BLUE,SECRET_CODE_FOXTROT: 7X9-BLUE",
+        "SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_NOVEMBER: BH1-PEARL  \nSECRET_CODE_HOTEL: YM2-BRONZE,2W6-SI",
+        "3, BH1-PEARL, YM2-BRONZE, 1, 2, 3, 4, 5,2W6-SILVER,1N8-BLACK,7X9-BLUE,SECRET_CODE_FOXTROT: 7X9-BLUE",
+        "The relevant sentence is:  \nSECRET_CODE_NOVEMBER: BH1-PEARL  \nSECRET_CODE_HOTEL: YM2-BRONZE  \n\nThe v",
+        "The relevant sentence is:  \n**SECRET_CODE_NOVEMBER: BH1-PEARL**  \n**SECRET_CODE_HOTEL: YM2-BRONZE**\n"
+      ]
+    },
+    {
+      "task_idx": 9,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.91,
+        0.91,
+        0.7300000000000001,
+        0.91,
+        0.19000000000000003,
+        0.7300000000000001,
+        0.7300000000000001,
+        0.91
+      ],
+      "answers": [
+        "1N8-BLACK,WN8-IVORY,COMMA_SEPARATED_VALUES: FS7-ONYX,6T5-WHITE,33, QZ4-RUBY, QZ4-RUBY, QZ4-RUBY, QZ4",
+        "COMMA_SEPERATED_LIST: 1N8-BLACK,WN8-IVORY,COMMA_SEPARATED_LIST: FS7-ONYX,6T5-WHITE,COMMA_SEPARATED_L",
+        "COMMA_SEPARATED_LIST: 1N8-BLACK,WN8-IVORY,COMMA_SEPARATED_LIST: FS7-ONYX,6T5-WHITE,1000,1001,1002,10",
+        "COMMA_SEPARATED_LIST: 1N8-BLACK,WN8-IVORY,COMMA_SEPARATED_LIST: FS7-ONYX,6T5-WHITE,COMMA_SEPARATED_L",
+        "The relevant sentence is:  \n**SECRET_CODE_LIMA: QZ4-RUBY**",
+        "COMMA_SEPARATED_VALUES: 1N8-BLACK,WN8-IVORY,COMMA_SEPARATED_VALUES: FS7-ONYX,6T5-WHITE,1000,1001,100",
+        "1N8-BLACK, WN8-IVORY\nCOMMA_SEPARATED_VALUES: FS7-ONYX,6T5-WHITE\n35,42,45,48,51,54,57,60,63,66,69,72,",
+        "1N8-BLACK,WN8-IVORY,COMMA_SEPERATED_LIST: FS7-ONYX,6T5-WHITE,QZ4-RUBY,RECENT_STUDIES,ENVIRONMENTAL_M"
+      ]
+    },
+    {
+      "task_idx": 10,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.7300000000000001,
+        0.7300000000000001,
+        0.91,
+        0.91
+      ],
+      "answers": [
+        "COMMA_SEPARATED_LIST: GT3-CORAL,1N8-BLACK,COMMA_SEPARATED_LIST: SECRET_CODE_INDIA: 7X9-BLUE,SECRET_C",
+        "SECRET_CODE_ALPHA: GT3-CORAL\nSECRET_CODE_JULIET: 1N8-BLACK\nVALUE1, VALUE2,SECRET_CODE_[NAME]: [VALUE",
+        "SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_ALPHA: GT3-CORAL  \nSECRET_CODE_JULIET: 1N8-BLACK,SECRET_CO",
+        "COMMA_SEPARATED_LIST: GT3-CORAL,1N8-BLACK,SECRET_CODE_INDIA: 7X9-BLUE,SECRET_CODE_NOVEMBER: DK6-AMBE",
+        "3-CORAL,1N8-BLACK,7X9-BLUE, DK6-AMBER,2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W6-SILVER, 2W",
+        "3-CORAL,1N8-BLACK,7X9-BLUE, DK6-AMBER,SECRET_CODE_KILO: 2W6-SILVER",
+        "1N8-BLACK,GT3-CORAL,1N8-BLACK,1N8-BLACK,1N8-BLACK,1N8-BLACK,1N8-BLACK,1N8-BLACK,1N8-BLACK,1N8-BLACK,",
+        "SECRET_CODE_ALPHA: GT3-CORAL, SECRET_CODE_JULIET: 1N8-BLACK,7X9-BLUE,DK6-AMBER,SECRET_CODE_KILO: 2W6"
+      ]
+    },
+    {
+      "task_idx": 11,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.55,
+        0.91,
+        0.55,
+        0.010000000000000002,
+        0.55,
+        0.91,
+        0.55,
+        0.91
+      ],
+      "answers": [
+        "The relevant sentence is:  \n**\"SECRET_CODE_KILO: XP5-SLATE\"**  \n**\"SECRET_CODE_ALPHA: DK6-AMBER\"**  ",
+        "COMMA_SEPARATED_VALUES: FS7-ONYX, YM2-BRONZE,comma-separated list: XP5-SLATE, DK6-AMBER,7X9-BLUE,7X9",
+        "3,5,7,9,11,COMMA_SEPARATED_VALUES: XP5-SLATE, DK6-AMBER,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE",
+        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+        "3,4,5,6,7,COMMA_SEPARATED_VALUES: XP5-SLATE, DK6-AMBER,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,7X9-BLUE,",
+        "3, YM2-BRONZE, FS7-ONYX, 4, YM2-BRONZE, 5, YM2-BRONZE,comma-separated list: XP5-SLATE, DK6-AMBER,7X9",
+        "3,4,5,6,7,comma-separated list: XP5-SLATE, DK6-AMBER,7X9-BLUE,NEW_POLICIES,INTERNATIONAL_PARTNERSHIP",
+        "SECRET_CODE_INDIA: FS7-ONYX\nSECRET_CODE_ECHO: YM2-BRONZE,SECRET_CODE_KILO: XP5-SLATE,SECRET_CODE_ALP"
+      ]
+    },
+    {
+      "task_idx": 12,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.7975,
+        0.46,
+        0.46,
+        0.7975,
+        0.91,
+        0.7975,
+        0.46,
+        0.46
+      ],
+      "answers": [
+        "5P1-GOLD, UC7-CHROME, BH1-PEARL,COMMA_SEPARATED_LIST: GT3-CORAL, DK6-AMBER, 8M4-GREEN,2T5-WHITE,1N8-",
+        "The relevant sentences are:\n\n1. SECRET_CODE_QUEBEC: 5P1-GOLD  \n2. SECRET_CODE_MIKE: UC7-CHROME  \n3. ",
+        "The relevant sentences are:\n\n1. SECRET_CODE_QUEBEC: 5P1-GOLD\n2. SECRET_CODE_MIKE: UC7-CHROME\n3. SECR",
+        "5P1-GOLD, UC7-CHROME, BH1-PEARL,3-CORAL, GT3-CORAL, DK6-AMBER, 8M4-GREEN,1N8-BLACK, 1N8-BLACK, 1N8-B",
+        "SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_QUEBEC: 5P1-GOLD  \nSECRET_CODE_MIKE: UC7-CHROME  \nSECRET_C",
+        "5P1-GOLD,UC7-CHROME,BH1-PEARL,SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_PAPA: GT3-CORAL  \nSECRET_COD",
+        "The relevant sentences are:\n\n1. SECRET_CODE_QUEBEC: 5P1-GOLD  \n2. SECRET_CODE_MIKE: UC7-CHROME  \n3. ",
+        "The relevant sentences are:\n\n1. SECRET_CODE_QUEBEC: 5P1-GOLD\n2. SECRET_CODE_MIKE: UC7-CHROME\n3. SECR"
+      ]
+    },
+    {
+      "task_idx": 13,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.5725,
+        0.5725,
+        0.7975,
+        0.685,
+        0.91,
+        0.46,
+        0.685,
+        0.91
+      ],
+      "answers": [
+        "3, 6T5-WHITE, 9J3-ORANGE\n3W6-SILVER, 4H7-PURPLE, 8M4-GREEN, DK6-AMBER\n345678901234567890123456789012",
+        "4T5-WHITE, 6T5-WHITE, 9J3-ORANGE,3W6-SILVER, 4H7-PURPLE, 8M4-GREEN, DK6-AMBER,3456789012345678901234",
+        "12, 6T5-WHITE, 9J3-ORANGE,COMMA_SEPARATED_VALUES: 2W6-SILVER,4H7-PURPLE,8M4-GREEN,DK6-AMBER,COMMA_SE",
+        "4T5-WHITE, 6T5-WHITE, 9J3-ORANGE,2W6-SILVER,4H7-PURPLE,8M4-GREEN,DK6-AMBER,3456789012345678901234567",
+        "6T5-WHITE, 9J3-ORANGE, UC7-CHROME,COMMA_SEPARATED_LIST: 2W6-SILVER,4H7-PURPLE,8M4-GREEN,DK6-AMBER,CO",
+        "COMMA_SEPARATED_LIST: 2W6-SILVER,4H7-PURPLE,8M4-GREEN,DK6-AMBER",
+        "3, 6T5-WHITE, 9J3-ORANGE,3W6-SILVER, 4H7-PURPLE, 8M4-GREEN, DK6-AMBER,3000,FS7-ONYX,FS7-ONYX,FS7-ONY",
+        "COMMA_SEPARATED_LIST: UC7-CHROME,6T5-WHITE,9J3-ORANGE,2W6-SILVER,4H7-PURPLE,8M4-GREEN,DK6-AMBER,COMM"
+      ]
+    },
+    {
+      "task_idx": 14,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.91,
+        0.91,
+        0.7975,
+        0.7975,
+        0.91,
+        0.5725,
+        0.7975,
+        0.5725
+      ],
+      "answers": [
+        "COMMA_SEPARATED_VALUES: 5P1-GOLD,WN8-IVORY,XP5-SLATE,COMMA_SEPARATED_LIST: VL2-JADE,2W6-SILVER,3K2-R",
+        "COMMA_SEPARATED_LIST: 5P1-GOLD,WN8-IVORY,XP5-SLATE,SECRET_CODE_[NAME]: [VALUE]  \nVL2-JADE  \n2W6-SILV",
+        "3P1-GOLD, WN8-IVORY, XP5-SLATE,comma-separated list: VL2-JADE, 2W6-SILVER, 3K2-RED,SECRET_CODE_KILO:",
+        "3P1-GOLD, WN8-IVORY, XP5-SLATE,SECRET_CODE_[NAME]: [VALUE]  \nVL2-JADE, 2W6-SILVER, 3K2-RED,SECRET_CO",
+        "COMMA_SEPARATED_LIST: 5P1-GOLD,WN8-IVORY,XP5-SLATE,SECRET_CODE_[NAME]: [VALUE]  \nVL2-JADE  \n2W6-SILV",
+        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890",
+        "3P1-GOLD, WN8-IVORY, XP5-SLATE,3K2-RED, 2W6-SILVER, VL2-JADE,SECRET_CODE_KILO: YM2-BRONZE,SECRET_COD",
+        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+      ]
+    },
+    {
+      "task_idx": 15,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.91,
+        0.1225,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.7975,
+        0.91
+      ],
+      "answers": [
+        "3K2-RED, QZ4-RUBY, 6T5-WHITE,5P1-GOLD,1N8-BLACK,VL2-JADE,8M4-GREEN,GT3-CORAL",
+        "SECRET_CODE_OSCAR: 5P1-GOLD\n\nThis is the relevant sentence.",
+        "3K2-RED, 6T5-WHITE, QZ4-RUBY,5P1-GOLD,1N8-BLACK,VL2-JADE,8M4-GREEN,GT3-CORAL",
+        "3K2-RED, 6T5-WHITE, QZ4-RUBY,5P1-GOLD,1N8-BLACK,VL2-JADE,8M4-GREEN,GT3-CORAL",
+        "3K2-RED, QZ4-RUBY, 6T5-WHITE,5P1-GOLD,1N8-BLACK,VL2-JADE,8M4-GREEN,GT3-CORAL",
+        "3K2-RED, QZ4-RUBY, 6T5-WHITE,5P1-GOLD,1N8-BLACK,VL2-JADE,8M4-GREEN,GT3-CORAL",
+        "2T5-WHITE, QZ4-RUBY, 3K2-RED,SECRET_CODE_OSCAR: 5P1-GOLD,SECRET_CODE_INDIA: 1N8-BLACK,SECRET_CODE_FO",
+        "14, 6T5-WHITE, QZ4-RUBY, 3K2-RED,5P1-GOLD,1N8-BLACK,VL2-JADE,8M4-GREEN,GT3-CORAL"
+      ]
+    },
+    {
+      "task_idx": 16,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.23500000000000001,
+        0.0,
+        0.0,
+        0.23500000000000001,
+        0.23500000000000001,
+        0.23500000000000001,
+        0.23500000000000001,
+        0.0
+      ],
+      "answers": [
+        "XP5-SLATE,2W6-SILVER",
+        "None",
+        "None",
+        "COMMA_SEPARATED_VALUES: WN8-IVORY,UC7-CHROME,TRAINING_PROGRAMS_EXPANDED,QUALITY_ASSURANCE_UPDATED,DE",
+        "comma-separated list: XP5-SLATE, 2W6-SILVER",
+        "2W6-SILVER,XP5-SLATE",
+        "comma-separated list: XP5-SLATE, 2W6-SILVER",
+        "None"
+      ]
+    },
+    {
+      "task_idx": 17,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.91,
+        0.23500000000000001,
+        0.0,
+        0.0,
+        0.91,
+        0.23500000000000001,
+        0.0,
+        0.23500000000000001
+      ],
+      "answers": [
+        "8M4-GREEN,7X9-BLUE,SECRET_CODE_FS7-ONYX: 1,SECRET_CODE_CHARLIE: 1,SECRET_CODE_[NAME]: 1,SECRET_CODE_",
+        "comma-separated list:\n\nWN8-IVORY,1N8-BLACK",
+        "None",
+        "None",
+        "8M4-GREEN,7X9-BLUE,COMMA_SEPARATED_VALUES: FS7-ONYX,Infrastructure improvements were planned for the",
+        "COMMA_SEPARATED_LIST: DK6-AMBER,2W6-SILVER",
+        "None",
+        "COMMA_SEPARATED_LIST: DK6-AMBER,2W6-SILVER"
+      ]
+    },
+    {
+      "task_idx": 18,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.23500000000000001,
+        0.23500000000000001,
+        0.1225,
+        0.23500000000000001,
+        0.23500000000000001,
+        0.23500000000000001,
+        0.1225,
+        0.91
+      ],
+      "answers": [
+        "3K2-RED, 9J3-ORANGE",
+        "COMMA_SEPARATED_LIST: BH1-PEARL,7X9-BLUE",
+        "SECRET_CODE_HOTEL: DK6-AMBER, TRAINING_PROGRAMS: EXPANDED, NEW_POLICIES: IMPLEMENTED, TECHNICAL_TEAM",
+        "37,7X9-BLUE,12,SECRET_CODE_BRAVO: BH1-PEARL,12,SECRET_CODE_KILO: 7X9-BLUE",
+        "3K2-RED, 9J3-ORANGE",
+        "COMMA_SEPERATED_LIST: BH1-PEARL,7X9-BLUE",
+        "SECRET_CODE_HOTEL: DK6-AMBER,NEW_POLICIES: IMPLEMENTED,TRAINING_PROGRAMS: EXPANDED,TECHNICAL_TEAM: R",
+        "COMMA_SEPARATED_VALUES: DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AMBER,DK6-AM"
+      ]
+    },
+    {
+      "task_idx": 19,
+      "task_type": "multi_niah",
+      "rewards": [
+        0.0,
+        0.1225,
+        0.010000000000000002,
+        0.91,
+        0.0,
+        0.23500000000000001,
+        0.23500000000000001,
+        0.23500000000000001
+      ],
+      "answers": [
+        "None",
+        "BH1-PEARL",
+        "answer",
+        "3, 6T5-WHITE, BH1-PEARL,comma-separated list: UC7-CHROME,2023-10-01, QZ4-RUBY, 2023-11-01, WN8-IVORY",
+        "None",
+        "COMMA_SEPARATED_LIST: QZ4-RUBY,WN8-IVORY",
+        "SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_NOVEMBER: QZ4-RUBY  \nSECRET_CODE_DELTA: WN8-IVORY",
+        "COMMA_SEPARATED_LIST: QZ4-RUBY,WN8-IVORY"
+      ]
+    }
+  ],
+  "gen_time_seconds": 5451.141662120819,
+  "n_niah_pairs": 7,
+  "n_mniah_pairs": 18
+}

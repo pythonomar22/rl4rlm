@@ -1,0 +1,126 @@
+2026-03-03 18:07:13,105 dpo INFO: Loading base model: Qwen/Qwen3-1.7B
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.73it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.95it/s]
+2026-03-03 18:07:15,007 dpo INFO: Loading LoRA adapter: data/sft/lora_v3/final
+2026-03-03 18:07:15,304 dpo INFO: Trainable parameters: 17.4M
+2026-03-03 18:07:15,304 dpo INFO: 
+============================================================
+2026-03-03 18:07:15,304 dpo INFO: PHASE 1: Generating trajectory pairs
+2026-03-03 18:07:15,304 dpo INFO: ============================================================
+2026-03-03 18:07:15,310 dpo INFO: Generated 15 NIAH + 20 multi-NIAH tasks
+2026-03-03 18:07:15,310 dpo INFO: K=8 trajectories per task, min_gap=0.15
+Generating niah trajectories:   0%|          | 0/15 [00:00<?, ?it/s]2026-03-03 18:08:01,652 dpo INFO: Task 0: niah | rewards=[0.84, 0.84, 0.84] | gap=0.00
+2026-03-03 18:08:01,652 dpo INFO:   -> No pair (gap 0.00 < 0.15)
+Generating niah trajectories:   7%|▋         | 1/15 [00:46<10:48, 46.34s/it]2026-03-03 18:08:56,853 dpo INFO: Task 1: niah | rewards=[0.04, 0.74, 0.84] | gap=0.80
+2026-03-03 18:08:56,853 dpo INFO:   -> Pair formed: winner=0.84 loser=0.04 gap=0.80
+Generating niah trajectories:  13%|█▎        | 2/15 [01:41<11:10, 51.55s/it]2026-03-03 18:09:54,634 dpo INFO: Task 2: niah | rewards=[0.84, 0.84, 0.84] | gap=0.00
+2026-03-03 18:09:54,634 dpo INFO:   -> No pair (gap 0.00 < 0.15)
+Generating niah trajectories:  20%|██        | 3/15 [02:39<10:52, 54.40s/it]2026-03-03 18:10:25,116 dpo INFO: Task 3: niah | rewards=[-0.04, 0.63, 0.84] | gap=0.88
+2026-03-03 18:10:25,116 dpo INFO:   -> Pair formed: winner=0.84 loser=-0.04 gap=0.88
+Generating niah trajectories:  27%|██▋       | 4/15 [03:09<08:14, 44.96s/it]2026-03-03 18:11:00,358 dpo INFO: Task 4: niah | rewards=[0.04, 0.64, 0.84] | gap=0.80
+2026-03-03 18:11:00,358 dpo INFO:   -> Pair formed: winner=0.84 loser=0.04 gap=0.80
+Generating niah trajectories:  33%|███▎      | 5/15 [03:45<06:54, 41.45s/it]2026-03-03 18:11:45,096 dpo INFO: Task 5: niah | rewards=[0.84, 0.84, 0.84] | gap=0.00
+2026-03-03 18:11:45,096 dpo INFO:   -> No pair (gap 0.00 < 0.15)
+Generating niah trajectories:  40%|████      | 6/15 [04:29<06:23, 42.57s/it]2026-03-03 18:12:27,708 dpo INFO: Task 6: niah | rewards=[0.04, 0.74, 0.84] | gap=0.80
+2026-03-03 18:12:27,708 dpo INFO:   -> Pair formed: winner=0.84 loser=0.04 gap=0.80
+Generating niah trajectories:  47%|████▋     | 7/15 [05:12<05:40, 42.58s/it]2026-03-03 18:13:11,973 dpo INFO: Task 7: niah | rewards=[0.04, 0.64, 0.84] | gap=0.80
+2026-03-03 18:13:11,973 dpo INFO:   -> Pair formed: winner=0.84 loser=0.04 gap=0.80
+Generating niah trajectories:  53%|█████▎    | 8/15 [05:56<05:01, 43.12s/it]2026-03-03 18:13:47,328 dpo INFO: Task 8: niah | rewards=[0.04, 0.54, 0.84] | gap=0.80
+2026-03-03 18:13:47,328 dpo INFO:   -> Pair formed: winner=0.84 loser=0.04 gap=0.80
+Generating niah trajectories:  60%|██████    | 9/15 [06:32<04:04, 40.69s/it]2026-03-03 18:14:33,727 dpo INFO: Task 9: niah | rewards=[0.84, 0.84, 0.84] | gap=0.00
+2026-03-03 18:14:33,727 dpo INFO:   -> No pair (gap 0.00 < 0.15)
+Generating niah trajectories:  67%|██████▋   | 10/15 [07:18<03:32, 42.45s/it]2026-03-03 18:15:52,269 dpo INFO: Task 10: niah | rewards=[0.84, 0.84, 0.84] | gap=0.00
+2026-03-03 18:15:52,269 dpo INFO:   -> No pair (gap 0.00 < 0.15)
+Generating niah trajectories:  73%|███████▎  | 11/15 [08:36<03:33, 53.50s/it]2026-03-03 18:16:54,194 dpo INFO: Task 11: niah | rewards=[0.84, 0.84, 0.84] | gap=0.00
+2026-03-03 18:16:54,194 dpo INFO:   -> No pair (gap 0.00 < 0.15)
+Generating niah trajectories:  80%|████████  | 12/15 [09:38<02:48, 56.06s/it]2026-03-03 18:17:47,176 dpo INFO: Task 12: niah | rewards=[0.84, 0.84, 0.84] | gap=0.00
+2026-03-03 18:17:47,176 dpo INFO:   -> No pair (gap 0.00 < 0.15)
+Generating niah trajectories:  87%|████████▋ | 13/15 [10:31<01:50, 55.13s/it]2026-03-03 18:18:17,839 dpo INFO: Task 13: niah | rewards=[0.04, 0.64, 0.84] | gap=0.80
+2026-03-03 18:18:17,839 dpo INFO:   -> Pair formed: winner=0.84 loser=0.04 gap=0.80
+Generating niah trajectories:  93%|█████████▎| 14/15 [11:02<00:47, 47.74s/it]2026-03-03 18:18:56,776 dpo INFO: Task 14: niah | rewards=[0.84, 0.84, 0.84] | gap=0.00
+2026-03-03 18:18:56,776 dpo INFO:   -> No pair (gap 0.00 < 0.15)
+Generating niah trajectories: 100%|██████████| 15/15 [11:41<00:00, 45.09s/it]Generating niah trajectories: 100%|██████████| 15/15 [11:41<00:00, 46.76s/it]
+Generating multi_niah trajectories:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-03 18:20:18,966 dpo INFO: Task 0: multi_niah | rewards=[0.01, 0.42, 0.91] | gap=0.90
+2026-03-03 18:20:18,966 dpo INFO:   -> Pair formed: winner=0.91 loser=0.01 gap=0.90
+Generating multi_niah trajectories:   5%|▌         | 1/20 [01:22<26:01, 82.19s/it]2026-03-03 18:21:09,739 dpo INFO: Task 1: multi_niah | rewards=[0.91, 0.91, 0.91] | gap=0.00
+2026-03-03 18:21:09,740 dpo INFO:   -> No pair (gap 0.00 < 0.15)
+Generating multi_niah trajectories:  10%|█         | 2/20 [02:12<19:06, 63.71s/it]2026-03-03 18:21:55,334 dpo INFO: Task 2: multi_niah | rewards=[0.01, 0.69, 0.91] | gap=0.90
+2026-03-03 18:21:55,334 dpo INFO:   -> Pair formed: winner=0.91 loser=0.01 gap=0.90
+Generating multi_niah trajectories:  15%|█▌        | 3/20 [02:58<15:42, 55.44s/it]2026-03-03 18:22:45,464 dpo INFO: Task 3: multi_niah | rewards=[0.91, 0.91, 0.91] | gap=0.00
+2026-03-03 18:22:45,465 dpo INFO:   -> No pair (gap 0.00 < 0.15)
+Generating multi_niah trajectories:  20%|██        | 4/20 [03:48<14:13, 53.34s/it]2026-03-03 18:26:43,660 dpo INFO: Task 4: multi_niah | rewards=[0.01, 0.10, 0.73] | gap=0.72
+2026-03-03 18:26:43,660 dpo INFO:   -> Pair formed: winner=0.73 loser=0.01 gap=0.72
+Generating multi_niah trajectories:  25%|██▌       | 5/20 [07:46<30:00, 120.00s/it]2026-03-03 18:28:52,057 dpo INFO: Task 5: multi_niah | rewards=[0.01, 0.48, 0.91] | gap=0.90
+2026-03-03 18:28:52,057 dpo INFO:   -> Pair formed: winner=0.91 loser=0.01 gap=0.90
+Generating multi_niah trajectories:  30%|███       | 6/20 [09:55<28:39, 122.86s/it]2026-03-03 18:29:56,290 dpo INFO: Task 6: multi_niah | rewards=[0.37, 0.57, 0.91] | gap=0.54
+2026-03-03 18:29:56,290 dpo INFO:   -> Pair formed: winner=0.91 loser=0.37 gap=0.54
+Generating multi_niah trajectories:  35%|███▌      | 7/20 [10:59<22:27, 103.69s/it]2026-03-03 18:30:56,514 dpo INFO: Task 7: multi_niah | rewards=[0.01, 0.64, 0.91] | gap=0.90
+2026-03-03 18:30:56,514 dpo INFO:   -> Pair formed: winner=0.91 loser=0.01 gap=0.90
+Generating multi_niah trajectories:  40%|████      | 8/20 [11:59<17:58, 89.85s/it] 2026-03-03 18:32:59,854 dpo INFO: Task 8: multi_niah | rewards=[0.00, 0.71, 0.91] | gap=0.91
+2026-03-03 18:32:59,854 dpo INFO:   -> Pair formed: winner=0.91 loser=0.00 gap=0.91
+Generating multi_niah trajectories:  45%|████▌     | 9/20 [14:03<18:23, 100.32s/it]2026-03-03 18:38:11,260 dpo INFO: Task 9: multi_niah | rewards=[0.19, 0.75, 0.91] | gap=0.72
+2026-03-03 18:38:11,260 dpo INFO:   -> Pair formed: winner=0.91 loser=0.19 gap=0.72
+Generating multi_niah trajectories:  50%|█████     | 10/20 [19:14<27:34, 165.49s/it]2026-03-03 18:41:35,516 dpo INFO: Task 10: multi_niah | rewards=[0.73, 0.86, 0.91] | gap=0.18
+2026-03-03 18:41:35,517 dpo INFO:   -> Pair formed: winner=0.91 loser=0.73 gap=0.18
+Generating multi_niah trajectories:  55%|█████▌    | 11/20 [22:38<26:36, 177.35s/it]2026-03-03 18:46:40,036 dpo INFO: Task 11: multi_niah | rewards=[0.01, 0.62, 0.91] | gap=0.90
+2026-03-03 18:46:40,036 dpo INFO:   -> Pair formed: winner=0.91 loser=0.01 gap=0.90
+Generating multi_niah trajectories:  60%|██████    | 12/20 [27:43<28:48, 216.04s/it]2026-03-03 18:48:21,211 dpo INFO: Task 12: multi_niah | rewards=[0.46, 0.64, 0.91] | gap=0.45
+2026-03-03 18:48:21,211 dpo INFO:   -> Pair formed: winner=0.91 loser=0.46 gap=0.45
+Generating multi_niah trajectories:  65%|██████▌   | 13/20 [29:24<21:08, 181.24s/it]2026-03-03 18:54:34,824 dpo INFO: Task 13: multi_niah | rewards=[0.46, 0.70, 0.91] | gap=0.45
+2026-03-03 18:54:34,824 dpo INFO:   -> Pair formed: winner=0.91 loser=0.46 gap=0.45
+Generating multi_niah trajectories:  70%|███████   | 14/20 [35:38<23:56, 239.35s/it]2026-03-03 18:56:49,478 dpo INFO: Task 14: multi_niah | rewards=[0.57, 0.78, 0.91] | gap=0.34
+2026-03-03 18:56:49,478 dpo INFO:   -> Pair formed: winner=0.91 loser=0.57 gap=0.34
+Generating multi_niah trajectories:  75%|███████▌  | 15/20 [37:52<17:18, 207.79s/it]2026-03-03 18:57:45,429 dpo INFO: Task 15: multi_niah | rewards=[0.12, 0.80, 0.91] | gap=0.79
+2026-03-03 18:57:45,429 dpo INFO:   -> Pair formed: winner=0.91 loser=0.12 gap=0.79
+Generating multi_niah trajectories:  80%|████████  | 16/20 [38:48<10:48, 162.09s/it]2026-03-03 19:06:32,772 dpo INFO: Task 16: multi_niah | rewards=[0.00, 0.15, 0.24] | gap=0.24
+2026-03-03 19:06:32,772 dpo INFO:   -> Pair formed: winner=0.24 loser=0.00 gap=0.24
+Generating multi_niah trajectories:  85%|████████▌ | 17/20 [47:35<13:35, 271.92s/it]2026-03-03 19:17:55,254 dpo INFO: Task 17: multi_niah | rewards=[0.00, 0.32, 0.91] | gap=0.91
+2026-03-03 19:17:55,254 dpo INFO:   -> Pair formed: winner=0.91 loser=0.00 gap=0.91
+Generating multi_niah trajectories:  90%|█████████ | 18/20 [58:58<13:10, 395.29s/it]2026-03-03 19:26:23,030 dpo INFO: Task 18: multi_niah | rewards=[0.12, 0.29, 0.91] | gap=0.79
+2026-03-03 19:26:23,030 dpo INFO:   -> Pair formed: winner=0.91 loser=0.12 gap=0.79
+Generating multi_niah trajectories:  95%|█████████▌| 19/20 [1:07:26<07:09, 429.07s/it]2026-03-03 19:38:06,445 dpo INFO: Task 19: multi_niah | rewards=[0.00, 0.22, 0.91] | gap=0.91
+2026-03-03 19:38:06,446 dpo INFO:   -> Pair formed: winner=0.91 loser=0.00 gap=0.91
+Generating multi_niah trajectories: 100%|██████████| 20/20 [1:19:09<00:00, 511.44s/it]Generating multi_niah trajectories: 100%|██████████| 20/20 [1:19:09<00:00, 237.48s/it]
+2026-03-03 19:38:06,446 dpo INFO: 
+Pair generation complete in 5451s
+2026-03-03 19:38:06,446 dpo INFO: NIAH pairs: 7/15 tasks
+2026-03-03 19:38:06,446 dpo INFO: Multi-NIAH pairs: 18/20 tasks
+2026-03-03 19:38:06,446 dpo INFO: Total pairs: 25
+2026-03-03 19:38:06,447 dpo INFO: 
+============================================================
+2026-03-03 19:38:06,447 dpo INFO: PHASE 2: Computing reference log-probs
+2026-03-03 19:38:06,447 dpo INFO: ============================================================
+Computing ref log-probs:   0%|          | 0/25 [00:00<?, ?it/s]2026-03-03 19:38:06,547 dpo INFO:   Pair 0: ref_lp(winner)=-3.3 ref_lp(loser)=-6.4 diff=3.1
+2026-03-03 19:38:06,639 dpo INFO:   Pair 1: ref_lp(winner)=-6.1 ref_lp(loser)=-6.4 diff=0.3
+Computing ref log-probs:   8%|▊         | 2/25 [00:00<00:02, 10.71it/s]2026-03-03 19:38:06,776 dpo INFO:   Pair 2: ref_lp(winner)=-3.6 ref_lp(loser)=-8.1 diff=4.5
+Computing ref log-probs:  16%|█▌        | 4/25 [00:00<00:02,  9.53it/s]Computing ref log-probs:  20%|██        | 5/25 [00:01<00:05,  3.92it/s]Computing ref log-probs:  28%|██▊       | 7/25 [00:01<00:04,  4.46it/s]Computing ref log-probs:  32%|███▏      | 8/25 [00:01<00:04,  3.74it/s]Computing ref log-probs:  40%|████      | 10/25 [00:01<00:02,  5.14it/s]Computing ref log-probs:  48%|████▊     | 12/25 [00:02<00:02,  6.42it/s]Computing ref log-probs:  56%|█████▌    | 14/25 [00:02<00:01,  7.50it/s]Computing ref log-probs:  60%|██████    | 15/25 [00:02<00:01,  5.36it/s]Computing ref log-probs:  68%|██████▊   | 17/25 [00:02<00:01,  6.55it/s]Computing ref log-probs:  76%|███████▌  | 19/25 [00:03<00:00,  7.68it/s]Computing ref log-probs:  84%|████████▍ | 21/25 [00:03<00:00,  8.64it/s]Computing ref log-probs:  88%|████████▊ | 22/25 [00:03<00:00,  6.97it/s]Computing ref log-probs:  96%|█████████▌| 24/25 [00:04<00:00,  5.45it/s]Computing ref log-probs: 100%|██████████| 25/25 [00:04<00:00,  5.43it/s]Computing ref log-probs: 100%|██████████| 25/25 [00:04<00:00,  5.89it/s]
+2026-03-03 19:38:10,694 dpo INFO: Reference log-probs computed in 4s
+2026-03-03 19:38:10,694 dpo INFO: 
+============================================================
+2026-03-03 19:38:10,694 dpo INFO: PHASE 3: DPO training
+2026-03-03 19:38:10,694 dpo INFO: ============================================================
+2026-03-03 19:38:15,729 dpo INFO: Step 10 (epoch 1) | Loss: 0.6930 | Acc: 80.0% | π(w): -0.02 π(l): -0.03
+2026-03-03 19:38:21,504 dpo INFO: Step 20 (epoch 1) | Loss: 0.6932 | Acc: 50.0% | π(w): -0.07 π(l): -0.08
+2026-03-03 19:38:23,680 dpo INFO: 
+Epoch 1/3: avg_loss=0.6931 avg_acc=64.0% (25 steps)
+2026-03-03 19:38:26,421 dpo INFO: Step 30 (epoch 2) | Loss: 0.6916 | Acc: 100.0% | π(w): -0.03 π(l): -0.10
+2026-03-03 19:38:30,872 dpo INFO: Step 40 (epoch 2) | Loss: 0.6920 | Acc: 90.0% | π(w): -0.06 π(l): -0.09
+2026-03-03 19:38:35,872 dpo INFO: Step 50 (epoch 2) | Loss: 0.6917 | Acc: 100.0% | π(w): -0.02 π(l): -0.08
+2026-03-03 19:38:36,323 dpo INFO:   Saved checkpoint: data/sft/dpo_v1/checkpoint-50
+2026-03-03 19:38:36,323 dpo INFO: 
+Epoch 2/3: avg_loss=0.6918 avg_acc=96.0% (25 steps)
+2026-03-03 19:38:42,886 dpo INFO: Step 60 (epoch 3) | Loss: 0.6899 | Acc: 100.0% | π(w): -0.02 π(l): -0.07
+2026-03-03 19:38:46,686 dpo INFO: Step 70 (epoch 3) | Loss: 0.6896 | Acc: 100.0% | π(w): -0.03 π(l): -0.26
+2026-03-03 19:38:48,326 dpo INFO: 
+Epoch 3/3: avg_loss=0.6897 avg_acc=96.0% (25 steps)
+2026-03-03 19:38:48,854 dpo INFO: 
+============================================================
+2026-03-03 19:38:48,854 dpo INFO: DPO TRAINING COMPLETE
+2026-03-03 19:38:48,854 dpo INFO: ============================================================
+2026-03-03 19:38:48,854 dpo INFO: Pairs: 25 (7 NIAH + 18 multi-NIAH)
+2026-03-03 19:38:48,854 dpo INFO: Steps: 75 (3 epochs)
+2026-03-03 19:38:48,854 dpo INFO: Final loss: 0.6842
+2026-03-03 19:38:48,854 dpo INFO: Final acc: 95.0%
+2026-03-03 19:38:48,854 dpo INFO: Generation time: 5451s
+2026-03-03 19:38:48,854 dpo INFO: Training time: 38s
+2026-03-03 19:38:48,854 dpo INFO: Total time: 5494s (1.53 GPU-hours)
+2026-03-03 19:38:48,854 dpo INFO: Saved to: data/sft/dpo_v1/final

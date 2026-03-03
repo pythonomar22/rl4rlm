@@ -1,0 +1,57 @@
+2026-03-03 18:07:15,747 rl_v4 INFO: Loading policy model: Qwen/Qwen3-1.7B
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.98it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.38it/s]
+2026-03-03 18:07:17,528 rl_v4 INFO: Loading policy LoRA adapter: data/sft/lora_v3/final
+2026-03-03 18:07:17,840 rl_v4 INFO: Loading reference model (frozen)
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.58it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.07it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  2.69it/s]
+2026-03-03 18:07:18,827 rl_v4 INFO: Loading reference LoRA adapter: data/sft/lora_v3/final
+2026-03-03 18:07:19,123 rl_v4 INFO: Policy model: 3.51 GB
+2026-03-03 18:07:19,123 rl_v4 INFO: Reference model: 3.51 GB
+2026-03-03 18:07:19,123 rl_v4 INFO: Total model memory: 7.02 GB
+2026-03-03 18:07:19,125 rl_v4 INFO: Trainable parameters: 17.4M
+2026-03-03 18:07:19,130 rl_v4 INFO: Task pool: 20 NIAH + 12 multi-NIAH
+2026-03-03 18:07:19,130 rl_v4 INFO: 
+Starting GRPO-v4 training:
+2026-03-03 18:07:19,130 rl_v4 INFO:   K=8 trajectories per prompt
+2026-03-03 18:07:19,130 rl_v4 INFO:   2 prompts per step
+2026-03-03 18:07:19,130 rl_v4 INFO:   30 steps
+2026-03-03 18:07:19,130 rl_v4 INFO:   KL coefficient: 0.05
+2026-03-03 18:07:19,130 rl_v4 INFO:   Learning rate: 5e-06
+2026-03-03 18:15:40,929 rl_v4 INFO: Step 3/30 | Reward: 0.639 | Correct: 12/16 | Loss: -0.392 | KL: 0.0008 | Updates: 8 | Time: 164s (total 502s)
+2026-03-03 18:30:56,293 rl_v4 INFO: Step 6/30 | Reward: 0.611 | Correct: 11/16 | Loss: -0.521 | KL: 0.0023 | Updates: 16 | Time: 182s (total 1417s)
+2026-03-03 18:47:55,090 rl_v4 INFO: Step 9/30 | Reward: 0.746 | Correct: 14/16 | Loss: -0.128 | KL: 0.0050 | Updates: 16 | Time: 384s (total 2436s)
+2026-03-03 18:50:25,559 rl_v4 INFO:   Sample 0 (NIAH): correct=1.0 answer=The critical deadline is **Dr. Elena Rodriguez**.
+
+This is explicitly stated in 
+2026-03-03 18:50:32,367 rl_v4 INFO:   Sample 1 (NIAH): correct=1.0 answer=The meeting is scheduled for **$12.7 billion**.
+
+**Explanation:**  
+The question
+2026-03-03 18:50:38,606 rl_v4 INFO:   Sample 2 (multi-NIAH): recall=0.67 (2/3) answer=3, 0R9-CYAN, BH1-PEARL
+2026-03-03 18:50:38,936 rl_v4 INFO:   Saved checkpoint: data/sft/rl_v4/checkpoint-10
+2026-03-03 18:58:54,817 rl_v4 INFO: Step 12/30 | Reward: 0.819 | Correct: 16/16 | Loss: -0.700 | KL: 0.0047 | Updates: 8 | Time: 367s (total 3096s)
+2026-03-03 19:05:45,306 rl_v4 INFO: Step 15/30 | Reward: 0.825 | Correct: 15/16 | Loss: -1.821 | KL: 0.0026 | Updates: 8 | Time: 146s (total 3506s)
+2026-03-03 19:11:37,753 rl_v4 INFO: Step 18/30 | Reward: 0.838 | Correct: 16/16 | Loss: 0.357 | KL: 0.0071 | Updates: 8 | Time: 81s (total 3859s)
+2026-03-03 19:16:29,121 rl_v4 INFO:   Sample 0 (NIAH): correct=1.0 answer=The critical deadline is Dr. Elena Rodriguez.
+
+This is stated directly in the do
+2026-03-03 19:16:34,432 rl_v4 INFO:   Sample 1 (NIAH): correct=0.0 answer=not found
+2026-03-03 19:16:41,079 rl_v4 INFO:   Sample 2 (multi-NIAH): recall=1.00 (3/3) answer=SECRET_CODE_OSCAR: BH1-PEARL
+SECRET_CODE_BRAVO: YM2-BRONZE
+SECRET_CODE_FOXTROT: 
+2026-03-03 19:16:41,419 rl_v4 INFO:   Saved checkpoint: data/sft/rl_v4/checkpoint-20
+2026-03-03 19:23:44,162 rl_v4 INFO: Step 21/30 | Reward: 0.728 | Correct: 13/16 | Loss: 0.823 | KL: 0.0071 | Updates: 8 | Time: 423s (total 4585s)
+2026-03-03 19:29:50,045 rl_v4 INFO: Step 24/30 | Reward: 0.864 | Correct: 16/16 | Loss: -0.239 | KL: 0.0132 | Updates: 8 | Time: 107s (total 4951s)
+2026-03-03 19:40:51,705 rl_v4 INFO: Step 27/30 | Reward: 0.785 | Correct: 15/16 | Loss: -0.638 | KL: 0.0173 | Updates: 7 | Time: 139s (total 5613s)
+2026-03-03 19:53:08,908 rl_v4 INFO: Step 30/30 | Reward: 0.864 | Correct: 16/16 | Loss: -0.503 | KL: 0.0197 | Updates: 8 | Time: 106s (total 6350s)
+2026-03-03 19:53:12,676 rl_v4 INFO:   Sample 0 (NIAH): correct=1.0 answer=The critical deadline is Dr. Elena Rodriguez.
+2026-03-03 19:53:18,974 rl_v4 INFO:   Sample 1 (NIAH): correct=0.0 answer=The question is asking for the **scheduled date of the meeting**, but **no speci
+2026-03-03 19:53:24,833 rl_v4 INFO:   Sample 2 (multi-NIAH): recall=0.67 (2/3) answer=3, 0R9-CYAN, BH1-PEARL
+2026-03-03 19:53:25,169 rl_v4 INFO:   Saved checkpoint: data/sft/rl_v4/checkpoint-30
+2026-03-03 19:53:25,527 rl_v4 INFO: 
+============================================================
+2026-03-03 19:53:25,527 rl_v4 INFO: GRPO-V4 TRAINING COMPLETE
+2026-03-03 19:53:25,527 rl_v4 INFO: ============================================================
+2026-03-03 19:53:25,527 rl_v4 INFO: Final avg reward: 0.864
+2026-03-03 19:53:25,527 rl_v4 INFO: Final KL: 0.0197
+2026-03-03 19:53:25,527 rl_v4 INFO: Total time: 6366s (1.77 GPU-hours)
+2026-03-03 19:53:25,527 rl_v4 INFO: Saved to: data/sft/rl_v4/final

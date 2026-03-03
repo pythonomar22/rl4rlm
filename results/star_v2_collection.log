@@ -1,0 +1,81 @@
+2026-03-03 08:34:57,731 star_v2 INFO: Loading SFT model: Qwen/Qwen3-1.7B + data/sft/lora_v2/final
+2026-03-03 08:34:57,731 rl INFO: Loading base model: Qwen/Qwen3-1.7B
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:00<00:00,  1.78it/s]Loading checkpoint shards: 100%|██████████| 2/2 [00:00<00:00,  3.06it/s]
+2026-03-03 08:34:59,560 rl INFO: Loading LoRA adapter: data/sft/lora_v2/final
+NIAH (hard):   0%|          | 0/20 [00:00<?, ?it/s]2026-03-03 08:35:09,795 star_v2 INFO:   niah_30000_50000_0.1: score=1.0 turns=1 time=9.9s
+NIAH (hard):   5%|▌         | 1/20 [00:09<03:08,  9.93s/it]2026-03-03 08:35:15,708 star_v2 INFO:   niah_30001_50000_0.1: score=1.0 turns=1 time=5.9s
+NIAH (hard):  10%|█         | 2/20 [00:15<02:16,  7.57s/it]2026-03-03 08:35:33,928 star_v2 INFO:   niah_30002_50000_0.2: score=1.0 turns=1 time=18.2s
+NIAH (hard):  15%|█▌        | 3/20 [00:34<03:31, 12.43s/it]2026-03-03 08:35:37,445 star_v2 INFO:   niah_30003_50000_0.2: score=1.0 turns=1 time=3.5s
+NIAH (hard):  20%|██        | 4/20 [00:37<02:22,  8.91s/it]2026-03-03 08:35:54,134 star_v2 INFO:   niah_30004_50000_0.5: score=1.0 turns=1 time=16.7s
+NIAH (hard):  25%|██▌       | 5/20 [00:54<02:55, 11.72s/it]2026-03-03 08:36:02,913 star_v2 INFO:   niah_30005_50000_0.5: score=1.0 turns=1 time=8.8s
+NIAH (hard):  30%|███       | 6/20 [01:03<02:30, 10.72s/it]2026-03-03 08:36:11,079 star_v2 INFO:   niah_30006_50000_0.8: score=1.0 turns=1 time=8.2s
+NIAH (hard):  35%|███▌      | 7/20 [01:11<02:08,  9.88s/it]2026-03-03 08:36:14,750 star_v2 INFO:   niah_30007_50000_0.8: score=1.0 turns=1 time=3.7s
+NIAH (hard):  40%|████      | 8/20 [01:14<01:34,  7.91s/it]2026-03-03 08:36:31,825 star_v2 INFO:   niah_30008_50000_0.9: score=1.0 turns=1 time=17.1s
+NIAH (hard):  45%|████▌     | 9/20 [01:31<01:58, 10.77s/it]2026-03-03 08:36:39,797 star_v2 INFO:   niah_30009_50000_0.9: score=1.0 turns=1 time=8.0s
+NIAH (hard):  50%|█████     | 10/20 [01:39<01:39,  9.91s/it]2026-03-03 08:36:43,587 star_v2 INFO:   niah_30010_100000_0.1: score=1.0 turns=1 time=3.8s
+NIAH (hard):  55%|█████▌    | 11/20 [01:43<01:12,  8.04s/it]2026-03-03 08:36:59,166 star_v2 INFO:   niah_30011_100000_0.1: score=1.0 turns=1 time=15.6s
+NIAH (hard):  60%|██████    | 12/20 [01:59<01:22, 10.33s/it]2026-03-03 08:37:15,233 star_v2 INFO:   niah_30012_100000_0.2: score=1.0 turns=1 time=16.1s
+NIAH (hard):  65%|██████▌   | 13/20 [02:15<01:24, 12.07s/it]2026-03-03 08:37:47,673 star_v2 INFO:   niah_30013_100000_0.2: score=1.0 turns=1 time=32.4s
+NIAH (hard):  70%|███████   | 14/20 [02:47<01:49, 18.22s/it]2026-03-03 08:37:58,330 star_v2 INFO:   niah_30014_100000_0.5: score=1.0 turns=1 time=10.7s
+NIAH (hard):  75%|███████▌  | 15/20 [02:58<01:19, 15.94s/it]2026-03-03 08:38:01,156 star_v2 INFO:   niah_30015_100000_0.5: score=1.0 turns=1 time=2.8s
+NIAH (hard):  80%|████████  | 16/20 [03:01<00:47, 11.99s/it]2026-03-03 08:38:07,566 star_v2 INFO:   niah_30016_100000_0.8: score=0.0 turns=1 time=6.4s
+NIAH (hard):  85%|████████▌ | 17/20 [03:07<00:30, 10.31s/it]2026-03-03 08:38:20,321 star_v2 INFO:   niah_30017_100000_0.8: score=1.0 turns=1 time=12.8s
+NIAH (hard):  90%|█████████ | 18/20 [03:20<00:22, 11.05s/it]2026-03-03 08:38:43,718 star_v2 INFO:   niah_30018_100000_0.9: score=0.0 turns=1 time=23.4s
+NIAH (hard):  95%|█████████▌| 19/20 [03:43<00:14, 14.76s/it]2026-03-03 08:38:55,931 star_v2 INFO:   niah_30019_100000_0.9: score=1.0 turns=1 time=12.2s
+NIAH (hard): 100%|██████████| 20/20 [03:56<00:00, 13.99s/it]NIAH (hard): 100%|██████████| 20/20 [03:56<00:00, 11.80s/it]
+2026-03-03 08:38:55,931 star_v2 INFO: NIAH (hard): 18/20 correct
+Multi-NIAH:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-03 08:39:01,411 star_v2 INFO:   mniah_000_10000_3needles: recall=0.00 (0/3) turns=1 time=5.5s
+Multi-NIAH:   5%|▌         | 1/20 [00:05<01:44,  5.47s/it]2026-03-03 08:39:06,475 star_v2 INFO:   mniah_001_10000_3needles: recall=0.00 (0/3) turns=1 time=5.1s
+Multi-NIAH:  10%|█         | 2/20 [00:10<01:34,  5.23s/it]2026-03-03 08:39:10,953 star_v2 INFO:   mniah_002_10000_3needles: recall=0.00 (0/3) turns=1 time=4.5s
+Multi-NIAH:  15%|█▌        | 3/20 [00:15<01:23,  4.89s/it]2026-03-03 08:39:17,057 star_v2 INFO:   mniah_003_10000_3needles: recall=1.00 (3/3) turns=1 time=6.1s
+Multi-NIAH:  20%|██        | 4/20 [00:21<01:25,  5.37s/it]2026-03-03 08:39:26,772 star_v2 INFO:   mniah_004_20000_5needles: recall=1.00 (5/5) turns=1 time=9.7s
+Multi-NIAH:  25%|██▌       | 5/20 [00:30<01:44,  6.94s/it]2026-03-03 08:39:36,400 star_v2 INFO:   mniah_005_20000_5needles: recall=1.00 (5/5) turns=1 time=9.6s
+Multi-NIAH:  30%|███       | 6/20 [00:40<01:49,  7.85s/it]2026-03-03 08:39:44,916 star_v2 INFO:   mniah_006_20000_5needles: recall=0.80 (4/5) turns=1 time=8.5s
+Multi-NIAH:  35%|███▌      | 7/20 [00:48<01:44,  8.07s/it]2026-03-03 08:39:50,533 star_v2 INFO:   mniah_007_20000_5needles: recall=0.00 (0/5) turns=1 time=5.6s
+Multi-NIAH:  40%|████      | 8/20 [00:54<01:27,  7.29s/it]2026-03-03 08:40:56,528 star_v2 INFO:   mniah_008_50000_5needles: recall=0.40 (2/5) turns=3 time=66.0s
+Multi-NIAH:  45%|████▌     | 9/20 [02:00<04:42, 25.64s/it]2026-03-03 08:42:02,326 star_v2 INFO:   mniah_009_50000_5needles: recall=0.40 (2/5) turns=3 time=65.8s
+Multi-NIAH:  50%|█████     | 10/20 [03:06<06:20, 38.04s/it]2026-03-03 08:42:45,381 star_v2 INFO:   mniah_010_50000_5needles: recall=1.00 (5/5) turns=1 time=43.1s
+Multi-NIAH:  55%|█████▌    | 11/20 [03:49<05:56, 39.57s/it]2026-03-03 08:43:51,101 star_v2 INFO:   mniah_011_50000_5needles: recall=0.40 (2/5) turns=3 time=65.7s
+Multi-NIAH:  60%|██████    | 12/20 [04:55<06:20, 47.53s/it]2026-03-03 08:43:57,905 star_v2 INFO:   mniah_012_50000_8needles: recall=0.62 (5/8) turns=1 time=6.8s
+Multi-NIAH:  65%|██████▌   | 13/20 [05:01<04:06, 35.19s/it]2026-03-03 08:44:40,758 star_v2 INFO:   mniah_013_50000_8needles: recall=0.62 (5/8) turns=1 time=42.9s
+Multi-NIAH:  70%|███████   | 14/20 [05:44<03:45, 37.51s/it]2026-03-03 08:44:47,945 star_v2 INFO:   mniah_014_50000_8needles: recall=0.88 (7/8) turns=1 time=7.2s
+Multi-NIAH:  75%|███████▌  | 15/20 [05:52<02:21, 28.37s/it]2026-03-03 08:45:31,677 star_v2 INFO:   mniah_015_50000_8needles: recall=1.00 (8/8) turns=1 time=43.7s
+Multi-NIAH:  80%|████████  | 16/20 [06:35<02:11, 32.99s/it]2026-03-03 08:45:39,638 star_v2 INFO:   mniah_016_100000_8needles: recall=0.00 (0/8) turns=1 time=8.0s
+Multi-NIAH:  85%|████████▌ | 17/20 [06:43<01:16, 25.46s/it]2026-03-03 08:46:45,381 star_v2 INFO:   mniah_017_100000_8needles: recall=0.25 (2/8) turns=3 time=65.7s
+Multi-NIAH:  90%|█████████ | 18/20 [07:49<01:15, 37.57s/it]2026-03-03 08:46:53,736 star_v2 INFO:   mniah_018_100000_8needles: recall=0.38 (3/8) turns=1 time=8.4s
+Multi-NIAH:  95%|█████████▌| 19/20 [07:57<00:28, 28.79s/it]2026-03-03 08:48:00,364 star_v2 INFO:   mniah_019_100000_8needles: recall=0.00 (0/8) turns=5 time=66.6s
+Multi-NIAH: 100%|██████████| 20/20 [09:04<00:00, 40.15s/it]Multi-NIAH: 100%|██████████| 20/20 [09:04<00:00, 27.22s/it]
+2026-03-03 08:48:00,364 star_v2 INFO: Multi-NIAH: 9/20 with recall > 0.5
+DocClassify:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-03 08:48:06,284 star_v2 INFO:   classify_000_5docs: acc=0.60 (3/5) turns=1 time=5.9s
+DocClassify:   5%|▌         | 1/20 [00:05<01:52,  5.92s/it]2026-03-03 08:48:11,716 star_v2 INFO:   classify_001_5docs: acc=0.80 (4/5) turns=1 time=5.4s
+DocClassify:  10%|█         | 2/20 [00:11<01:41,  5.63s/it]2026-03-03 08:48:17,194 star_v2 INFO:   classify_002_5docs: acc=0.60 (3/5) turns=1 time=5.5s
+DocClassify:  15%|█▌        | 3/20 [00:16<01:34,  5.56s/it]2026-03-03 08:48:22,696 star_v2 INFO:   classify_003_5docs: acc=1.00 (5/5) turns=1 time=5.5s
+DocClassify:  20%|██        | 4/20 [00:22<01:28,  5.54s/it]2026-03-03 08:48:27,998 star_v2 INFO:   classify_004_5docs: acc=1.00 (5/5) turns=1 time=5.3s
+DocClassify:  25%|██▌       | 5/20 [00:27<01:21,  5.45s/it]2026-03-03 08:48:33,971 star_v2 INFO:   classify_005_10docs: acc=1.00 (10/10) turns=1 time=6.0s
+DocClassify:  30%|███       | 6/20 [00:33<01:18,  5.63s/it]2026-03-03 08:48:41,297 star_v2 INFO:   classify_006_10docs: acc=0.90 (9/10) turns=1 time=7.3s
+DocClassify:  35%|███▌      | 7/20 [00:40<01:20,  6.18s/it]2026-03-03 08:48:47,245 star_v2 INFO:   classify_007_10docs: acc=0.90 (9/10) turns=1 time=5.9s
+DocClassify:  40%|████      | 8/20 [00:46<01:13,  6.11s/it]2026-03-03 08:48:53,508 star_v2 INFO:   classify_008_10docs: acc=0.90 (9/10) turns=1 time=6.3s
+DocClassify:  45%|████▌     | 9/20 [00:53<01:07,  6.16s/it]2026-03-03 08:48:59,709 star_v2 INFO:   classify_009_10docs: acc=0.50 (5/10) turns=1 time=6.2s
+DocClassify:  50%|█████     | 10/20 [00:59<01:01,  6.17s/it]2026-03-03 08:49:06,869 star_v2 INFO:   classify_010_15docs: acc=0.93 (14/15) turns=1 time=7.2s
+DocClassify:  55%|█████▌    | 11/20 [01:06<00:58,  6.47s/it]2026-03-03 08:49:14,323 star_v2 INFO:   classify_011_15docs: acc=0.87 (13/15) turns=1 time=7.5s
+DocClassify:  60%|██████    | 12/20 [01:13<00:54,  6.77s/it]2026-03-03 08:49:21,165 star_v2 INFO:   classify_012_15docs: acc=0.93 (14/15) turns=1 time=6.8s
+DocClassify:  65%|██████▌   | 13/20 [01:20<00:47,  6.79s/it]2026-03-03 08:49:29,134 star_v2 INFO:   classify_013_15docs: acc=0.93 (14/15) turns=1 time=8.0s
+DocClassify:  70%|███████   | 14/20 [01:28<00:42,  7.15s/it]2026-03-03 08:49:36,599 star_v2 INFO:   classify_014_15docs: acc=0.80 (12/15) turns=1 time=7.5s
+DocClassify:  75%|███████▌  | 15/20 [01:36<00:36,  7.24s/it]2026-03-03 08:49:44,419 star_v2 INFO:   classify_015_20docs: acc=0.80 (16/20) turns=1 time=7.8s
+DocClassify:  80%|████████  | 16/20 [01:44<00:29,  7.42s/it]2026-03-03 08:49:52,353 star_v2 INFO:   classify_016_20docs: acc=0.70 (14/20) turns=1 time=7.9s
+DocClassify:  85%|████████▌ | 17/20 [01:51<00:22,  7.57s/it]2026-03-03 08:50:00,388 star_v2 INFO:   classify_017_20docs: acc=0.75 (15/20) turns=1 time=8.0s
+DocClassify:  90%|█████████ | 18/20 [02:00<00:15,  7.71s/it]2026-03-03 08:50:07,649 star_v2 INFO:   classify_018_20docs: acc=0.00 (0/20) turns=1 time=7.3s
+DocClassify:  95%|█████████▌| 19/20 [02:07<00:07,  7.58s/it]2026-03-03 08:50:15,978 star_v2 INFO:   classify_019_20docs: acc=0.80 (16/20) turns=1 time=8.3s
+DocClassify: 100%|██████████| 20/20 [02:15<00:00,  7.80s/it]DocClassify: 100%|██████████| 20/20 [02:15<00:00,  6.78s/it]
+2026-03-03 08:50:15,978 star_v2 INFO: DocClassify: 18/20 with acc > 0.5
+2026-03-03 08:50:15,983 star_v2 INFO: 
+============================================================
+2026-03-03 08:50:15,983 star_v2 INFO: STaR-v2 COLLECTION COMPLETE
+2026-03-03 08:50:15,983 star_v2 INFO: ============================================================
+2026-03-03 08:50:15,983 star_v2 INFO: Total: 60
+2026-03-03 08:50:15,983 star_v2 INFO: Correct (score > 0.5): 45 (75.0%)
+2026-03-03 08:50:15,983 star_v2 INFO:   niah: 18/20
+2026-03-03 08:50:15,983 star_v2 INFO:   multi_niah: 9/20
+2026-03-03 08:50:15,983 star_v2 INFO:   doc_classify: 18/20
+2026-03-03 08:50:15,983 star_v2 INFO: Time: 916s (0.25 GPU-hours)
+2026-03-03 08:50:15,983 star_v2 INFO: Saved to: data/trajectories/star_v2

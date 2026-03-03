@@ -1,0 +1,138 @@
+{
+  "benchmark": "niah",
+  "accuracy": 0.8,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "niah_10000_5000_0.1",
+      "question": "Who is the key contact person?",
+      "expected": "BRAVO-42",
+      "predicted": "The key contact person is **BRAVO-42**.",
+      "score": 1.0,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 4.923380613327026,
+      "doc_length": 5002,
+      "needle_position": 0.1
+    },
+    {
+      "task_id": "niah_10001_5000_0.2",
+      "question": "What is the budget total?",
+      "expected": "CHARLIE-19",
+      "predicted": "The question asks for the \"budget total,\" but the provided documents do not mention any budget figures, financial totals, or related data. Therefore, the answer is:\n\n**not found**",
+      "score": 0.0,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 4.998326778411865,
+      "doc_length": 5002,
+      "needle_position": 0.25
+    },
+    {
+      "task_id": "niah_10002_5000_0.5",
+      "question": "What is the critical deadline?",
+      "expected": "HOTEL-256",
+      "predicted": "The critical deadline is **HOTEL-256**.",
+      "score": 1.0,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 4.912328243255615,
+      "doc_length": 5002,
+      "needle_position": 0.5
+    },
+    {
+      "task_id": "niah_10003_5000_0.8",
+      "question": "What is the project codename?",
+      "expected": "ALPHA-7",
+      "predicted": "The project codename is **ALPHA-7**.\n\n**Answer:** ALPHA-7",
+      "score": 1.0,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 3.259383201599121,
+      "doc_length": 5002,
+      "needle_position": 0.75
+    },
+    {
+      "task_id": "niah_10004_5000_0.9",
+      "question": "What is the assigned location?",
+      "expected": "Sector 9 North Wing",
+      "predicted": "The assigned location is **Sector 9 North Wing**.\n\n**Reasoning:**  \nThe document contains multiple mentions of infrastructure improvements, budget allocations, market trends, communication systems, and other administrative activities. However, the only specific location mentioned in the text is **\"The assigned location is Sector 9 North Wing.\"** This is the only direct reference to a physical location, and it is explicitly stated.\n\nNo other locations are mentioned in the document, so the answer is:\n\n**Sector 9 North Wing**.",
+      "score": 1.0,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 6.1594789028167725,
+      "doc_length": 5002,
+      "needle_position": 0.9
+    },
+    {
+      "task_id": "niah_10005_10000_0.1",
+      "question": "What is the assigned location?",
+      "expected": "CHARLIE-19",
+      "predicted": "The assigned location is **CHARLIE-19**.\n\n**Answer:** CHARLIE-19",
+      "score": 1.0,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 3.590810537338257,
+      "doc_length": 10002,
+      "needle_position": 0.1
+    },
+    {
+      "task_id": "niah_10006_10000_0.2",
+      "question": "What is the project codename?",
+      "expected": "BRAVO-42",
+      "predicted": "The project codename is **BRAVO-42**.\n\n**Reason:** The document contains the line:  \n*\"The project codename is BRAVO-42.\"*  \n\nThis is the only mention of a project codename in the provided text.",
+      "score": 1.0,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 6.615267038345337,
+      "doc_length": 10002,
+      "needle_position": 0.25
+    },
+    {
+      "task_id": "niah_10007_10000_0.5",
+      "question": "Who is the key contact person?",
+      "expected": "JULIET-99",
+      "predicted": "The key contact person is **JULIET-99**.",
+      "score": 1.0,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 2.3799426555633545,
+      "doc_length": 10002,
+      "needle_position": 0.5
+    },
+    {
+      "task_id": "niah_10008_10000_0.8",
+      "question": "When is the meeting scheduled?",
+      "expected": "Professor James Chen",
+      "predicted": "is explicitly stated in the document:  \n**\"the meeting is",
+      "score": 0.0,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 4.947207689285278,
+      "doc_length": 10002,
+      "needle_position": 0.75
+    },
+    {
+      "task_id": "niah_10009_10000_0.9",
+      "question": "What is the budget total?",
+      "expected": "GOLF-77",
+      "predicted": "The total budget is **GOLF-77**.\n\n**Explanation:**  \nThe document contains multiple entries about budget allocations, but none of them explicitly state a \"total budget\" value. However, the line **\"The budget total is GOLF-77.\"** is explicitly mentioned in the text, which indicates that this is the value for the total budget.\n\nThus, the answer is:\n\n**GOLF-77**.",
+      "score": 1.0,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 5.812598943710327,
+      "doc_length": 10002,
+      "needle_position": 0.9
+    }
+  ],
+  "by_doc_length": {
+    "5K": 0.8,
+    "10K": 0.8
+  },
+  "by_needle_position": {
+    "0.10": 1.0,
+    "0.25": 0.5,
+    "0.50": 1.0,
+    "0.75": 0.5,
+    "0.90": 1.0
+  }
+}
