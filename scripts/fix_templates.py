@@ -130,18 +130,19 @@ def fix_trajectory(trajectory: dict) -> dict:
     fixes = {"final_var_literal": 0, "final_plan": 0, "missing_fstring": 0}
     flagged_for_removal = False
 
+    # Track available variables across ALL turns (REPL state persists)
+    available_vars = []
+
     for turn in trajectory.get("turns", []):
         code = turn.get("parsed_code", "")
         if not code:
             continue
 
-        # Track available variables (rough approximation)
-        # In practice, we'd need to actually parse the REPL state
-        available_vars = []
+        # Accumulate variables from this turn
         for line in code.split("\n"):
             if "=" in line and not line.strip().startswith("#"):
                 var = line.split("=")[0].strip()
-                if var.isidentifier():
+                if var.isidentifier() and var not in available_vars:
                     available_vars.append(var)
 
         # Fix FINAL_VAR with literal
