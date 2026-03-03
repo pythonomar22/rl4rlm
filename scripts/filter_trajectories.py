@@ -88,29 +88,28 @@ def trajectory_to_sft_samples(trajectory: dict, system_prompt: str) -> list[dict
         if not code:
             continue
 
-        # The "input" is all messages so far
-        # The "output" is the model's code for this turn
-        sample = {
-            "messages": list(messages),  # Copy
-            "completion": f"```repl\n{code}\n```",
-            "turn_index": i,
-            "task_id": trajectory.get("task_id", "unknown"),
-        }
-        samples.append(sample)
-
-        # Add this turn to the conversation for the next sample
-        messages.append({"role": "assistant", "content": f"```repl\n{code}\n```"})
-
-        # Add feedback matching rlm.py's actual format
-        stdout = turn.get("stdout", "")
         error = turn.get("error", "")
+        stdout = turn.get("stdout", "")
+
+        # Only create training samples from non-error turns.
+        # Error turns teach bad patterns (failed code as positive examples).
+        if not error:
+            sample = {
+                "messages": list(messages),  # Copy
+                "completion": f"```repl\n{code}\n```",
+                "turn_index": i,
+                "task_id": trajectory.get("task_id", "unknown"),
+            }
+            samples.append(sample)
+
+        # Still add ALL turns to conversation context so later turns
+        # have the full history (including error recovery)
+        messages.append({"role": "assistant", "content": f"```repl\n{code}\n```"})
 
         if not turn.get("terminated"):
             if error:
-                # Matches rlm.py: error_feedback + metadata
                 feedback = f"Error executing code:\n{error}"
             elif stdout:
-                # Matches rlm.py: stdout_metadata + state metadata
                 stdout_display = stdout[:1000]
                 if len(stdout) > 1000:
                     stdout_display += f"\n... [{len(stdout) - 1000} more chars]"

@@ -31,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import torch
 from tqdm import tqdm
 
-from scaffold.llm_query import HFModel
+from scaffold.llm_query import HFModel, strip_think_tags
 from scaffold.rlm import rlm, trajectory_to_dict
 from scaffold.prompts.qwen2b import QWEN_2B_SYSTEM_PROMPT
 from eval.benchmarks.niah import generate_niah_suite, score_niah
@@ -120,6 +120,8 @@ def run_niah_eval(
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="Qwen/Qwen3-1.7B")
+    parser.add_argument("--adapter", default=None,
+                        help="Path to LoRA adapter (e.g., data/sft/lora_v1/final)")
     parser.add_argument("--benchmark", default="niah", choices=["niah"])
     parser.add_argument("--n-tasks", type=int, default=10)
     parser.add_argument("--max-iterations", type=int, default=8)
@@ -142,13 +144,26 @@ def main():
 
     # Load model
     logger.info(f"Loading model: {args.model}")
+    if args.adapter:
+        logger.info(f"Loading LoRA adapter: {args.adapter}")
     t0 = time.time()
-    model = HFModel(
-        model_name=args.model,
-        device="cuda:0",
-        max_new_tokens=1024,
-        temperature=0.7,
-    )
+
+    if args.adapter:
+        from training.rl import RLModel
+        model = RLModel(
+            base_model_name=args.model,
+            adapter_path=args.adapter,
+            device="cuda:0",
+            max_new_tokens=1024,
+        )
+    else:
+        model = HFModel(
+            model_name=args.model,
+            device="cuda:0",
+            max_new_tokens=1024,
+            temperature=0.7,
+        )
+
     load_time = time.time() - t0
     logger.info(f"Model loaded in {load_time:.1f}s")
 
@@ -189,6 +204,7 @@ def main():
 
     config = {
         "model": args.model,
+        "adapter": args.adapter,
         "benchmark": args.benchmark,
         "n_tasks": args.n_tasks,
         "max_iterations": args.max_iterations,

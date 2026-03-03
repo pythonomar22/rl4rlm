@@ -96,9 +96,15 @@ class RLModel:
         """Generate for RLM root turns."""
         from scaffold.llm_query import strip_think_tags
 
-        text = self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True,
-        )
+        try:
+            text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+                enable_thinking=False,
+            )
+        except TypeError:
+            text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+            )
         inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
         input_len = inputs["input_ids"].shape[1]
 
@@ -129,9 +135,15 @@ class RLModel:
         from scaffold.llm_query import strip_think_tags
 
         messages = [{"role": "user", "content": prompt_str}]
-        text = self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True,
-        )
+        try:
+            text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+                enable_thinking=False,
+            )
+        except TypeError:
+            text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+            )
         inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
         input_len = inputs["input_ids"].shape[1]
 
@@ -147,6 +159,13 @@ class RLModel:
 
         new_tokens = outputs[0][input_len:]
         response = self.tokenizer.decode(new_tokens, skip_special_tokens=True)
+
+        self.generation_log.append({
+            "type": "sub_query",
+            "input_tokens": input_len,
+            "output_tokens": len(new_tokens),
+        })
+
         return strip_think_tags(response)
 
     def total_stats(self) -> dict:
