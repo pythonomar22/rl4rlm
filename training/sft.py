@@ -72,15 +72,23 @@ class SFTDataset(Dataset):
         # Build the full conversation with completion
         full_messages = messages + [{"role": "assistant", "content": completion}]
 
-        # Tokenize with chat template
-        text = self.tokenizer.apply_chat_template(
-            full_messages, tokenize=False, add_generation_prompt=False,
-        )
-
-        # Also tokenize without the completion to find where labels start
-        prompt_text = self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True,
-        )
+        # Tokenize with chat template (disable thinking to avoid extra tokens)
+        try:
+            text = self.tokenizer.apply_chat_template(
+                full_messages, tokenize=False, add_generation_prompt=False,
+                enable_thinking=False,
+            )
+            prompt_text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+                enable_thinking=False,
+            )
+        except TypeError:
+            text = self.tokenizer.apply_chat_template(
+                full_messages, tokenize=False, add_generation_prompt=False,
+            )
+            prompt_text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+            )
 
         # Tokenize
         full_tokens = self.tokenizer(
