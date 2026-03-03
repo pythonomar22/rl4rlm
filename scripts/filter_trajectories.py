@@ -31,30 +31,65 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("filter")
 
 
+def reconstruct_initial_metadata(trajectory: dict) -> str:
+    """
+    Reconstruct the initial metadata message from stored trajectory data.
+
+    During RLM execution, the model sees metadata (context length, prefix,
+    available functions) instead of the full prompt. We reconstruct this
+    from the stored prompt prefix and length.
+    """
+    prompt = trajectory.get("prompt", "")
+    prompt_length = trajectory.get("prompt_length", len(prompt))
+
+    # Remove trailing "..." from truncated prompts
+    prefix = prompt.rstrip(".")
+    if len(prefix) < len(prompt):
+        prefix = prefix  # Was truncated
+    else:
+        prefix = prompt[:500]
+
+    if prompt_length > 500:
+        prefix_display = prefix + f"\n... [{prompt_length - 500} more characters]"
+    else:
+        prefix_display = prefix
+
+    parts = [
+        f"Context length: {prompt_length} characters",
+        f"Context prefix:\n{prefix_display}",
+        f"\nAvailable functions: llm_query(prompt_str), FINAL(answer), FINAL_VAR(variable_name)",
+        f"Available variable: context (the full input, {prompt_length} chars)",
+    ]
+    return "\n".join(parts)
+
+
 def trajectory_to_sft_samples(trajectory: dict, system_prompt: str) -> list[dict]:
     """
     Convert a trajectory to per-turn SFT training samples.
 
     Each sample is a (messages, completion) pair where:
-    - messages: conversation up to this turn
+    - messages: conversation up to this turn (matching actual RLM conversation)
     - completion: the model's code for this turn
 
-    This is how the paper trains: per-turn supervised learning.
+    The initial metadata message is reconstructed from stored prompt data,
+    matching what the model sees during actual RLM execution.
     """
     samples = []
 
-    # Build conversation incrementally
-    messages = [{"role": "system", "content": system_prompt}]
+    # Build conversation incrementally — matches build_initial_message() in rlm.py
+    initial_metadata = reconstruct_initial_metadata(trajectory)
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": initial_metadata},
+    ]
 
     for i, turn in enumerate(trajectory.get("turns", [])):
         code = turn.get("parsed_code")
         if not code:
             continue
 
-        raw_response = turn.get("raw_response", "")
-
         # The "input" is all messages so far
-        # The "output" is the model's response (with code block)
+        # The "output" is the model's code for this turn
         sample = {
             "messages": list(messages),  # Copy
             "completion": f"```repl\n{code}\n```",
@@ -66,17 +101,22 @@ def trajectory_to_sft_samples(trajectory: dict, system_prompt: str) -> list[dict
         # Add this turn to the conversation for the next sample
         messages.append({"role": "assistant", "content": f"```repl\n{code}\n```"})
 
-        # Add feedback (stdout or error)
+        # Add feedback matching rlm.py's actual format
         stdout = turn.get("stdout", "")
         error = turn.get("error", "")
-        if error:
-            feedback = f"Error: {error}"
-        elif stdout:
-            feedback = f"Output:\n{stdout[:1000]}"
-        else:
-            feedback = "Code executed successfully."
 
         if not turn.get("terminated"):
+            if error:
+                # Matches rlm.py: error_feedback + metadata
+                feedback = f"Error executing code:\n{error}"
+            elif stdout:
+                # Matches rlm.py: stdout_metadata + state metadata
+                stdout_display = stdout[:1000]
+                if len(stdout) > 1000:
+                    stdout_display += f"\n... [{len(stdout) - 1000} more chars]"
+                feedback = f"Output:\n{stdout_display}"
+            else:
+                feedback = "Code executed successfully."
             messages.append({"role": "user", "content": feedback})
 
     return samples

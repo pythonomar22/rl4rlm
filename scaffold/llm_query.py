@@ -124,10 +124,17 @@ class HFModel:
         max_new_tokens = kwargs.get("max_new_tokens", self.max_new_tokens)
         temperature = kwargs.get("temperature", self.temperature)
 
-        # Apply chat template
-        text = self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True,
-        )
+        # Apply chat template (disable thinking to save tokens)
+        try:
+            text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+                enable_thinking=False,
+            )
+        except TypeError:
+            # Fallback for models without enable_thinking
+            text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+            )
         inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
         input_len = inputs["input_ids"].shape[1]
 
@@ -170,9 +177,15 @@ class HFModel:
 
         import torch
 
-        text = self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True,
-        )
+        try:
+            text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+                enable_thinking=False,
+            )
+        except TypeError:
+            text = self.tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True,
+            )
         inputs = self.tokenizer(text, return_tensors="pt").to(self.device)
         input_len = inputs["input_ids"].shape[1]
 
