@@ -43,6 +43,7 @@ from tqdm import tqdm
 from scaffold.rlm import rlm, trajectory_to_dict
 from scaffold.prompts.qwen2b import QWEN_2B_SYSTEM_PROMPT
 from eval.benchmarks.niah import generate_niah_suite, score_niah
+from eval.benchmarks.multi_niah import generate_multi_niah_suite, score_multi_niah
 from training.rewards import binary_reward, composite_reward
 
 logging.basicConfig(
@@ -181,12 +182,25 @@ class RLModel:
         }
 
 
+def multi_niah_reward(predicted: str | None, expected_answers: list[str],
+                      trajectory: dict) -> float:
+    """Reward for multi-needle NIAH: recall + format bonus."""
+    if predicted is None:
+        return 0.0
+    scores = score_multi_niah(predicted, expected_answers)
+    recall = scores["recall"]
+    # Small format bonus for proper termination
+    fmt_bonus = 0.1 if trajectory.get("terminated") else 0.0
+    return 0.9 * recall + 0.1 * fmt_bonus
+
+
 def grpo_step(
     model: RLModel,
     optimizer: torch.optim.Optimizer,
     task_prompts: list[str],
-    expected_answers: list[str],
+    expected_answers: list,  # list[str] for NIAH, list[list[str]] for multi-NIAH
     system_prompt: str,
+    reward_fn: str = "composite",  # "composite" or "multi_niah"
     k: int = 4,
     clip_eps: float = 0.2,
     kl_coeff: float = 0.01,
@@ -222,9 +236,14 @@ def grpo_step(
                 verbose=False,
             )
 
-            reward = composite_reward(
-                traj.answer, expected, trajectory_to_dict(traj),
-            )
+            if reward_fn == "multi_niah":
+                reward = multi_niah_reward(
+                    traj.answer, expected, trajectory_to_dict(traj),
+                )
+            else:
+                reward = composite_reward(
+                    traj.answer, expected, trajectory_to_dict(traj),
+                )
             group_rewards.append(reward)
             group_trajs.append(traj)
 
@@ -321,6 +340,9 @@ def main():
     parser.add_argument("--doc-lengths", nargs="+", type=int,
                         default=[5000, 10000, 20000],
                         help="Document lengths for NIAH training tasks")
+    parser.add_argument("--task-type", default="niah",
+                        choices=["niah", "multi_niah"],
+                        help="Task type for training")
     args = parser.parse_args()
 
     assert torch.cuda.device_count() <= 2
@@ -348,8 +370,16 @@ def main():
     optimizer = torch.optim.AdamW(trainable_params, lr=args.lr, weight_decay=0.01)
 
     # Generate task pool
-    tasks = generate_niah_suite(n_tasks=args.n_tasks, doc_lengths=args.doc_lengths)
-    logger.info(f"  Doc lengths: {args.doc_lengths}")
+    import random as _random
+    if args.task_type == "multi_niah":
+        tasks = generate_multi_niah_suite(n_tasks=args.n_tasks)
+        reward_fn = "multi_niah"
+        logger.info(f"  Task type: multi_niah (O(K) needle search)")
+    else:
+        tasks = generate_niah_suite(n_tasks=args.n_tasks, doc_lengths=args.doc_lengths)
+        reward_fn = "composite"
+        logger.info(f"  Task type: niah")
+        logger.info(f"  Doc lengths: {args.doc_lengths}")
 
     # Training loop
     logger.info(f"\nStarting GRPO training:")
@@ -357,16 +387,20 @@ def main():
     logger.info(f"  {args.batch_prompts} prompts per step")
     logger.info(f"  {args.steps} steps")
     logger.info(f"  {args.n_tasks} total tasks in pool")
+    logger.info(f"  Reward function: {reward_fn}")
 
     training_log = []
     t0 = time.time()
 
     for step in range(args.steps):
         # Sample batch of tasks
-        import random
-        batch_tasks = random.sample(tasks, min(args.batch_prompts, len(tasks)))
+        batch_tasks = _random.sample(tasks, min(args.batch_prompts, len(tasks)))
         batch_prompts = [t.prompt for t in batch_tasks]
-        batch_expected = [t.expected_answer for t in batch_tasks]
+
+        if args.task_type == "multi_niah":
+            batch_expected = [t.expected_answers for t in batch_tasks]
+        else:
+            batch_expected = [t.expected_answer for t in batch_tasks]
 
         # GRPO step
         stats = grpo_step(
@@ -375,6 +409,7 @@ def main():
             task_prompts=batch_prompts,
             expected_answers=batch_expected,
             system_prompt=QWEN_2B_SYSTEM_PROMPT,
+            reward_fn=reward_fn,
             k=args.k,
         )
 
@@ -387,6 +422,7 @@ def main():
                 f"Reward: {stats['avg_reward']:.3f} | "
                 f"Correct: {stats['correct']}/{stats['total']} | "
                 f"Loss: {stats['policy_loss']:.4f} | "
+                f"Updates: {stats['n_updates']} | "
                 f"Turns: {stats['avg_turns']:.1f} | "
                 f"Time: {elapsed:.0f}s"
             )
@@ -407,10 +443,19 @@ def main():
                 )
                 with open(sample_dir / f"traj_{i}.json", "w") as f:
                     json.dump(trajectory_to_dict(traj), f, indent=2, default=str)
-                logger.info(
-                    f"  Sample {i}: score={score_niah(traj.answer, task.expected_answer)} "
-                    f"answer={str(traj.answer)[:80]}"
-                )
+
+                if args.task_type == "multi_niah":
+                    scores = score_multi_niah(traj.answer, task.expected_answers)
+                    logger.info(
+                        f"  Sample {i}: recall={scores['recall']:.2f} "
+                        f"({scores['found']}/{scores['total']}) "
+                        f"answer={str(traj.answer)[:80]}"
+                    )
+                else:
+                    logger.info(
+                        f"  Sample {i}: score={score_niah(traj.answer, task.expected_answer)} "
+                        f"answer={str(traj.answer)[:80]}"
+                    )
 
         if (step + 1) % args.save_interval == 0:
             ckpt_dir = output_dir / f"checkpoint-{step + 1}"
