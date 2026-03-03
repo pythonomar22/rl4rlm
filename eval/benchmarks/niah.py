@@ -135,11 +135,16 @@ def generate_niah_suite(
     n_tasks: int = 50,
     doc_lengths: list[int] | None = None,
     positions: list[float] | None = None,
+    seed_offset: int = 0,
 ) -> list[NIAHTask]:
     """
     Generate a full NIAH benchmark suite.
 
     Default: 50 tasks across varying document lengths and needle positions.
+
+    Args:
+        seed_offset: Offset for task seeds to avoid overlap with training data.
+                     Use 0 for training, 10000+ for eval.
     """
     if doc_lengths is None:
         doc_lengths = [5000, 10000, 20000, 50000, 100000]
@@ -151,18 +156,21 @@ def generate_niah_suite(
     for doc_len in doc_lengths:
         for pos in positions:
             for _ in range(n_tasks // (len(doc_lengths) * len(positions)) or 1):
-                tasks.append(generate_niah_task(idx, doc_len, pos))
+                tasks.append(generate_niah_task(
+                    idx + seed_offset, doc_len, pos, seed=idx + seed_offset,
+                ))
                 idx += 1
                 if len(tasks) >= n_tasks:
                     return tasks
 
     # Fill remaining with random combinations
-    rng = random.Random(42)
+    rng = random.Random(42 + seed_offset)
     while len(tasks) < n_tasks:
         tasks.append(generate_niah_task(
-            idx,
+            idx + seed_offset,
             rng.choice(doc_lengths),
             rng.choice(positions),
+            seed=idx + seed_offset,
         ))
         idx += 1
 

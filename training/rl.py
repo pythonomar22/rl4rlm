@@ -318,6 +318,9 @@ def main():
     parser.add_argument("--save-interval", type=int, default=25)
     parser.add_argument("--sample-trajectories-interval", type=int, default=10,
                         help="How often to log sample trajectories for inspection")
+    parser.add_argument("--doc-lengths", nargs="+", type=int,
+                        default=[5000, 10000, 20000],
+                        help="Document lengths for NIAH training tasks")
     args = parser.parse_args()
 
     assert torch.cuda.device_count() <= 2
@@ -345,7 +348,8 @@ def main():
     optimizer = torch.optim.AdamW(trainable_params, lr=args.lr, weight_decay=0.01)
 
     # Generate task pool
-    tasks = generate_niah_suite(n_tasks=args.n_tasks, doc_lengths=[5000, 10000, 20000])
+    tasks = generate_niah_suite(n_tasks=args.n_tasks, doc_lengths=args.doc_lengths)
+    logger.info(f"  Doc lengths: {args.doc_lengths}")
 
     # Training loop
     logger.info(f"\nStarting GRPO training:")
