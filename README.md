@@ -4,7 +4,7 @@ Training [Recursive Language Models](https://arxiv.org/abs/2502.14155) (RLMs) vi
 
 **Key result:** RL (DPO, GRPO) improves multi-needle retrieval from 58% to 88% over SFT — but only after fixing two subtle implementation bugs. Naive GRPO catastrophically regresses to 41%.
 
-**[Paper](icmltemplate/final_report.pdf)** | **[Models on HuggingFace](https://huggingface.co/collections/omar81939)**
+**[Models on HuggingFace](https://huggingface.co/collections/omar81939/rl4rlm-training-native-recursive-language-models-69a76eb0a64b8b22b4d6c5d5)**
 
 ## Results
 
