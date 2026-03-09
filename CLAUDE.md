@@ -1,226 +1,295 @@
-# CLAUDE.md
+# CLAUDE.md — Training a Natively Recursive Language Model
 
-This is a research project to train natively recursive language models (RLMs) via reinforcement learning. The RLM paper (Zhang, Kraska, Khattab 2026) showed that SFT on filtered trajectories improved Qwen3-8B by 28.3% on long-context tasks. We believe RL can go much further. Read `PAPER_REFERENCE.md` for algorithms, prompts, and findings.
+## What We're Building
 
-## ⚠️ Cluster Safety
+We are training **the first open-weight natively recursive language model based on Qwen3.5**. When released publicly, this model will be able to solve long-context tasks that defeat even frontier models — by writing Python code in a persistent REPL, chunking and searching its input programmatically, and recursively calling itself on sub-problems.
 
-**Read `CLUSTER_SAFETY.md` before running anything.** Shared 8×H200 server. GPUs 6 and 7 only. Check they are free before every use. Release immediately after. No external API calls. No inference servers. No interaction with processes on GPUs 0–5. No exceptions.
+The original RLM paper (Zhang, Kraska & Khattab, arXiv:2512.24601) trained RLM-Qwen3-8B and showed a 28.3% average improvement over base Qwen3-8B, approaching GPT-5 on long-context tasks. **We are going bigger and better** — targeting Qwen3.5-35B-A3B (MoE) on Tinker's training API, which removes all GPU/VRAM constraints.
 
-## ⚠️ Think Like a Researcher
+See `PAPER.md` for the full paper reference. See `TINKER.md` for the Tinker API reference.
 
-You are not just writing code — you are running experiments on a system with many moving parts. The most dangerous bugs produce plausible-looking but wrong results.
+## Target Model
 
-**Read the actual outputs.** When something doesn't work, look at what the model actually generated. Print the raw text. If the model outputs `"Great! Here's the code:\n```python\ndef solve():\n```"` but you're trying to execute the raw response as Python, the fix is to change the prompt or parse the output — not the execution engine. The model's raw output is ground truth for debugging.
+**Primary: `Qwen3.5-35B-A3B`** (MoE, 35B total / 3B active parameters)
 
-**Read logs line by line when stuck.** Not summaries. Not the last 5 lines. Scroll up. The root cause is almost always upstream of where symptoms appear.
+Why this model:
+- MoE architecture is **cost-effective on Tinker** — you pay per active parameter, not total
+- 35B total params means rich representations and strong code generation
+- 3B active params means fast inference — practical for real RLM deployment where each task requires multiple LLM calls
+- Significantly larger than the paper's Qwen3-8B — potential for a meaningful contribution
+- Qwen3.5 is the latest family, better base capabilities than Qwen3
 
-**Maintain intuition about magnitudes.** Training loss of 0.001 on step 1 → something is wrong. A 2B model scoring 90% on a task GPT-5 scores 62% on → data leakage or eval bug. Generation taking 0.1s for 100K tokens → not actually processing context. Always ask: does this number make sense?
+**Fallback: `Qwen3.5-27B`** (dense) if MoE causes issues with LoRA training on Tinker.
 
-**Look at actual samples, not just metrics.** Before celebrating a reward increase, read 10 trajectories. Is the model solving the task or gaming the format?
+**For cheap iteration / debugging: `Qwen3.5-4B`** (dense, small, fast turnaround).
 
-**Iterate small with validation.** Build the REPL → test with a hardcoded trajectory. Build eval → test with a known-correct answer. Build the reward → score 5 trajectories by hand. Validate each piece before composing.
+## Research Goals
 
-**Fix prompts before fixing code.** 90% of "the model can't do X" is "the prompt doesn't clearly ask for X." A 2B model needs very clear, simple instructions. If it's wrapping code in markdown, tell it not to. If it's writing plans instead of code, tell it to write code. Iterate the prompt on 3-5 examples before changing anything else.
+1. **Train RLM-Qwen3.5-35B-A3B** that dramatically outperforms the base model on long-context tasks
+2. **Beat the paper's results** — RLM-Qwen3-8B got +28.3% over base. We should do better with a stronger base model.
+3. **Evaluate on diverse benchmarks** — not just S-NIAH. Include multi-needle, document classification, and ideally external benchmarks (OOLONG, LoCoDiff, BABILong, RULER, etc.)
+4. **Public release** — weights on HuggingFace, paper (icmltemplate/ has the LaTeX), reproducible training recipe
+5. **Novel contributions** where possible — better training recipes, new benchmarks, analysis of what makes RLMs work
 
-**Diff against what worked.** When something breaks, `git diff` first. Know exactly what changed.
+## The RLM in 30 Seconds
 
-## Hardware & Model Decisions
+The full prompt **never enters the LLM's context window**. Instead:
+1. Prompt is stored as `context` variable in a Python REPL
+2. LLM sees only metadata (length, prefix, available functions)
+3. LLM writes code: chunk context, call `llm_query()` on chunks, aggregate results
+4. `llm_query(text)` invokes a fresh LLM on a substring — the recursive call
+5. LLM calls `FINAL(answer)` when done
 
-**Training target: Qwen3.5-2B (instruct).** ~4GB in bf16. Full fine-tune + AdamW ≈ 16GB. On a 143GB H200, this leaves >125GB headroom.
+This lets a model with a 32K context window process **millions of tokens** with no degradation.
 
-**Why 2B:** Fast to train, fast to generate rollouts, fast to iterate. If RL can make a 2B model a competent RLM, that's a strong result. If it's too weak, scale up with the same pipeline.
-
-**No servers. No APIs. Everything in-process.** Load models with `transformers` or `vllm.LLM()` directly. Generate with `model.generate()`. No HTTP, no ports, no sglang, no vLLM server mode. This is simpler, safer (no orphan processes), and sufficient for a 2B model that fits trivially in memory.
-
-**Teacher model for trajectory collection:** Temporarily load a larger model (e.g., Qwen3.5-9B on one GPU, or Qwen3.5-27B across both GPUs 6+7) in-process. Collect trajectories. Unload it. Then load and train the 2B. This is a one-time data collection step — not a persistent service.
-
-Alternatively, skip the teacher entirely and use STaR-style bootstrapping: generate rollouts with the 2B itself, filter correct ones, train on them, repeat. The 2B may be good enough as its own teacher after SFT warm-start.
-
-**Sub-call model at eval/rollout time:** Qwen3.5-2B itself. Same model, same process, same weights. A sub-call is just another `model.generate()` call. No separate model needed.
-
-**GPU allocation:**
-- Training the 2B: 1 GPU (~16GB). Use the other for anything else or leave it free.
-- If using 2 GPUs: one for training, one for rollout generation (batch generate → train on batch → repeat). But with a 2B model, sequential on 1 GPU is fast enough to start.
-- Loading a teacher model (9B/27B) for trajectory collection: may need 1 or 2 GPUs depending on model size. Free them when done.
-
-## What Is an RLM
-
-An RLM treats the user prompt as part of the environment. Given a prompt P, the RLM loads it into a persistent Python REPL, then writes code to peek into, decompose, and recursively invoke itself over slices of P.
-
-1. **Prompt in the environment.** P is a REPL variable. The root LLM sees only metadata (length, prefix, available functions).
-2. **Output in the environment.** Final answer via `FINAL(answer)` or `FINAL_VAR(variable_name)`.
-3. **Symbolic recursion.** `llm_query()` callable inside loops over slices of P.
-
-## The Training Insight
-
-Leaf sub-calls are just regular LLM requests. The hard part is the **root model's** ability to write correct REPL code and decide when to sub-call. Focus training here.
-
-For a 2B model: it needs to produce valid Python that uses `context`, `llm_query()`, `print()`, and terminates with `FINAL()`/`FINAL_VAR()`. It does NOT need general coding ability — just this specific API.
-
-## Project Goals
-
-1. Build the RLM scaffold (REPL, eval harness, trajectory collection).
-2. Collect trajectories (teacher model or STaR bootstrapping).
-3. SFT warm-start Qwen3.5-2B (stepping stone, not deliverable).
-4. **Train via RL on trajectory-level rewards from the SFT checkpoint.**
-5. Evaluate and analyze where RL improves over SFT.
-
-## Critical Invariants
-
-1. **The REPL is the source of truth.** Full prompt P never enters the context window. If P is in messages, it's broken.
-2. **Trajectory quality > quantity.** Filter and validate before training.
-3. **Evaluate with the full scaffold.** RLM eval requires the REPL.
-4. **Simple rewards first.** Binary trajectory-level. Add complexity only after understanding failure modes.
-5. **Track costs.** GPU hours, tokens generated, wall-clock time. Report quartiles.
-
-## Pipeline
+## Project Structure
 
 ```
-Phase 0: Infrastructure
-  REPL environment, eval harness, trajectory tooling.
-  Validate each piece with hardcoded test cases.
-
-Phase 1: Data Collection
-  Option A: Load teacher model (9B/27B) on GPUs 6+7. Run as RLM on tasks.
-            Collect trajectories. Unload teacher. Filter and clean.
-  Option B: Skip teacher. Use Qwen3.5-2B directly with STaR bootstrapping.
-  Either way: fix FINAL/FINAL_VAR template mistakes before training.
-
-Phase 2: SFT Warm-Start
-  LoRA fine-tune Qwen3.5-2B on filtered trajectories. GPU 6 or 7.
-  Quick validation: run as RLM on a few tasks, confirm improvement.
-  This is the RL starting checkpoint.
-
-Phase 3: RL Training (The Main Event)
-  Generate on-policy rollouts: load model, run RLM loop, score outcomes.
-  Update with GRPO. Iterate.
-  LOOK AT ACTUAL TRAJECTORIES EVERY FEW ITERATIONS.
-
-Phase 4: Evaluation & Analysis
-  All benchmarks, multiple context lengths.
-  Compare: base → SFT → RL.
-  Analyze trajectories qualitatively.
+rlm/
+├── CLAUDE.md              # THIS FILE — project guide for the agent
+├── TINKER.md              # Tinker API reference (consult for any API questions)
+├── PAPER.md               # RLM paper reference & key design decisions
+├── paper.md               # Our paper draft (working notes)
+├── icmltemplate/          # LaTeX template for the final paper
+├── ideas/                 # Research ideas, experiment plans, observations
+│   ├── YYYYMMDD_*.md      # One file per idea/experiment — keep adding here
+├── results/               # All experiment results (organized by experiment name)
+├── data/                  # Training data, trajectories, filtered samples
+│   ├── trajectories/      # Raw collected trajectories
+│   ├── filtered/          # Filtered SFT-ready samples
+│   ├── sft/               # SFT checkpoints
+│   └── rl/                # RL checkpoints
+├── scaffold/              # Core RLM runtime (model-agnostic)
+│   ├── repl.py            # Persistent Python REPL
+│   ├── rlm.py             # Main RLM loop (Algorithm 1)
+│   ├── llm_query.py       # Model wrappers (HFModel, MockModel, → add TinkerModel)
+│   └── prompts/           # System prompts per model
+├── eval/                  # Evaluation harness & benchmarks
+│   ├── benchmarks/        # Synthetic benchmark generators (pure Python)
+│   └── run_eval.py        # Eval runner
+├── training/              # Training scripts (rewriting for Tinker)
+├── scripts/               # Data pipeline & utilities
+├── tests/                 # Unit tests
+├── pyproject.toml         # Project config (use uv)
+└── uv.lock
 ```
+
+## Development Rules
+
+### Tools & Workflow
+- **Always use `uv`** for package management (`uv pip install`, `uv run python`)
+- **Always use `git`** — commit early and often with meaningful messages
+- **Write ideas to `ideas/`** — one markdown file per idea, dated (YYYYMMDD_description.md)
+- **Log all experiment results** — save to `results/`, include configs, metrics, and observations
+- **Update `paper.md`** as results come in — keep a running draft
+
+### Git Discipline
+```bash
+git add -A && git commit -m "descriptive message"
+```
+Commit after: every successful experiment, every code change, every new idea, every bug fix. Never let work go uncommitted.
+
+### Research Mindset
+This is a **research project**, not a software project. The agent should:
+- **Form hypotheses** before running experiments
+- **Analyze results carefully** — look at per-task breakdowns, failure modes, sample trajectories
+- **Read sample trajectories** — understand what the model is actually doing wrong or right
+- **Iterate on the approach** — if something doesn't work, understand why before trying the next thing
+- **Document everything** in `ideas/` and `paper.md`
+- **Think about what makes a publishable contribution** — what's new, what's better, what's the insight
+
+## Searching Online for Research Ideas
+
+**This is cutting-edge work.** The agent should actively search the web for ideas to improve training, evaluation, and the model's recursive capabilities.
+
+### Where to Look
+- **arXiv:** Search "recursive language model", "long context RL", "RLM training", "context folding", "natively recursive"
+- **Official RLM repo:** https://github.com/alexzhang13/rlm — check for updates, new benchmarks, new results
+- **Prime Intellect's RLM work:** https://www.primeintellect.ai/blog/rlm — they have a different training pipeline with `verifiers` and `prime-rl`
+- **Tinker cookbook:** https://github.com/thinking-machines-lab/tinker-cookbook — reference RL training patterns
+- **Papers citing arXiv:2512.24601** — improvements, ablations, new benchmarks
+- **Related approaches:** LoongRL, QwenLong-L1.5, RAPTOR, SkyRL (Berkeley, uses Tinker for multi-agent/tool-use RL)
+- **Twitter/X:** Search #RLM, "recursive language model", discussions around Qwen3.5 fine-tuning
+- **HuggingFace:** Look for existing RLM models, datasets, training scripts people have shared
+
+### When to Search
+- **Before starting a new training phase** — check if anyone has found better hyperparameters or recipes
+- **When stuck on a failure mode** — search for how others handled similar issues
+- **When designing new benchmarks** — look for established ones to include for credibility
+- **When writing the paper** — check for concurrent work to cite and position against
+- **Periodically (every few major iterations)** — the field moves fast, new work appears weekly
+- **When considering novel ideas** — check if someone already tried it
+
+### What to Do with Findings
+- Write a brief note in `ideas/` capturing what you found and how it applies
+- If it suggests a code change, implement it and test
+- If it's a benchmark to add, add it to `eval/benchmarks/`
+- If it's a training recipe improvement, try it and compare
+- Always cite sources in `paper.md`
+
+## Current State & History
+
+### What Was Done (on the old 8×H200 cluster, Qwen3-1.7B)
+
+The codebase contains a complete pipeline developed on a shared GPU cluster with Qwen3-1.7B:
+
+1. **Smoke test** — verified Qwen3-1.7B can write REPL code (it barely can — biggest risk at 2B)
+2. **Trajectory collection** — STaR with base model and SFT checkpoints
+3. **Template fixing** — automated fixes for FINAL_VAR literals, missing f-strings, plan-as-answer
+4. **SFT v1-v3** — LoRA on filtered trajectories, progressively harder tasks
+5. **GRPO v1-v4** — RL with progressive bug fixes (unconditional logprobs → conditioned, L2 KL → token KL)
+6. **DPO v1** — preference-based training on trajectory pairs
+7. **Comprehensive evals** — NIAH, multi-NIAH, doc-classify at multiple checkpoints
+8. **Results analysis** — comparison tables with CIs
+
+All results are in `results/` and experiment notes in `ideas/`. These contain valuable lessons even though we're switching models.
+
+### What Changes Now
+
+The codebase was built for **local GPU execution**: `CUDA_VISIBLE_DEVICES` assertions, `AutoModelForCausalLM.from_pretrained()`, local `model.generate()`, local `loss.backward()`, `peft` LoRA. All training and inference happened in-process on GPU 6 or 7.
+
+**Tinker changes the paradigm completely:**
+- Training (forward/backward, optimizer) runs **remotely** via API calls
+- Generation runs **remotely** via `sample()` API
+- You write the training loop locally (CPU only), Tinker executes it on their GPU cluster
+- LoRA is the only option (which is fine — we were already using LoRA)
+- No VRAM limits — we can train models we could never fit locally
+
+### Migration Checklist
+
+**Must rewrite for Tinker:**
+- `scaffold/llm_query.py` — add `TinkerModel` class wrapping `sampling_client.sample()` for both root generation and sub-calls
+- `training/sft.py` — `forward_backward("cross_entropy")` + `optim_step()` instead of local training
+- `training/rl.py` / `training/rl_v4.py` — Tinker RL primitives (`importance_sampling`/`ppo`)
+- `training/dpo.py` — `forward_backward_custom` for DPO loss
+- `eval/run_eval.py` — use TinkerModel
+- `scripts/collect_trajectories.py`, `scripts/collect_star_v2.py` — use TinkerModel
+- `scripts/smoke_test_2b.py` — rewrite for Qwen3.5-35B-A3B on Tinker
+- Remove all `CUDA_VISIBLE_DEVICES` assertions
+
+**Keep as-is (pure Python, no GPU):**
+- `scaffold/repl.py` — the REPL runs locally, this is the core
+- `scaffold/rlm.py` — model-agnostic loop, just needs the model wrapper to change
+- `scaffold/prompts/` — keep old prompts, add new ones for Qwen3.5
+- `eval/benchmarks/` — all benchmark generation and scoring
+- `training/rewards.py` — reward computation
+- `scripts/filter_trajectories.py`, `scripts/fix_templates.py`, `scripts/analyze_results.py`
+- `tests/` — MockModel tests still work
+
+**Can likely remove:**
+- `training/logprobs.py` — Tinker returns logprobs natively from `forward_backward` and `sample()`
+- `CLUSTER_SAFETY.md` — no longer relevant
+
+## Research Plan
+
+### Phase 0: Infrastructure (do this first)
+- [ ] Add `TinkerModel` to `scaffold/llm_query.py`
+- [ ] Rewrite training scripts for Tinker
+- [ ] Test end-to-end on `Qwen3.5-4B` (cheap)
+- [ ] Verify: can generate, can train, can evaluate
+
+### Phase 1: Baselines (critical — establishes the floor)
+- [ ] **Base Qwen3.5-35B-A3B direct** (no RLM scaffold) on all benchmarks — the floor
+- [ ] **Base Qwen3.5-35B-A3B + RLM scaffold** (no fine-tuning) — what scaffolding alone gives you
+- [ ] **Base Qwen3.5-4B + RLM scaffold** — shows model size matters
+- [ ] Document in `results/` and `paper.md`
+
+### Phase 2: Data Collection & SFT
+- [ ] Collect trajectories from base model (STaR round 1)
+- [ ] If success rate < 30%, use Qwen3.5-397B-A17B as teacher to generate gold trajectories
+- [ ] Filter, fix templates, convert to SFT samples
+- [ ] SFT warm-start with LoRA on Tinker
+- [ ] Evaluate — should see meaningful improvement
+
+### Phase 3: RL
+- [ ] GRPO on SFT checkpoint
+- [ ] Experiment: reward functions, KL coefficients, K values
+- [ ] Try DPO as alternative/complement
+- [ ] Multiple STaR rounds (collect harder trajectories from best model → retrain)
+- [ ] Evaluate after each round
+
+### Phase 4: Hardening & New Benchmarks
+- [ ] Add external benchmarks (OOLONG, LoCoDiff, BABILong, RULER)
+- [ ] Create harder synthetic benchmarks
+- [ ] Stress test at extreme context lengths (1M+ tokens)
+- [ ] Ablation studies
+
+### Phase 5: Release
+- [ ] Final comprehensive eval
+- [ ] Upload weights to HuggingFace
+- [ ] Write paper (icmltemplate/)
+- [ ] Clean repo, write public README
 
 ## Benchmarks
 
-| Benchmark | Complexity | Metric |
-|-----------|-----------|--------|
-| S-NIAH (50 tasks) | O(1) | Accuracy |
-| BrowseComp+ (150 tasks, 1K docs) | O(1) multi-hop | Accuracy |
-| OOLONG trec_coarse (50 tasks) | O(n) | Custom score |
-| OOLONG-Pairs (20 tasks) | O(n²) | F1 |
-| LongBench-v2 CodeQA | Fixed | Accuracy |
+### Current (in eval/benchmarks/)
+- **S-NIAH** (niah.py): O(1) — single needle in 5K–100K chars
+- **Multi-NIAH** (multi_niah.py): O(K) — K=3-10 needles in 10K–100K chars
+- **Doc-Classify** (doc_classify.py): O(N) — classify N=5-20 articles into 6 categories
 
-**Reference numbers (Qwen3-8B from the paper — our 2B will be lower):**
+### Should Add
+- **OOLONG** (arXiv:2511.02817): Document classification from long context. The paper's main benchmark.
+- **OOLONG-Pairs**: Cross-document comparison. O(N²) complexity.
+- **LoCoDiff**: Track long git diff histories. GPT-5 < 10% at 75K+ tokens.
+- **BABILong**: Extended bAbI tasks at long context.
+- **RULER**: Synthetic long-context with multiple task types.
+- **Verbatim Copy**: Faithfully reproduce context segments. Tests precision.
+- **Multi-hop QA at scale**: Questions requiring chaining facts from different parts of a huge context.
 
-| Method | CodeQA | BrowseComp+ | OOLONG | OOLONG-Pairs |
-|-------|--------|-------------|--------|--------------|
-| Base | 4.0 | 0.0 | 0.0 | 0.1 |
-| RLM prompted | 26.0 | 2.0 | 24.0 | 4.3 |
-| RLM SFT | 32.0 | 14.0 | 32.0 | 5.2 |
+### Evaluation Strategy
+1. Always compare: **base (direct)** vs **base (RLM scaffold)** vs **fine-tuned (RLM scaffold)**
+2. Report per-task breakdowns — aggregates hide patterns
+3. Track trajectory quality — code quality, turn count, sub-call patterns
+4. Save and read sample trajectories for qualitative analysis
+5. Report cost — total tokens, time per task
 
-Research question: **does RL close the gap between prompted RLM and SFT, and between SFT and frontier, faster than scaling model size?**
+## System Prompt Design
 
-## Lessons Learned from the Paper
+Current prompt (`scaffold/prompts/qwen2b.py`) was tuned for 1.7B. For Qwen3.5-35B-A3B:
+- Much stronger instruction following — can give richer prompts
+- 2-3 worked examples covering different task types
+- Consider separate prompts for different complexity classes
+- Look online for strategies used by other RLM implementations
+- Create new file: `scaffold/prompts/qwen35_35b.py`
 
-### 1. Template Mistakes Dominate
-16% of turns: FINAL with plan as answer. 13%: FINAL_VAR with literal text. Build `scripts/fix_templates.py` early.
+## Key Lessons (Don't Repeat These Mistakes)
 
-### 2. Small Models Need Coding Ability
-Qwen3-8B base couldn't write REPL code. **At 2B, this is our biggest risk.** Before any training: run Qwen3.5-2B on 5 tasks with the RLM prompt. Look at raw output. Can it write `context[:1000]` and `llm_query(...)`? If not, how close? This determines everything. Consider 
+1. **GRPO v1-v3 trained on unconditional code** — taught patterns in general, not conditioned on the task. Always use conditioned log-probs.
+2. **Weight-space L2 ≈ 0** as KL — meaningless. Use token-level KL with frozen reference.
+3. **K=4 too small** for stable advantages. Use K=8+.
+4. **2B models barely write Python** — 35B MoE will be dramatically better. Still smoke test first.
+5. **16% FINAL() with plans, 13% FINAL_VAR() with literals** — fix_templates.py helps, but training should eliminate these.
+6. **f-string bug** — `llm_query("{context}")` instead of `f"{context}"`. Watch for it even at 35B.
 
-### 3. Prompts Must Match the Model
-Each model needs its own prompt. The 2B needs simpler, shorter instructions than 8B. Validate on 5-10 tasks before committing.
+## Ideas to Explore (flesh out in ideas/)
 
-### 4. Sub-Call Batching Matters
-Scale batching guidance to the model's context window. For 2B, keep it conservative.
+- **Teacher distillation:** Qwen3.5-397B-A17B generates gold trajectories → SFT the 35B model
+- **Curriculum learning:** Start easy (short docs, single needle), progressively increase difficulty
+- **Multi-task mixing:** NIAH + multi-NIAH + doc-classify + external benchmarks in each batch
+- **Sub-call model:** Use smaller model for llm_query() sub-calls during inference (cost savings)
+- **Multi-level recursion:** Can we train RLM to call RLM to call RLM?
+- **Code quality rewards:** Reward clean, efficient code patterns, not just correctness
+- **Context length extrapolation:** Train on 50K, test on 500K — does it generalize?
+- **Comparison with Prime Intellect** — what can we learn from their approach?
+- **Thinking tokens:** Qwen3.5 supports `<think>` blocks — should the RLM think before coding?
+- **Tool augmentation:** Give the REPL additional tools beyond llm_query (regex search, embeddings?)
 
-### 5. RLMs Are Worse on Short Inputs
-Crossover ~16K tokens. Include short-context baselines.
+## Quick Reference
 
-### 6. Correct Answers Get Discarded
-Models build correct REPL variables then return wrong root-generated text. RL target: reward FINAL_VAR(correct_variable).
+```bash
+# Run tests
+uv run python tests/test_repl.py
+uv run python tests/test_rlm.py
 
-## Directory Structure
+# Commit
+git add -A && git commit -m "description"
 
+# Environment
+export TINKER_API_KEY=<key>
+
+# Write an idea
+# ideas/YYYYMMDD_short_description.md
+
+# Check Tinker API
+# See TINKER.md in this repo
 ```
-rlm-training/
-├── CLAUDE.md
-├── CLUSTER_SAFETY.md
-├── PAPER_REFERENCE.md
-├── scaffold/
-│   ├── repl.py                 # REPL environment
-│   ├── rlm.py                  # Main RLM loop
-│   ├── llm_query.py            # Sub-LLM (same model, in-process)
-│   └── prompts/
-├── data/                       # Gitignored except configs
-│   ├── trajectories/
-│   ├── filtered/
-│   ├── sft/
-│   └── collection_configs/
-├── training/
-│   ├── sft.py
-│   ├── rl.py                   # GRPO
-│   ├── rewards.py
-│   └── configs/
-├── eval/
-│   ├── run_eval.py
-│   ├── benchmarks/
-│   ├── scoring.py
-│   └── data/                   # Gitignored
-├── analysis/
-├── results/                    # Gitignored
-│   └── {experiment}/{YYYYMMDD_HHMMSS}/
-│       ├── eval_results.json
-│       ├── trajectories/
-│       ├── training_logs/
-│       ├── cost_report.json
-│       ├── config.json
-│       └── stdout.log
-├── ideas/                      # YYYYMMDD_short_name.md
-└── scripts/
-    ├── collect_trajectories.py
-    ├── filter_trajectories.py
-    └── fix_templates.py
-```
-
-## Required Outputs (Every Experiment)
-
-1. **`eval_results.json`** — Scores per benchmark, task, context length.
-2. **`cost_report.json`** — GPU hours, tokens generated, wall-clock time. Quartiles.
-3. **`config.json`** — Full snapshot: model, hyperparams, prompt version, git hash.
-4. **`stdout.log`** — Complete console output.
-5. **`trajectories/`** — ≥10 sample trajectories as full REPL logs.
-
-## Code Standards
-
-- Simple, modular, readable.
-- `uv` for package management. `tqdm` for progress. Type hints.
-- Correctness first, performance second.
-- **Print raw model outputs during debugging.** Not just metrics — the actual text.  Log everything. Every experiment that is useful for my eyes to look at: you will work autonomously, and I will come back and view these logs when I can, so log everything that I can see and that would be important for me to look at. 
-
-## Git
-
-- Commit early and often. Imperative mood, under 72 chars.
-- Never commit weights, trajectories, or results. `.gitignore`: `data/`, `results/`, `*.pt`, `*.safetensors`.
-- Branch for experiments: `feat/repl-scaffold`, `exp/sft-warmstart`, `exp/rl-grpo-v1`.
-- Tag milestones.
-
-## Experiment Tracking
-
-Every experiment gets `ideas/YYYYMMDD_short_name.md`:
-
-```markdown
-# YYYYMMDD: Short Name
-## Hypothesis
-## Method
-## Expected Outcome (with numbers)
-## What Would Disprove This
-## Results
-## Conclusion
-```
-
-## When in Doubt
-
-Stop and ask. And when something isn't working: read the logs, look at the model's actual output, check your prompts, reason about what the model is seeing, before changing code.

@@ -5,12 +5,23 @@ Evaluation harness for RLM models.
 Runs the full RLM loop on benchmark tasks and scores results.
 Saves detailed results, trajectories, and cost reports.
 
-Usage:
+Usage (Tinker — no GPU needed):
+    uv run python eval/run_eval.py \
+        --model Qwen/Qwen3.5-35B-A3B \
+        --benchmark all \
+        --experiment-name baseline_35b_a3b
+
+    # With fine-tuned checkpoint:
+    uv run python eval/run_eval.py \
+        --model Qwen/Qwen3.5-35B-A3B \
+        --model-path tinker://run-id/weights/ckpt-100 \
+        --benchmark all \
+        --experiment-name sft_35b_v1
+
+Legacy (local GPU):
     CUDA_VISIBLE_DEVICES=7 uv run python eval/run_eval.py \
-        --model Qwen/Qwen3-1.7B \
-        --benchmark niah \
-        --n-tasks 10 \
-        --experiment-name baseline_1.7b
+        --model Qwen/Qwen3-1.7B --backend hf \
+        --benchmark niah --n-tasks 10
 """
 
 from __future__ import annotations
@@ -23,16 +34,13 @@ import sys
 import time
 from pathlib import Path
 
-assert os.environ.get("CUDA_VISIBLE_DEVICES") in ("6", "7", "6,7"), \
-    "CUDA_VISIBLE_DEVICES must be set to 6, 7, or 6,7"
-
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import torch
 from tqdm import tqdm
 
-from scaffold.llm_query import HFModel, strip_think_tags
+from scaffold.llm_query import TinkerModel, strip_think_tags
 from scaffold.rlm import rlm, trajectory_to_dict
+from scaffold.prompts.qwen35_35b import QWEN35_35B_SYSTEM_PROMPT
 from scaffold.prompts.qwen2b import QWEN_2B_SYSTEM_PROMPT
 from eval.benchmarks.niah import generate_niah_suite, score_niah
 from eval.benchmarks.multi_niah import generate_multi_niah_suite, score_multi_niah
@@ -46,7 +54,7 @@ logger = logging.getLogger("eval")
 
 
 def run_niah_eval(
-    model: HFModel,
+    model,
     system_prompt: str,
     n_tasks: int = 50,
     max_iterations: int = 8,
@@ -125,7 +133,7 @@ def run_niah_eval(
 
 
 def run_multi_niah_eval(
-    model: HFModel,
+    model,
     system_prompt: str,
     n_tasks: int = 24,
     max_iterations: int = 10,
@@ -209,7 +217,7 @@ def run_multi_niah_eval(
 
 
 def run_doc_classify_eval(
-    model: HFModel,
+    model,
     system_prompt: str,
     n_tasks: int = 20,
     max_iterations: int = 10,
@@ -281,9 +289,13 @@ def run_doc_classify_eval(
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", default="Qwen/Qwen3-1.7B")
+    parser.add_argument("--model", default="Qwen/Qwen3.5-35B-A3B")
+    parser.add_argument("--model-path", default=None,
+                        help="Tinker model path (e.g., tinker://run-id/weights/ckpt-100)")
     parser.add_argument("--adapter", default=None,
-                        help="Path to LoRA adapter (e.g., data/sft/lora_v1/final)")
+                        help="(Legacy) Path to local LoRA adapter")
+    parser.add_argument("--backend", default="tinker", choices=["tinker", "hf"],
+                        help="Backend: tinker (remote) or hf (local GPU)")
     parser.add_argument("--benchmark", default="niah",
                         choices=["niah", "multi_niah", "doc_classify", "all"])
     parser.add_argument("--n-tasks", type=int, default=10)
@@ -298,37 +310,40 @@ def main():
                         help="Path to custom system prompt file")
     args = parser.parse_args()
 
-    # Verify GPU isolation
-    assert torch.cuda.device_count() <= 2, "CUDA_VISIBLE_DEVICES not set correctly"
-    logger.info(f"CUDA_VISIBLE_DEVICES={os.environ.get('CUDA_VISIBLE_DEVICES')}")
-    logger.info(f"GPU count: {torch.cuda.device_count()}")
-
     # Results directory
     timestamp = time.strftime("%Y%m%d_%H%M%S")
     results_dir = Path("results") / args.experiment_name / timestamp
     results_dir.mkdir(parents=True, exist_ok=True)
 
     # Load model
-    logger.info(f"Loading model: {args.model}")
-    if args.adapter:
-        logger.info(f"Loading LoRA adapter: {args.adapter}")
+    logger.info(f"Loading model: {args.model} (backend={args.backend})")
     t0 = time.time()
 
-    if args.adapter:
-        from training.rl import RLModel
-        model = RLModel(
-            base_model_name=args.model,
-            adapter_path=args.adapter,
-            device="cuda:0",
-            max_new_tokens=1024,
-        )
-    else:
-        model = HFModel(
+    if args.backend == "tinker":
+        model = TinkerModel(
             model_name=args.model,
-            device="cuda:0",
-            max_new_tokens=1024,
+            model_path=args.model_path,
+            max_new_tokens=2048,
             temperature=0.7,
         )
+    else:
+        # Legacy: local HF model
+        from scaffold.llm_query import HFModel
+        if args.adapter:
+            from training.rl import RLModel
+            model = RLModel(
+                base_model_name=args.model,
+                adapter_path=args.adapter,
+                device="cuda:0",
+                max_new_tokens=1024,
+            )
+        else:
+            model = HFModel(
+                model_name=args.model,
+                device="cuda:0",
+                max_new_tokens=1024,
+                temperature=0.7,
+            )
 
     load_time = time.time() - t0
     logger.info(f"Model loaded in {load_time:.1f}s")
@@ -336,6 +351,8 @@ def main():
     # System prompt
     if args.system_prompt:
         system_prompt = Path(args.system_prompt).read_text()
+    elif "qwen3.5" in args.model.lower() or "Qwen3.5" in args.model:
+        system_prompt = QWEN35_35B_SYSTEM_PROMPT
     else:
         system_prompt = QWEN_2B_SYSTEM_PROMPT
 
@@ -391,6 +408,8 @@ def main():
 
     config = {
         "model": args.model,
+        "backend": args.backend,
+        "model_path": args.model_path,
         "adapter": args.adapter,
         "benchmarks": benchmarks_to_run,
         "n_tasks": args.n_tasks,

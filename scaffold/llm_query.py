@@ -1,17 +1,16 @@
 """
 LLM query wrapper for RLM sub-calls.
 
-All calls are in-process. No servers, no HTTP, no ports.
-The same model handles both root generation and sub-calls.
-
-Two implementations:
-1. HFModel: uses transformers model.generate() directly
-2. MockModel: returns fixed strings for testing
+Three implementations:
+1. HFModel: uses transformers model.generate() directly (local GPU)
+2. TinkerModel: uses Tinker API for remote generation (no GPU needed)
+3. MockModel: returns fixed strings for testing
 """
 
 from __future__ import annotations
 
 import logging
+import os
 import re
 import time
 from typing import Any
@@ -66,6 +65,176 @@ class MockModel:
             return resp
 
         return f"[mock sub-response to {len(prompt_str)} char prompt]"
+
+
+class TinkerModel:
+    """
+    Tinker API model for remote generation.
+
+    Uses Tinker's sampling_client.sample() for both root generation
+    and sub-calls. No local GPU needed — all computation runs on
+    Tinker's distributed GPU cluster.
+
+    Supports both base models and fine-tuned checkpoints.
+    """
+
+    def __init__(
+        self,
+        model_name: str = "Qwen/Qwen3.5-35B-A3B",
+        max_new_tokens: int = 2048,
+        temperature: float = 0.7,
+        model_path: str | None = None,
+        renderer_name: str = "qwen3_disable_thinking",
+    ):
+        from dotenv import load_dotenv
+        load_dotenv()
+
+        import tinker
+        from tinker_cookbook import renderers, tokenizer_utils
+
+        logger.info(f"Creating TinkerModel for {model_name}...")
+        t0 = time.time()
+
+        self.model_name = model_name
+        self.max_new_tokens = max_new_tokens
+        self.temperature = temperature
+        self.generation_log: list[dict] = []
+
+        # Setup tokenizer and renderer
+        self.tokenizer = tokenizer_utils.get_tokenizer(model_name)
+        self.renderer = renderers.get_renderer(renderer_name, self.tokenizer)
+        self.stop_sequences = self.renderer.get_stop_sequences()
+
+        # Create sampling client
+        self.service_client = tinker.ServiceClient()
+        if model_path:
+            # Fine-tuned checkpoint
+            self.sampling_client = self.service_client.create_sampling_client(
+                model_path=model_path
+            )
+            logger.info(f"Loaded fine-tuned model from {model_path}")
+        else:
+            # Base model
+            self.sampling_client = self.service_client.create_sampling_client(
+                base_model=model_name
+            )
+            logger.info(f"Loaded base model {model_name}")
+
+        self._tinker = tinker  # Keep reference for SamplingParams
+        elapsed = time.time() - t0
+        logger.info(f"TinkerModel ready in {elapsed:.1f}s")
+
+    def generate(self, messages: list[dict[str, str]], **kwargs) -> str:
+        """
+        Generate from chat messages. Used for root RLM turns.
+
+        Args:
+            messages: List of {"role": ..., "content": ...} dicts
+        Returns:
+            Generated text (assistant response only)
+        """
+        max_new_tokens = kwargs.get("max_new_tokens", self.max_new_tokens)
+        temperature = kwargs.get("temperature", self.temperature)
+        num_samples = kwargs.get("num_samples", 1)
+
+        # Build prompt using renderer (handles chat template correctly)
+        prompt = self.renderer.build_generation_prompt(messages)
+
+        params = self._tinker.SamplingParams(
+            max_tokens=max_new_tokens,
+            temperature=temperature,
+            stop=self.stop_sequences,
+        )
+
+        t0 = time.time()
+        result = self.sampling_client.sample(
+            prompt=prompt,
+            sampling_params=params,
+            num_samples=num_samples,
+        ).result()
+        elapsed = time.time() - t0
+
+        # Parse response
+        seq = result.sequences[0]
+        msg, parse_ok = self.renderer.parse_response(seq.tokens)
+        response = msg.get("content", "") if isinstance(msg, dict) else str(msg)
+
+        # Strip think tags if present
+        response = strip_think_tags(response)
+
+        self.generation_log.append({
+            "type": "root",
+            "input_tokens": prompt.length,
+            "output_tokens": len(seq.tokens),
+            "time": elapsed,
+            "parse_ok": parse_ok,
+        })
+
+        logger.debug(f"Generated {len(seq.tokens)} tokens in {elapsed:.2f}s")
+        return response
+
+    def sub_query(self, prompt_str: str) -> str:
+        """
+        Sub-call interface for llm_query() inside the REPL.
+
+        Takes a plain string prompt, wraps it as a user message,
+        generates a response. No system prompt — leaf calls are
+        just regular LLM requests.
+        """
+        messages = [{"role": "user", "content": prompt_str}]
+        prompt = self.renderer.build_generation_prompt(messages)
+
+        params = self._tinker.SamplingParams(
+            max_tokens=self.max_new_tokens,
+            temperature=self.temperature,
+            stop=self.stop_sequences,
+        )
+
+        t0 = time.time()
+        result = self.sampling_client.sample(
+            prompt=prompt,
+            sampling_params=params,
+            num_samples=1,
+        ).result()
+        elapsed = time.time() - t0
+
+        seq = result.sequences[0]
+        msg, parse_ok = self.renderer.parse_response(seq.tokens)
+        response = msg.get("content", "") if isinstance(msg, dict) else str(msg)
+        response = strip_think_tags(response)
+
+        self.generation_log.append({
+            "type": "sub_query",
+            "input_tokens": prompt.length,
+            "output_tokens": len(seq.tokens),
+            "time": elapsed,
+        })
+
+        logger.debug(f"Sub-query: {len(seq.tokens)} tokens in {elapsed:.2f}s")
+        return response
+
+    def refresh_sampling_client(self, model_path: str | None = None):
+        """Refresh sampling client after training (gets updated weights)."""
+        if model_path:
+            self.sampling_client = self.service_client.create_sampling_client(
+                model_path=model_path
+            )
+        else:
+            self.sampling_client = self.service_client.create_sampling_client(
+                base_model=self.model_name
+            )
+
+    def total_stats(self) -> dict:
+        """Return total generation statistics."""
+        root_calls = [g for g in self.generation_log if g["type"] == "root"]
+        sub_calls = [g for g in self.generation_log if g["type"] == "sub_query"]
+        return {
+            "root_calls": len(root_calls),
+            "sub_calls": len(sub_calls),
+            "total_input_tokens": sum(g["input_tokens"] for g in self.generation_log),
+            "total_output_tokens": sum(g["output_tokens"] for g in self.generation_log),
+            "total_time": sum(g["time"] for g in self.generation_log),
+        }
 
 
 class HFModel:
