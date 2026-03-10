@@ -1,3 +1,6 @@
 data/
 icmltemplate/
-results/
+results/__pycache__/
+*.pyc
+.env
+*.log

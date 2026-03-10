@@ -1,342 +1,0 @@
-2026-03-09 23:51:32,622 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
-2026-03-09 23:51:36,046 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
-2026-03-09 23:51:41,961 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session fa3deb2d-99e2-5910-96a6-5d6a93116583
-2026-03-09 23:51:42,149 scaffold.llm_query INFO: Loaded base model Qwen/Qwen3.5-35B-A3B
-2026-03-09 23:51:42,149 scaffold.llm_query INFO: TinkerModel ready in 6.1s
-2026-03-09 23:51:42,149 eval INFO: Model loaded in 9.5s
-2026-03-09 23:51:42,149 eval INFO: 
-============================================================
-2026-03-09 23:51:42,149 eval INFO: Running benchmark: niah
-2026-03-09 23:51:42,149 eval INFO: ============================================================
-NIAH:   0%|          | 0/100 [00:00<?, ?it/s]2026-03-09 23:51:42,198 eval INFO: 
-Task: niah_20000_5000_0.1 | Q: What is the critical deadline? | Expected: September 3 2024
-2026-03-09 23:51:50,781 eval INFO:   Score: 1.0 | Answer: September 3 2024 | 8.6s
-NIAH:   1%|          | 1/100 [00:08<14:09,  8.58s/it]2026-03-09 23:51:50,782 eval INFO: 
-Task: niah_20001_5000_0.1 | Q: What is the budget total? | Expected: March 15 2025
-2026-03-09 23:52:42,813 eval INFO:   Score: 0.0 | Answer: I don't see any budget data or extracted information included in your message yet. To calculate the  | 52.0s
-NIAH:   2%|▏         | 2/100 [01:00<55:45, 34.14s/it]2026-03-09 23:52:42,814 eval INFO: 
-Task: niah_20002_5000_0.1 | Q: Who is the key contact person? | Expected: $12.7 billion
-2026-03-09 23:52:51,569 eval INFO:   Score: 0.0 | Answer: Not found | 8.8s
-NIAH:   3%|▎         | 3/100 [01:09<36:27, 22.55s/it]2026-03-09 23:52:51,570 eval INFO: 
-Task: niah_20003_5000_0.1 | Q: What is the secret code? | Expected: DELTA-88
-2026-03-09 23:53:00,378 eval INFO:   Score: 1.0 | Answer: DELTA-88 | 8.8s
-NIAH:   4%|▍         | 4/100 [01:18<27:23, 17.12s/it]2026-03-09 23:53:00,378 eval INFO: 
-Task: niah_20004_5000_0.2 | Q: What is the vault password? | Expected: ALPHA-7
-2026-03-09 23:53:09,487 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 9.1s
-NIAH:   5%|▌         | 5/100 [01:27<22:32, 14.23s/it]2026-03-09 23:53:09,487 eval INFO: 
-Task: niah_20005_5000_0.2 | Q: What is the vault password? | Expected: $4.2 million
-2026-03-09 23:53:17,751 eval INFO:   Score: 1.0 | Answer: $4.2 million | 8.3s
-NIAH:   6%|▌         | 6/100 [01:35<19:07, 12.20s/it]2026-03-09 23:53:17,752 eval INFO: 
-Task: niah_20006_5000_0.2 | Q: What is the secret code? | Expected: ALPHA-7
-2026-03-09 23:53:25,406 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 7.7s
-NIAH:   7%|▋         | 7/100 [01:43<16:36, 10.72s/it]2026-03-09 23:53:25,407 eval INFO: 
-Task: niah_20007_5000_0.2 | Q: When is the meeting scheduled? | Expected: BRAVO-42
-2026-03-09 23:53:33,441 eval INFO:   Score: 0.0 | Answer: Meeting time not found | 8.0s
-NIAH:   8%|▊         | 8/100 [01:51<15:07,  9.86s/it]2026-03-09 23:53:33,442 eval INFO: 
-Task: niah_20008_5000_0.5 | Q: What is the assigned location? | Expected: Sector 9 North Wing
-2026-03-09 23:53:40,325 eval INFO:   Score: 1.0 | Answer: Sector 9 North Wing | 6.9s
-NIAH:   9%|▉         | 9/100 [01:58<13:32,  8.93s/it]2026-03-09 23:53:40,325 eval INFO: 
-Task: niah_20009_5000_0.5 | Q: Who is the key contact person? | Expected: FOXTROT-11
-2026-03-09 23:53:49,558 eval INFO:   Score: 1.0 | Answer: Name: FOXTROT-11 Role: key contact person | 9.2s
-NIAH:  10%|█         | 10/100 [02:07<13:32,  9.02s/it]2026-03-09 23:53:49,558 eval INFO: 
-Task: niah_20010_5000_0.5 | Q: What is the budget total? | Expected: CHARLIE-19
-2026-03-09 23:54:04,347 eval INFO:   Score: 0.0 | Answer: Not found | 14.8s
-NIAH:  11%|█         | 11/100 [02:22<16:00, 10.79s/it]2026-03-09 23:54:04,348 eval INFO: 
-Task: niah_20011_5000_0.5 | Q: What is the secret code? | Expected: CHARLIE-19
-2026-03-09 23:54:12,009 eval INFO:   Score: 1.0 | Answer: CHARLIE-19 | 7.7s
-NIAH:  12%|█▏        | 12/100 [02:29<14:25,  9.84s/it]2026-03-09 23:54:12,009 eval INFO: 
-Task: niah_20012_5000_0.8 | Q: What is the project codename? | Expected: September 3 2024
-2026-03-09 23:54:19,414 eval INFO:   Score: 1.0 | Answer: September 3 2024 | 7.4s
-NIAH:  13%|█▎        | 13/100 [02:37<13:11,  9.10s/it]2026-03-09 23:54:19,414 eval INFO: 
-Task: niah_20013_5000_0.8 | Q: When is the meeting scheduled? | Expected: DELTA-88
-2026-03-09 23:54:27,574 eval INFO:   Score: 0.0 | Answer: Not found | 8.2s
-NIAH:  14%|█▍        | 14/100 [02:45<12:38,  8.82s/it]2026-03-09 23:54:27,574 eval INFO: 
-Task: niah_20014_5000_0.8 | Q: What is the vault password? | Expected: January 22 2026
-2026-03-09 23:54:37,421 eval INFO:   Score: 1.0 | Answer: January 22 2026 | 9.8s
-NIAH:  15%|█▌        | 15/100 [02:55<12:55,  9.13s/it]2026-03-09 23:54:37,421 eval INFO: 
-Task: niah_20015_5000_0.8 | Q: What is the budget total? | Expected: BRAVO-42
-2026-03-09 23:54:44,841 eval INFO:   Score: 1.0 | Answer: BRAVO-42 | 7.4s
-NIAH:  16%|█▌        | 16/100 [03:02<12:03,  8.61s/it]2026-03-09 23:54:44,841 eval INFO: 
-Task: niah_20016_5000_0.9 | Q: What is the secret code? | Expected: INDIA-33
-2026-03-09 23:54:53,161 eval INFO:   Score: 1.0 | Answer: INDIA-33 | 8.3s
-NIAH:  17%|█▋        | 17/100 [03:10<11:47,  8.53s/it]2026-03-09 23:54:53,161 eval INFO: 
-Task: niah_20017_5000_0.9 | Q: Who is the key contact person? | Expected: ALPHA-7
-2026-03-09 23:55:02,267 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 9.1s
-NIAH:  18%|█▊        | 18/100 [03:20<11:53,  8.70s/it]2026-03-09 23:55:02,267 eval INFO: 
-Task: niah_20018_5000_0.9 | Q: When is the meeting scheduled? | Expected: Agent Sarah Miller
-2026-03-09 23:55:10,482 eval INFO:   Score: 0.0 | Answer: Not found | 8.2s
-NIAH:  19%|█▉        | 19/100 [03:28<11:32,  8.55s/it]2026-03-09 23:55:10,482 eval INFO: 
-Task: niah_20019_5000_0.9 | Q: Who is the key contact person? | Expected: BRAVO-42
-2026-03-09 23:55:17,950 eval INFO:   Score: 1.0 | Answer: BRAVO-42 (Key contact person) | 7.5s
-NIAH:  20%|██        | 20/100 [03:35<10:58,  8.23s/it]2026-03-09 23:55:17,951 eval INFO: 
-Task: niah_20020_10000_0.1 | Q: What is the assigned location? | Expected: Professor James Chen
-2026-03-09 23:55:24,104 eval INFO:   Score: 1.0 | Answer: Professor James Chen | 6.2s
-NIAH:  21%|██        | 21/100 [03:41<10:00,  7.61s/it]2026-03-09 23:55:24,105 eval INFO: 
-Task: niah_20021_10000_0.1 | Q: What is the project codename? | Expected: September 3 2024
-2026-03-09 23:55:37,388 eval INFO:   Score: 1.0 | Answer: September 3 2024 | 13.3s
-NIAH:  22%|██▏       | 22/100 [03:55<12:06,  9.31s/it]2026-03-09 23:55:37,390 eval INFO: 
-Task: niah_20022_10000_0.1 | Q: What is the project codename? | Expected: Professor James Chen
-2026-03-09 23:55:47,262 eval INFO:   Score: 1.0 | Answer: Professor James Chen | 9.9s
-NIAH:  23%|██▎       | 23/100 [04:05<12:09,  9.48s/it]2026-03-09 23:55:47,263 eval INFO: 
-Task: niah_20023_10000_0.1 | Q: What is the secret code? | Expected: $12.7 billion
-2026-03-09 23:55:55,347 eval INFO:   Score: 1.0 | Answer: $12.7 billion | 8.1s
-NIAH:  24%|██▍       | 24/100 [04:13<11:28,  9.06s/it]2026-03-09 23:55:55,348 eval INFO: 
-Task: niah_20024_10000_0.2 | Q: What is the secret code? | Expected: CHARLIE-19
-2026-03-09 23:56:03,350 eval INFO:   Score: 1.0 | Answer: CHARLIE-19 | 8.0s
-NIAH:  25%|██▌       | 25/100 [04:21<10:55,  8.74s/it]2026-03-09 23:56:03,350 eval INFO: 
-Task: niah_20025_10000_0.2 | Q: Who is the key contact person? | Expected: $850,000
-2026-03-09 23:56:14,012 eval INFO:   Score: 0.0 | Answer: Not found | 10.7s
-NIAH:  26%|██▌       | 26/100 [04:31<11:29,  9.32s/it]2026-03-09 23:56:14,012 eval INFO: 
-Task: niah_20026_10000_0.2 | Q: What is the secret code? | Expected: $850,000
-2026-03-09 23:56:28,130 eval INFO:   Score: 1.0 | Answer: $850,000 | 14.1s
-NIAH:  27%|██▋       | 27/100 [04:45<13:05, 10.76s/it]2026-03-09 23:56:28,130 eval INFO: 
-Task: niah_20027_10000_0.2 | Q: When is the meeting scheduled? | Expected: CHARLIE-19
-2026-03-09 23:56:38,815 eval INFO:   Score: 1.0 | Answer: Based on the text provided, the specific date and time mentioned for the meeting is:
-
-**CHARLIE-19** | 10.7s
-NIAH:  28%|██▊       | 28/100 [04:56<12:53, 10.74s/it]2026-03-09 23:56:38,816 eval INFO: 
-Task: niah_20028_10000_0.5 | Q: What is the project codename? | Expected: March 15 2025
-2026-03-09 23:56:49,165 eval INFO:   Score: 1.0 | Answer: March 15 2025 | 10.3s
-NIAH:  29%|██▉       | 29/100 [05:06<12:34, 10.62s/it]2026-03-09 23:56:49,165 eval INFO: 
-Task: niah_20029_10000_0.5 | Q: What is the vault password? | Expected: Building 7 Room 304
-2026-03-09 23:56:56,050 eval INFO:   Score: 1.0 | Answer: Building 7 Room 304 | 6.9s
-NIAH:  30%|███       | 30/100 [05:13<11:05,  9.50s/it]2026-03-09 23:56:56,051 eval INFO: 
-Task: niah_20030_10000_0.5 | Q: What is the budget total? | Expected: GOLF-77
-2026-03-09 23:57:06,664 eval INFO:   Score: 1.0 | Answer: The budget total mentioned in the text is **GOLF-77**. | 10.6s
-NIAH:  31%|███       | 31/100 [05:24<11:18,  9.83s/it]2026-03-09 23:57:06,664 eval INFO: 
-Task: niah_20031_10000_0.5 | Q: What is the vault password? | Expected: $4.2 million
-2026-03-09 23:57:13,754 eval INFO:   Score: 1.0 | Answer: $4.2 million | 7.1s
-NIAH:  32%|███▏      | 32/100 [05:31<10:12,  9.01s/it]2026-03-09 23:57:13,754 eval INFO: 
-Task: niah_20032_10000_0.8 | Q: What is the project codename? | Expected: March 15 2025
-2026-03-09 23:57:25,923 eval INFO:   Score: 1.0 | Answer: March 15 2025 | 12.2s
-NIAH:  33%|███▎      | 33/100 [05:43<11:07,  9.96s/it]2026-03-09 23:57:25,924 eval INFO: 
-Task: niah_20033_10000_0.8 | Q: What is the critical deadline? | Expected: HOTEL-256
-2026-03-09 23:57:40,698 eval INFO:   Score: 1.0 | Answer: HOTEL-256 | 14.8s
-NIAH:  34%|███▍      | 34/100 [05:58<12:32, 11.40s/it]2026-03-09 23:57:40,699 eval INFO: 
-Task: niah_20034_10000_0.8 | Q: Who is the key contact person? | Expected: DELTA-88
-2026-03-09 23:57:53,534 eval INFO:   Score: 1.0 | Answer: DELTA-88, key contact person | 12.8s
-NIAH:  35%|███▌      | 35/100 [06:11<12:49, 11.83s/it]2026-03-09 23:57:53,534 eval INFO: 
-Task: niah_20035_10000_0.8 | Q: What is the critical deadline? | Expected: Professor James Chen
-2026-03-09 23:58:00,763 eval INFO:   Score: 0.0 | Answer: Not found | 7.2s
-NIAH:  36%|███▌      | 36/100 [06:18<11:08, 10.45s/it]2026-03-09 23:58:00,764 eval INFO: 
-Task: niah_20036_10000_0.9 | Q: What is the assigned location? | Expected: CHARLIE-19
-2026-03-09 23:58:13,814 eval INFO:   Score: 1.0 | Answer: CHARLIE-19 | 13.0s
-NIAH:  37%|███▋      | 37/100 [06:31<11:47, 11.23s/it]2026-03-09 23:58:13,814 eval INFO: 
-Task: niah_20037_10000_0.9 | Q: What is the vault password? | Expected: CHARLIE-19
-2026-03-09 23:58:24,537 eval INFO:   Score: 1.0 | Answer: CHARLIE-19 | 10.7s
-NIAH:  38%|███▊      | 38/100 [06:42<11:26, 11.08s/it]2026-03-09 23:58:24,537 eval INFO: 
-Task: niah_20038_10000_0.9 | Q: Who is the key contact person? | Expected: GOLF-77
-2026-03-09 23:58:32,155 eval INFO:   Score: 1.0 | Answer: GOLF-77, key contact person | 7.6s
-NIAH:  39%|███▉      | 39/100 [06:49<10:12, 10.04s/it]2026-03-09 23:58:32,156 eval INFO: 
-Task: niah_20039_10000_0.9 | Q: What is the critical deadline? | Expected: Dr. Elena Rodriguez
-2026-03-09 23:58:39,094 eval INFO:   Score: 1.0 | Answer: Dr. Elena Rodriguez | 6.9s
-NIAH:  40%|████      | 40/100 [06:56<09:06,  9.11s/it]2026-03-09 23:58:39,094 eval INFO: 
-Task: niah_20040_20000_0.1 | Q: What is the assigned location? | Expected: DELTA-88
-2026-03-09 23:58:46,210 eval INFO:   Score: 1.0 | Answer: DELTA-88 | 7.1s
-NIAH:  41%|████      | 41/100 [07:04<08:22,  8.51s/it]2026-03-09 23:58:46,211 eval INFO: 
-Task: niah_20041_20000_0.1 | Q: What is the vault password? | Expected: JULIET-99
-2026-03-09 23:58:53,332 eval INFO:   Score: 1.0 | Answer: JULIET-99 | 7.1s
-NIAH:  42%|████▏     | 42/100 [07:11<07:49,  8.09s/it]2026-03-09 23:58:53,332 eval INFO: 
-Task: niah_20042_20000_0.1 | Q: What is the secret code? | Expected: Lab Complex Alpha
-2026-03-09 23:59:01,095 eval INFO:   Score: 1.0 | Answer: Lab Complex Alpha | 7.8s
-NIAH:  43%|████▎     | 43/100 [07:18<07:35,  8.00s/it]2026-03-09 23:59:01,095 eval INFO: 
-Task: niah_20043_20000_0.1 | Q: What is the secret code? | Expected: FOXTROT-11
-2026-03-09 23:59:08,820 eval INFO:   Score: 1.0 | Answer: FOXTROT-11 | 7.7s
-NIAH:  44%|████▍     | 44/100 [07:26<07:23,  7.91s/it]2026-03-09 23:59:08,820 eval INFO: 
-Task: niah_20044_20000_0.2 | Q: What is the vault password? | Expected: FOXTROT-11
-2026-03-09 23:59:15,921 eval INFO:   Score: 1.0 | Answer: FOXTROT-11 | 7.1s
-NIAH:  45%|████▌     | 45/100 [07:33<07:01,  7.67s/it]2026-03-09 23:59:15,922 eval INFO: 
-Task: niah_20045_20000_0.2 | Q: What is the secret code? | Expected: FOXTROT-11
-2026-03-09 23:59:23,615 eval INFO:   Score: 1.0 | Answer: FOXTROT-11 | 7.7s
-NIAH:  46%|████▌     | 46/100 [07:41<06:54,  7.68s/it]2026-03-09 23:59:23,616 eval INFO: 
-Task: niah_20046_20000_0.2 | Q: What is the secret code? | Expected: ALPHA-7
-2026-03-09 23:59:30,122 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 6.5s
-NIAH:  47%|████▋     | 47/100 [07:47<06:28,  7.33s/it]2026-03-09 23:59:30,123 eval INFO: 
-Task: niah_20047_20000_0.2 | Q: What is the vault password? | Expected: Agent Sarah Miller
-2026-03-09 23:59:37,803 eval INFO:   Score: 1.0 | Answer: Agent Sarah Miller | 7.7s
-NIAH:  48%|████▊     | 48/100 [07:55<06:26,  7.43s/it]2026-03-09 23:59:37,804 eval INFO: 
-Task: niah_20048_20000_0.5 | Q: What is the critical deadline? | Expected: Sector 9 North Wing
-2026-03-10 00:00:28,652 eval INFO:   Score: 1.0 | Answer: Sector 9 North Wing | 50.8s
-NIAH:  49%|████▉     | 49/100 [08:46<17:23, 20.46s/it]2026-03-10 00:00:28,656 eval INFO: 
-Task: niah_20049_20000_0.5 | Q: What is the assigned location? | Expected: ALPHA-7
-2026-03-10 00:00:37,343 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 8.7s
-NIAH:  50%|█████     | 50/100 [08:55<14:06, 16.93s/it]2026-03-10 00:00:37,344 eval INFO: 
-Task: niah_20050_20000_0.5 | Q: When is the meeting scheduled? | Expected: DELTA-88
-2026-03-10 00:00:45,817 eval INFO:   Score: 1.0 | Answer: DELTA-88 | 8.5s
-NIAH:  51%|█████     | 51/100 [09:03<11:45, 14.39s/it]2026-03-10 00:00:45,839 eval INFO: 
-Task: niah_20051_20000_0.5 | Q: Who is the key contact person? | Expected: FOXTROT-11
-2026-03-10 00:00:58,496 eval INFO:   Score: 1.0 | Answer: FOXTROT-11 | 12.7s
-NIAH:  52%|█████▏    | 52/100 [09:16<11:06, 13.88s/it]2026-03-10 00:00:58,496 eval INFO: 
-Task: niah_20052_20000_0.8 | Q: Who is the key contact person? | Expected: Dr. Elena Rodriguez
-2026-03-10 00:01:09,019 eval INFO:   Score: 1.0 | Answer: Based on the text provided, here is the key contact person and their details:
-
-**Name:** Dr. Elena R | 10.5s
-NIAH:  53%|█████▎    | 53/100 [09:26<10:04, 12.87s/it]2026-03-10 00:01:09,019 eval INFO: 
-Task: niah_20053_20000_0.8 | Q: Who is the key contact person? | Expected: DELTA-88
-2026-03-10 00:01:16,823 eval INFO:   Score: 1.0 | Answer: DELTA-88 | 7.8s
-NIAH:  54%|█████▍    | 54/100 [09:34<08:42, 11.35s/it]2026-03-10 00:01:16,823 eval INFO: 
-Task: niah_20054_20000_0.8 | Q: What is the project codename? | Expected: Building 7 Room 304
-2026-03-10 00:01:27,172 eval INFO:   Score: 1.0 | Answer: Building 7 Room 304 | 10.3s
-NIAH:  55%|█████▌    | 55/100 [09:44<08:17, 11.05s/it]2026-03-10 00:01:27,172 eval INFO: 
-Task: niah_20055_20000_0.8 | Q: What is the secret code? | Expected: Agent Sarah Miller
-2026-03-10 00:01:35,152 eval INFO:   Score: 1.0 | Answer: Agent Sarah Miller | 8.0s
-NIAH:  56%|█████▌    | 56/100 [09:52<07:25, 10.13s/it]2026-03-10 00:01:35,152 eval INFO: 
-Task: niah_20056_20000_0.9 | Q: What is the critical deadline? | Expected: $850,000
-2026-03-10 00:01:42,986 eval INFO:   Score: 0.0 | Answer: Not found | 7.8s
-NIAH:  57%|█████▋    | 57/100 [10:00<06:45,  9.44s/it]2026-03-10 00:01:42,986 eval INFO: 
-Task: niah_20057_20000_0.9 | Q: What is the vault password? | Expected: CHARLIE-19
-2026-03-10 00:01:52,358 eval INFO:   Score: 1.0 | Answer: CHARLIE-19 | 9.4s
-NIAH:  58%|█████▊    | 58/100 [10:10<06:35,  9.42s/it]2026-03-10 00:01:52,358 eval INFO: 
-Task: niah_20058_20000_0.9 | Q: What is the budget total? | Expected: Professor James Chen
-2026-03-10 00:02:03,331 eval INFO:   Score: 1.0 | Answer: Professor James Chen | 10.9s
-NIAH:  59%|█████▉    | 59/100 [10:21<06:45,  9.89s/it]2026-03-10 00:02:03,331 eval INFO: 
-Task: niah_20059_20000_0.9 | Q: When is the meeting scheduled? | Expected: JULIET-99
-2026-03-10 00:02:11,083 eval INFO:   Score: 1.0 | Answer: JULIET-99 | 7.8s
-NIAH:  60%|██████    | 60/100 [10:28<06:09,  9.25s/it]2026-03-10 00:02:11,083 eval INFO: 
-Task: niah_20060_50000_0.1 | Q: What is the assigned location? | Expected: Building 7 Room 304
-2026-03-10 00:02:20,378 eval INFO:   Score: 1.0 | Answer: Building 7 Room 304 | 9.3s
-NIAH:  61%|██████    | 61/100 [10:38<06:01,  9.26s/it]2026-03-10 00:02:20,385 eval INFO: 
-Task: niah_20061_50000_0.1 | Q: What is the project codename? | Expected: INDIA-33
-2026-03-10 00:02:29,732 eval INFO:   Score: 1.0 | Answer: INDIA-33 | 9.3s
-NIAH:  62%|██████▏   | 62/100 [10:47<05:52,  9.29s/it]2026-03-10 00:02:29,733 eval INFO: 
-Task: niah_20062_50000_0.1 | Q: When is the meeting scheduled? | Expected: ALPHA-7
-2026-03-10 00:02:39,498 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 9.8s
-NIAH:  63%|██████▎   | 63/100 [10:57<05:48,  9.43s/it]2026-03-10 00:02:39,499 eval INFO: 
-Task: niah_20063_50000_0.1 | Q: What is the critical deadline? | Expected: INDIA-33
-2026-03-10 00:02:50,050 eval INFO:   Score: 1.0 | Answer: INDIA-33 | 10.6s
-NIAH:  64%|██████▍   | 64/100 [11:07<05:51,  9.77s/it]2026-03-10 00:02:50,051 eval INFO: 
-Task: niah_20064_50000_0.2 | Q: What is the project codename? | Expected: $4.2 million
-2026-03-10 00:02:59,841 eval INFO:   Score: 1.0 | Answer: $4.2 million | 9.8s
-NIAH:  65%|██████▌   | 65/100 [11:17<05:42,  9.77s/it]2026-03-10 00:02:59,842 eval INFO: 
-Task: niah_20065_50000_0.2 | Q: When is the meeting scheduled? | Expected: $12.7 billion
-2026-03-10 00:03:10,937 eval INFO:   Score: 0.0 | Answer: Meeting time not found | 11.1s
-NIAH:  66%|██████▌   | 66/100 [11:28<05:45, 10.17s/it]2026-03-10 00:03:10,938 eval INFO: 
-Task: niah_20066_50000_0.2 | Q: What is the vault password? | Expected: Building 7 Room 304
-2026-03-10 00:03:23,191 eval INFO:   Score: 1.0 | Answer: Building 7 Room 304 | 12.3s
-NIAH:  67%|██████▋   | 67/100 [11:41<05:56, 10.80s/it]2026-03-10 00:03:23,225 eval INFO: 
-Task: niah_20067_50000_0.2 | Q: What is the critical deadline? | Expected: September 3 2024
-2026-03-10 00:03:31,580 eval INFO:   Score: 1.0 | Answer: September 3 2024 | 8.4s
-NIAH:  68%|██████▊   | 68/100 [11:49<05:22, 10.07s/it]2026-03-10 00:03:31,581 eval INFO: 
-Task: niah_20068_50000_0.5 | Q: When is the meeting scheduled? | Expected: September 3 2024
-2026-03-10 00:03:39,859 eval INFO:   Score: 1.0 | Answer: September 3 2024 | 8.3s
-NIAH:  69%|██████▉   | 69/100 [11:57<04:55,  9.53s/it]2026-03-10 00:03:39,859 eval INFO: 
-Task: niah_20069_50000_0.5 | Q: Who is the key contact person? | Expected: $850,000
-2026-03-10 00:03:52,101 eval INFO:   Score: 0.0 | Answer: No key contact person found | 12.2s
-NIAH:  70%|███████   | 70/100 [12:09<05:10, 10.35s/it]2026-03-10 00:03:52,102 eval INFO: 
-Task: niah_20070_50000_0.5 | Q: What is the vault password? | Expected: DELTA-88
-2026-03-10 00:04:00,251 eval INFO:   Score: 1.0 | Answer: DELTA-88 | 8.1s
-NIAH:  71%|███████   | 71/100 [12:18<04:40,  9.69s/it]2026-03-10 00:04:00,252 eval INFO: 
-Task: niah_20071_50000_0.5 | Q: What is the budget total? | Expected: $12.7 billion
-2026-03-10 00:04:08,729 eval INFO:   Score: 1.0 | Answer: $12.7 billion | 8.5s
-NIAH:  72%|███████▏  | 72/100 [12:26<04:21,  9.32s/it]2026-03-10 00:04:08,730 eval INFO: 
-Task: niah_20072_50000_0.8 | Q: Who is the key contact person? | Expected: $850,000
-2026-03-10 00:04:21,679 eval INFO:   Score: 0.0 | Answer: Not found | 12.9s
-NIAH:  73%|███████▎  | 73/100 [12:39<04:41, 10.41s/it]2026-03-10 00:04:21,679 eval INFO: 
-Task: niah_20073_50000_0.8 | Q: Who is the key contact person? | Expected: January 22 2026
-2026-03-10 00:04:31,180 eval INFO:   Score: 0.0 | Answer: Not found | 9.5s
-NIAH:  74%|███████▍  | 74/100 [12:48<04:23, 10.14s/it]2026-03-10 00:04:31,180 eval INFO: 
-Task: niah_20074_50000_0.8 | Q: When is the meeting scheduled? | Expected: $12.7 billion
-2026-03-10 00:04:40,360 eval INFO:   Score: 0.0 | Answer: Meeting time not found | 9.2s
-NIAH:  75%|███████▌  | 75/100 [12:58<04:06,  9.85s/it]2026-03-10 00:04:40,360 eval INFO: 
-Task: niah_20075_50000_0.8 | Q: What is the budget total? | Expected: January 22 2026
-2026-03-10 00:04:49,246 eval INFO:   Score: 0.0 | Answer: Not found | 8.9s
-NIAH:  76%|███████▌  | 76/100 [13:07<03:49,  9.56s/it]2026-03-10 00:04:49,246 eval INFO: 
-Task: niah_20076_50000_0.9 | Q: What is the vault password? | Expected: September 3 2024
-2026-03-10 00:04:56,793 eval INFO:   Score: 1.0 | Answer: September 3 2024 | 7.5s
-NIAH:  77%|███████▋  | 77/100 [13:14<03:26,  8.96s/it]2026-03-10 00:04:56,794 eval INFO: 
-Task: niah_20077_50000_0.9 | Q: What is the project codename? | Expected: Dr. Elena Rodriguez
-2026-03-10 00:05:07,450 eval INFO:   Score: 1.0 | Answer: Dr. Elena Rodriguez | 10.7s
-NIAH:  78%|███████▊  | 78/100 [13:25<03:28,  9.47s/it]2026-03-10 00:05:07,451 eval INFO: 
-Task: niah_20078_50000_0.9 | Q: Who is the key contact person? | Expected: ECHO-365
-2026-03-10 00:05:15,639 eval INFO:   Score: 1.0 | Answer: ECHO-365 | 8.2s
-NIAH:  79%|███████▉  | 79/100 [13:33<03:10,  9.08s/it]2026-03-10 00:05:15,640 eval INFO: 
-Task: niah_20079_50000_0.9 | Q: What is the secret code? | Expected: GOLF-77
-2026-03-10 00:05:28,638 eval INFO:   Score: 1.0 | Answer: GOLF-77 | 13.0s
-NIAH:  80%|████████  | 80/100 [13:46<03:25, 10.26s/it]2026-03-10 00:05:28,638 eval INFO: 
-Task: niah_20080_100000_0.1 | Q: What is the critical deadline? | Expected: January 22 2026
-2026-03-10 00:05:44,639 eval INFO:   Score: 1.0 | Answer: January 22 2026 | 16.0s
-NIAH:  81%|████████  | 81/100 [14:02<03:47, 11.98s/it]2026-03-10 00:05:44,644 eval INFO: 
-Task: niah_20081_100000_0.1 | Q: What is the vault password? | Expected: September 3 2024
-2026-03-10 00:05:56,032 eval INFO:   Score: 1.0 | Answer: September 3 2024 | 11.4s
-NIAH:  82%|████████▏ | 82/100 [14:13<03:32, 11.80s/it]2026-03-10 00:05:56,033 eval INFO: 
-Task: niah_20082_100000_0.1 | Q: When is the meeting scheduled? | Expected: GOLF-77
-2026-03-10 00:06:07,158 eval INFO:   Score: 1.0 | Answer: GOLF-77 | 11.1s
-NIAH:  83%|████████▎ | 83/100 [14:24<03:17, 11.60s/it]2026-03-10 00:06:07,158 eval INFO: 
-Task: niah_20083_100000_0.1 | Q: When is the meeting scheduled? | Expected: ECHO-365
-2026-03-10 00:06:18,476 eval INFO:   Score: 0.0 | Answer: Not found | 11.3s
-NIAH:  84%|████████▍ | 84/100 [14:36<03:04, 11.52s/it]2026-03-10 00:06:18,476 eval INFO: 
-Task: niah_20084_100000_0.2 | Q: When is the meeting scheduled? | Expected: HOTEL-256
-2026-03-10 00:06:31,493 eval INFO:   Score: 0.0 | Answer: NOT FOUND | 13.0s
-NIAH:  85%|████████▌ | 85/100 [14:49<02:59, 11.97s/it]2026-03-10 00:06:31,493 eval INFO: 
-Task: niah_20085_100000_0.2 | Q: What is the assigned location? | Expected: January 22 2026
-2026-03-10 00:06:42,623 eval INFO:   Score: 1.0 | Answer: January 22 2026 | 11.1s
-NIAH:  86%|████████▌ | 86/100 [15:00<02:44, 11.72s/it]2026-03-10 00:06:42,624 eval INFO: 
-Task: niah_20086_100000_0.2 | Q: Who is the key contact person? | Expected: ALPHA-7
-2026-03-10 00:06:52,964 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 10.3s
-NIAH:  87%|████████▋ | 87/100 [15:10<02:26, 11.30s/it]2026-03-10 00:06:52,967 eval INFO: 
-Task: niah_20087_100000_0.2 | Q: What is the secret code? | Expected: JULIET-99
-2026-03-10 00:07:03,116 eval INFO:   Score: 1.0 | Answer: JULIET-99 | 10.1s
-NIAH:  88%|████████▊ | 88/100 [15:20<02:11, 10.96s/it]2026-03-10 00:07:03,117 eval INFO: 
-Task: niah_20088_100000_0.5 | Q: What is the budget total? | Expected: BRAVO-42
-2026-03-10 00:07:21,630 eval INFO:   Score: 1.0 | Answer: Budget: BRAVO-42 (The budget total is BRAVO-42) | 18.5s
-NIAH:  89%|████████▉ | 89/100 [15:39<02:25, 13.22s/it]2026-03-10 00:07:21,630 eval INFO: 
-Task: niah_20089_100000_0.5 | Q: Who is the key contact person? | Expected: BRAVO-42
-2026-03-10 00:07:32,503 eval INFO:   Score: 1.0 | Answer: BRAVO-42 | 10.9s
-NIAH:  90%|█████████ | 90/100 [15:50<02:05, 12.52s/it]2026-03-10 00:07:32,504 eval INFO: 
-Task: niah_20090_100000_0.5 | Q: What is the vault password? | Expected: $12.7 billion
-2026-03-10 00:07:43,308 eval INFO:   Score: 1.0 | Answer: $12.7 billion | 10.8s
-NIAH:  91%|█████████ | 91/100 [16:01<01:48, 12.00s/it]2026-03-10 00:07:43,308 eval INFO: 
-Task: niah_20091_100000_0.5 | Q: Who is the key contact person? | Expected: Professor James Chen
-2026-03-10 00:07:56,217 eval INFO:   Score: 1.0 | Answer: Based on the text provided, here is the key contact person found:
-
-**Name:** Professor James Chen  
- | 12.9s
-NIAH:  92%|█████████▏| 92/100 [16:14<01:38, 12.28s/it]2026-03-10 00:07:56,218 eval INFO: 
-Task: niah_20092_100000_0.8 | Q: What is the critical deadline? | Expected: ALPHA-7
-2026-03-10 00:08:09,047 eval INFO:   Score: 1.0 | Answer: ['ALPHA-7'] | 12.8s
-NIAH:  93%|█████████▎| 93/100 [16:26<01:27, 12.44s/it]2026-03-10 00:08:09,049 eval INFO: 
-Task: niah_20093_100000_0.8 | Q: What is the assigned location? | Expected: ECHO-365
-2026-03-10 00:08:22,219 eval INFO:   Score: 1.0 | Answer: ECHO-365 | 13.2s
-NIAH:  94%|█████████▍| 94/100 [16:40<01:15, 12.66s/it]2026-03-10 00:08:22,221 eval INFO: 
-Task: niah_20094_100000_0.8 | Q: What is the project codename? | Expected: Professor James Chen
-2026-03-10 00:08:33,529 eval INFO:   Score: 1.0 | Answer: Professor James Chen | 11.3s
-NIAH:  95%|█████████▌| 95/100 [16:51<01:01, 12.26s/it]2026-03-10 00:08:33,530 eval INFO: 
-Task: niah_20095_100000_0.8 | Q: What is the critical deadline? | Expected: CHARLIE-19
-2026-03-10 00:08:43,953 eval INFO:   Score: 1.0 | Answer: CHARLIE-19 | 10.4s
-NIAH:  96%|█████████▌| 96/100 [17:01<00:46, 11.71s/it]2026-03-10 00:08:43,954 eval INFO: 
-Task: niah_20096_100000_0.9 | Q: What is the budget total? | Expected: September 3 2024
-2026-03-10 00:10:03,768 eval INFO:   Score: 0.0 | Answer: No budget total found | 79.8s
-NIAH:  97%|█████████▋| 97/100 [18:21<01:36, 32.14s/it]2026-03-10 00:10:03,783 eval INFO: 
-Task: niah_20097_100000_0.9 | Q: What is the secret code? | Expected: ALPHA-7
-2026-03-10 00:10:17,100 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 13.3s
-NIAH:  98%|█████████▊| 98/100 [18:34<00:52, 26.50s/it]2026-03-10 00:10:17,101 eval INFO: 
-Task: niah_20098_100000_0.9 | Q: What is the budget total? | Expected: BRAVO-42
-2026-03-10 00:10:29,617 eval INFO:   Score: 0.0 | Answer: Budget total not found in the provided text. | 12.5s
-NIAH:  99%|█████████▉| 99/100 [18:47<00:22, 22.30s/it]2026-03-10 00:10:29,622 eval INFO: 
-Task: niah_20099_100000_0.9 | Q: What is the vault password? | Expected: ALPHA-7
-2026-03-10 00:10:42,229 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 12.6s
-NIAH: 100%|██████████| 100/100 [19:00<00:00, 19.39s/it]NIAH: 100%|██████████| 100/100 [19:00<00:00, 11.40s/it]
-2026-03-10 00:10:42,231 eval INFO: 
---- niah Results ---
-2026-03-10 00:10:42,231 eval INFO: Accuracy/Recall: 81.0%
-2026-03-10 00:10:42,231 eval INFO: Tasks: 100
-2026-03-10 00:10:42,231 eval INFO: By doc length:
-2026-03-10 00:10:42,231 eval INFO:   100K: 80.0%
-2026-03-10 00:10:42,231 eval INFO:   10K: 90.0%
-2026-03-10 00:10:42,231 eval INFO:   20K: 95.0%
-2026-03-10 00:10:42,231 eval INFO:   50K: 70.0%
-2026-03-10 00:10:42,231 eval INFO:   5K: 70.0%
-2026-03-10 00:10:42,231 eval INFO: By needle position:
-2026-03-10 00:10:42,231 eval INFO:   0.10: 85.0%
-2026-03-10 00:10:42,231 eval INFO:   0.25: 80.0%
-2026-03-10 00:10:42,231 eval INFO:   0.50: 90.0%
-2026-03-10 00:10:42,231 eval INFO:   0.75: 70.0%
-2026-03-10 00:10:42,231 eval INFO:   0.90: 80.0%
-2026-03-10 00:10:42,248 eval INFO: 
-============================================================
-2026-03-10 00:10:42,248 eval INFO: ALL EVALUATIONS COMPLETE
-2026-03-10 00:10:42,248 eval INFO: ============================================================
-2026-03-10 00:10:42,248 eval INFO:   niah: 81.0% (100 tasks)
-2026-03-10 00:10:42,248 eval INFO: Total time: 1140.1s
-2026-03-10 00:10:42,248 eval INFO: Model stats: {'root_calls': 102, 'sub_calls': 355, 'total_input_tokens': 761801, 'total_output_tokens': 17512, 'total_time': 1129.9717638492584}
-2026-03-10 00:10:42,248 eval INFO: Results saved to: results/baseline_35b_a3b/20260309_235132
