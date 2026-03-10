@@ -197,11 +197,15 @@ def main():
 
     logger.info(f"Loaded {len(trajectories)} trajectories from {input_path}")
 
+    from scaffold.prompts.qwen35_35b import QWEN35_35B_SYSTEM_PROMPT
     from scaffold.prompts.qwen2b import QWEN_2B_SYSTEM_PROMPT
+
+    # Auto-detect prompt based on trajectory content
+    system_prompt = QWEN35_35B_SYSTEM_PROMPT  # Default to newer prompt
 
     samples, stats = filter_trajectories(
         trajectories,
-        system_prompt=QWEN_2B_SYSTEM_PROMPT,
+        system_prompt=system_prompt,
         max_turns=args.max_turns,
         max_errors=args.max_errors,
     )

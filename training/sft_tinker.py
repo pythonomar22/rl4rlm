@@ -71,16 +71,31 @@ def sample_to_datum(sample: dict, renderer, tokenizer) -> tinker.Datum | None:
         logger.warning(f"Failed to render sample: {e}")
         return None
 
-    # Convert weights to numpy
-    if hasattr(weights, 'numpy'):
-        weights_np = weights.float().numpy()
+    # Use cookbook's utility to create properly shifted input/target pairs
+    from tinker_cookbook.supervised.common import create_rightshifted_model_input_and_leftshifted_targets
+    input_model_input, target_tokens = create_rightshifted_model_input_and_leftshifted_targets(
+        model_input.chunks
+    )
+    # Weights need same shift: drop first, keep up to len(target_tokens)
+    if hasattr(weights, 'tolist'):
+        weights_list = weights.tolist()
     else:
-        weights_np = np.array(weights, dtype=np.float32)
+        weights_list = list(weights)
+    weights_shifted = weights_list[1:len(target_tokens) + 1]
 
     datum = tinker.Datum(
-        model_input=model_input,
+        model_input=input_model_input,
         loss_fn_inputs={
-            "weights": tinker.TensorData.from_numpy(weights_np),
+            "target_tokens": tinker.TensorData(
+                data=target_tokens,
+                dtype="int64",
+                shape=[len(target_tokens)],
+            ),
+            "weights": tinker.TensorData(
+                data=[float(w) for w in weights_shifted],
+                dtype="float32",
+                shape=[len(weights_shifted)],
+            ),
         }
     )
     return datum
@@ -192,8 +207,8 @@ def train_sft(
             fwd_bwd_result = fwd_bwd_future.result()
             optim_result = optim_future.result()
 
-            # Extract loss
-            loss = fwd_bwd_result.loss if hasattr(fwd_bwd_result, 'loss') else None
+            # Extract loss from metrics dict (Tinker uses "loss:sum" key)
+            loss = fwd_bwd_result.metrics.get("loss:sum") if hasattr(fwd_bwd_result, 'metrics') else None
 
             step_info = {
                 "epoch": epoch + 1,
@@ -244,6 +259,8 @@ def train_sft(
     final_sampling_client = training_client.save_weights_and_get_sampling_client(
         name="final"
     )
+    final_model_path = final_sampling_client.model_path if hasattr(final_sampling_client, 'model_path') else None
+    logger.info(f"  Final model path: {final_model_path}")
     training_client.save_state(name="final-state")
 
     total_time = time.time() - t0
@@ -259,6 +276,7 @@ def train_sft(
         "total_steps": total_steps,
         "total_time": total_time,
         "n_samples": len(all_data),
+        "final_model_path": final_model_path,
         "training_log": training_log,
     }
 

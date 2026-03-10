@@ -93,8 +93,6 @@ def trajectory_to_training_data(
     - Advantage signal
     - Sampling log-probs (from generation)
     """
-    import torch
-
     messages_so_far = []
     data = []
 
