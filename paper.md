@@ -182,6 +182,59 @@ We train the first open-weight natively recursive language model based on Qwen3.
 6. **DataFrame QA regressed**: model's chunking loses table structure on large CSV data
 7. **Declining reward trend**: 0.865→0.741→0.665→0.480 (steps 5-8) — concerning
 
+### Step 10 Evaluation — All 8 Benchmarks (including 2 new)
+
+| Benchmark | Base Model | v1 Step 10 | v2 Step 5 | v2 Step 10 | Delta (v2-s10 vs base) |
+|-----------|------------|------------|-----------|------------|------------------------|
+| NIAH (20) | 81.0% | 75.0% | 80.0% | 85.0% | **+4.0%** |
+| Multi-NIAH (12) | 97.8% | 100.0% | 90.0% | 95.0% | -2.8% |
+| Doc-Classify (10) | 53.6% | 92.0% | 65.0% | **95.0%** | **+41.4%** |
+| Multi-Hop QA (10) | 50.0% | N/A | 50.0% | **70.0%** | **+20.0%** |
+| Code Debug (8) | 25.0% | N/A | 50.0%* | 25.0% | 0% |
+| DataFrame QA (10) | 80.0% | N/A | 48.0% | 50.0% | -30.0% |
+| Notebook QA (10) | 60.0%† | N/A | N/A | **75.0%**† | **+15.0%** |
+| Hard NIAH (10) | 90.0%‡ | N/A | N/A | **100.0%**‡ | **+10.0%** |
+| **Average (6 core)** | **64.6%** | N/A | **63.8%** | **70.0%** | **+5.4%** |
+| **Average (all 8)** | **67.2%** | N/A | N/A | **74.4%** | **+7.2%** |
+
+†Notebook QA: New benchmark testing Jupyter notebook comprehension.
+‡Hard NIAH: New benchmark with adversarial distractors + 500K-1M char docs.
+*Code-debug: Fixed benchmark with round-robin bug assignment.
+
+#### Key Findings (v2 Step 10)
+1. **NIAH recovered to 85%**: +4% over base, best result yet (v1 s10: 75%, v2 s5: 80%)
+2. **Doc-Classify near-ceiling at 95%**: consistent improvement from RL signal
+3. **Multi-Hop QA breakthrough: +20%!** Model learning multi-step decomposition for 2-hop and 3-hop questions
+4. **Notebook QA transfer: +15%** without any notebook-specific training! RLM search skills generalize
+5. **Code-Debug regressed to 25%**: the model lost code analysis capability at this checkpoint
+6. **DataFrame QA still weak**: -30% from base, numerical/analytical tasks hurt by text-focused RL
+7. **Multi-NIAH slight regression**: 95% vs 97.8% base, but recovery from 90% at step 5
+
+### V2 Reward Trajectory (Extended)
+| Step | Reward | Updates |
+|------|--------|---------|
+| 1 | 0.757 | 21 |
+| 5 | 0.865 | 16 |
+| 8 | 0.480 | 15 |
+| 9 | 0.464 | 16 |
+| 10 | 0.565 | 16 |
+| 11 | 0.888 | 8 |
+
+## GRPO v3 (Running)
+
+### Training Details
+- Session: de5a5059-ed71-5661-acad-de7fdae4f048
+- Resume from v1 step 10 (same starting point as v2)
+- LR: 2e-6 base with **cosine decay schedule** (→ 10% over 30 steps)
+- Temperature: 1.0
+- Batch size: 4 (up from 3 in v2)
+- Mixed_v3 task type: includes Multi-Hop QA (15%) and Hard NIAH (5%)
+
+### Step 1 Results
+- Reward: 0.790 | Updates: 32 (+24/-8)
+- Per-task rewards: doc_classify=0.892 | multi_hop_qa=0.688
+- Multi-hop QA showing immediate training signal with mixed success/failure
+
 ## GRPO v3 Plan
 
 ### Task Mix Changes
@@ -198,10 +251,15 @@ v3: 30% NIAH, 15% Multi-NIAH, 15% Doc-Classify, 15% Multi-Hop QA, 10% DFQA, 10% 
 
 - [x] GRPO v2: Resume from step 10, lower LR, negative advantages
 - [x] Evaluate v2 step 5 on all 6 benchmarks
-- [ ] Evaluate v2 step 10 checkpoint (saving at step 10)
-- [ ] Fix code-debug benchmark diversity ✓
-- [ ] Fix doc-classify scoring for list format ✓
-- [ ] GRPO v3 with Multi-Hop QA in task mix
+- [x] Evaluate v2 step 10 on all 8 benchmarks (including Notebook QA + Hard NIAH)
+- [x] Fix code-debug benchmark diversity (round-robin bug assignment)
+- [x] Fix doc-classify scoring for list format
+- [x] GRPO v3 with Multi-Hop QA in task mix (running)
+- [x] Add Notebook QA benchmark (Jupyter-style)
+- [x] Add Hard NIAH benchmark (distractors + extreme lengths)
+- [ ] Evaluate v3 step 5 checkpoint
+- [ ] Compare v1-s10, v2-s5, v2-s10, v3-s5 head-to-head
+- [ ] Add verbatim copy benchmark
 - [ ] External benchmarks (OOLONG, RULER, BABILong)
 - [ ] Upload best model to HuggingFace
 - [ ] Write full paper (icmltemplate/)

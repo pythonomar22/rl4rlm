@@ -54,6 +54,7 @@ from eval.benchmarks.doc_classify import generate_doc_classify_suite, score_doc_
 from eval.benchmarks.dataframe_qa import generate_dataframe_qa_suite, score_dataframe_qa
 from eval.benchmarks.code_debug import generate_code_debug_suite, score_code_debug
 from eval.benchmarks.multi_hop_qa import generate_multi_hop_suite, score_multi_hop
+from eval.benchmarks.notebook_qa import generate_notebook_qa_suite, score_notebook_qa
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -455,6 +456,9 @@ def score_trajectory(traj_dict: dict, task_info: dict) -> float:
         return scores["score"]
     elif task_type == "multi_hop_qa":
         scores = score_multi_hop(answer, task.expected_answer)
+        return scores["score"]
+    elif task_type == "notebook_qa":
+        scores = score_notebook_qa(answer, task.expected_answer)
         return scores["score"]
     return 0
 

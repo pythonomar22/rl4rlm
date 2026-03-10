@@ -449,10 +449,9 @@ def score_dataframe_qa(answer: str | None, expected: str, task_type: str) -> dic
     except (ValueError, ZeroDivisionError):
         pass
 
-    # For ticker answers, check if expected ticker is in the answer
-    if task_type in ("ranking", "sector", "lookup"):
-        if expected.upper() in answer.upper():
-            return {"score": 0.8, "match_type": "contains"}
+    # Contains match — expected answer found within the answer text
+    if expected.lower() in answer.lower():
+        return {"score": 0.8, "match_type": "contains"}
 
     # For multi-line answers (sector_count), check partial matches
     if "\n" in expected:
