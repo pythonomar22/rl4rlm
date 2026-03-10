@@ -58,6 +58,7 @@ from eval.benchmarks.multi_hop_qa import generate_multi_hop_suite, score_multi_h
 from eval.benchmarks.notebook_qa import generate_notebook_qa_suite, score_notebook_qa
 from eval.benchmarks.multi_hop_hard import generate_hard_multi_hop_suite, score_hard_multi_hop
 from eval.benchmarks.event_counting import generate_event_counting_suite, score_event_counting
+from eval.benchmarks.cross_doc_compare import generate_cross_doc_suite, score_cross_doc
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -126,6 +127,7 @@ TASK_STRATEGY_WEIGHTS = {
     "code_debug": {"standard": 0.4, "two_pass": 0.3, "small_chunks": 0.3},
     "notebook_qa": {"extract_compute": 0.3, "standard": 0.3, "map_reduce": 0.2, "small_chunks": 0.2},
     "dataframe_qa": {"extract_compute": 0.4, "map_reduce": 0.3, "standard": 0.2, "small_chunks": 0.1},
+    "cross_doc_compare": {"map_reduce": 0.3, "two_pass": 0.3, "extract_compute": 0.2, "standard": 0.2},
 }
 
 
@@ -214,6 +216,9 @@ def compute_reward(trajectory_dict: dict, task_type: str, task_info: dict | None
     elif task_type == "event_counting":
         # Event counting: reward Python-based counting (not sub-model counting)
         return 0.70 * score + 0.10 * (format_bonus + 0.1) + 0.10 * persistence_bonus + 0.10 * subcall_bonus
+    elif task_type == "cross_doc_compare":
+        # Cross-doc: multi-step reasoning required (find doc A info, find doc B info, compare)
+        return 0.65 * score + 0.10 * (format_bonus + 0.1) + 0.15 * persistence_bonus + 0.10 * subcall_bonus
     else:
         return score
 
@@ -552,13 +557,14 @@ def sample_tasks_v6(
     seed_offset = step * 1000
 
     task_weights = [
-        ("hard_multi_hop", 0.20),
+        ("hard_multi_hop", 0.15),
         ("multi_hop_qa", 0.15),
-        ("event_counting", 0.15),  # NEW: teaches extract-then-count-in-Python
+        ("event_counting", 0.15),  # teaches extract-then-count-in-Python
+        ("cross_doc_compare", 0.10),  # NEW: cross-document comparison (O(N) multi-doc)
         ("notebook_qa", 0.10),
         ("dataframe_qa", 0.10),
         ("code_debug", 0.10),
-        ("doc_classify", 0.10),
+        ("doc_classify", 0.05),
         ("niah", 0.05),
         ("multi_niah", 0.05),
     ]
@@ -620,6 +626,10 @@ def sample_tasks_v6(
             # ANTI-SHORTCUT: 50K-200K event logs, trains extract-then-count
             items = generate_event_counting_suite(n_tasks=count, seed_offset=s)
             tasks.extend({"task": t, "type": "event_counting"} for t in items)
+        elif ttype == "cross_doc_compare":
+            # Cross-document comparison: O(N) multi-doc reasoning
+            items = generate_cross_doc_suite(n_tasks=count, seed_offset=s)
+            tasks.extend({"task": t, "type": "cross_doc_compare"} for t in items)
 
     rng.shuffle(tasks)
     return tasks
@@ -661,6 +671,9 @@ def score_trajectory(traj_dict: dict, task_info: dict) -> float:
     elif task_type == "event_counting":
         scores = score_event_counting(answer, task.expected_answer)
         return scores["score"]
+    elif task_type == "cross_doc_compare":
+        scores = score_cross_doc(answer, task)
+        return scores["score"]
     return 0
 
 
@@ -684,6 +697,9 @@ def train_rl_v6(
     grad_accum_batch: int = 4,
     timeout_retry_limit: int = 2,
     strategy_conditioning: bool = False,
+    ngrpo_virtual_reward: bool = False,
+    clip_high: float = 0.0,
+    clip_low: float = 0.0,
 ):
     """Run GRPO RL training V6 on Tinker.
 
@@ -699,6 +715,15 @@ def train_rl_v6(
     - Each trajectory gets a randomly assigned strategy prompt
     - Different strategies produce different code patterns
     - Combats mode collapse by injecting diversity through prompt space
+
+    V8 additions:
+    - NGRPO virtual max-reward (--ngrpo-virtual-reward): For all-wrong groups,
+      add virtual optimal completion with reward=1.0 instead of skipping.
+      Gives negative advantage to all completions → pushes away from failures.
+      (arXiv:2509.18851)
+    - Asymmetric advantage clipping (--clip-high, --clip-low): Clip positive
+      advantages more aggressively than negative to preserve entropy.
+      clip_high=0.15, clip_low=0.3 recommended (arXiv:2509.26114)
     """
 
     log_dir = Path("data/rl") / experiment_name
@@ -768,6 +793,9 @@ def train_rl_v6(
     logger.info(f"  Multi-turn persistence bonus: ON")
     logger.info(f"  Code diversity bonus: ON")
     logger.info(f"  Strategy conditioning: {'ON' if strategy_conditioning else 'OFF'}")
+    logger.info(f"  NGRPO virtual reward: {'ON' if ngrpo_virtual_reward else 'OFF'}")
+    if clip_high > 0 or clip_low > 0:
+        logger.info(f"  Asymmetric advantage: clip_high={clip_high}, clip_low={clip_low}")
     logger.info(f"{'='*60}\n")
 
     # Temperature schedule
@@ -946,14 +974,52 @@ def train_rl_v6(
             per_task_groups[ttype] += 1
 
             if std_r < 1e-6:
-                # All same reward — skip (no learning signal)
-                n_skipped_groups += 1
-                per_task_skips[ttype] += 1
-                logger.info(f"  SKIP group {ttype}: all same reward {mean_r:.3f}")
-                continue
+                if ngrpo_virtual_reward and mean_r < 0.5:
+                    # NGRPO virtual max-reward (arXiv:2509.18851):
+                    # For all-wrong groups, add a virtual optimal completion with reward=1.0.
+                    # This gives negative advantage to all actual completions, pushing the
+                    # model away from failure patterns instead of wasting compute by skipping.
+                    virtual_mean = (mean_r * len(rewards) + 1.0) / (len(rewards) + 1)
+                    virtual_std = np.std(rewards + [1.0])
+                    logger.info(f"  NGRPO virtual reward for {ttype}: mean {mean_r:.3f} → "
+                                f"virtual_mean {virtual_mean:.3f}, virtual_std {virtual_std:.3f}")
+                    for traj_dict, reward in zip(group["trajectories"], rewards):
+                        advantage = (reward - virtual_mean) / (virtual_std + 1e-8)
+                        # All real completions get negative advantage (pushed away)
+                        step_advantages.append(advantage)
+                        turn_has_logprobs = any(
+                            t.get("logprobs") is not None for t in traj_dict.get("turns", [])
+                        )
+                        if turn_has_logprobs:
+                            data = trajectory_to_training_data_is(
+                                traj_dict, advantage, renderer, tokenizer
+                            )
+                        else:
+                            data = trajectory_to_training_data(
+                                traj_dict, advantage, renderer, tokenizer
+                            )
+                        training_data.extend(data)
+                        n_updates += 1
+                    continue
+                else:
+                    # All same reward — skip (no learning signal)
+                    n_skipped_groups += 1
+                    per_task_skips[ttype] += 1
+                    logger.info(f"  SKIP group {ttype}: all same reward {mean_r:.3f}")
+                    continue
 
             for traj_dict, reward in zip(group["trajectories"], rewards):
                 advantage = (reward - mean_r) / (std_r + 1e-8)
+
+                # Asymmetric advantage scaling (inspired by arXiv:2509.26114):
+                # Positive advantages reinforce existing patterns → can cause collapse.
+                # Scale down positive advantages (conservative updates for "good" trajectories).
+                # Keep negative advantages full strength (aggressively push away from bad).
+                # Net effect: preserves entropy, prevents mode collapse.
+                if clip_high > 0 and advantage > 0:
+                    advantage *= clip_high  # e.g., 0.5 = halve positive advantages
+                if clip_low > 0 and advantage < 0:
+                    advantage *= clip_low  # e.g., 1.5 = amplify negative advantages
 
                 if abs(advantage) < 0.05:
                     continue
@@ -1153,6 +1219,12 @@ def main():
     parser.add_argument("--timeout-retry-limit", type=int, default=2)
     parser.add_argument("--strategy-conditioning", action="store_true",
                         help="Enable SC-GRPO: strategy-conditioned training")
+    parser.add_argument("--ngrpo-virtual-reward", action="store_true",
+                        help="NGRPO: virtual max-reward for all-wrong groups (arXiv:2509.18851)")
+    parser.add_argument("--clip-high", type=float, default=0.0,
+                        help="Asymmetric scaling for positive advantages (e.g., 0.5 = halve). 0=disabled")
+    parser.add_argument("--clip-low", type=float, default=0.0,
+                        help="Asymmetric scaling for negative advantages (e.g., 1.5 = amplify). 0=disabled")
     args = parser.parse_args()
 
     train_rl_v6(
@@ -1171,6 +1243,9 @@ def main():
         grad_accum_batch=args.grad_accum_batch,
         timeout_retry_limit=args.timeout_retry_limit,
         strategy_conditioning=args.strategy_conditioning,
+        ngrpo_virtual_reward=args.ngrpo_virtual_reward,
+        clip_high=args.clip_high,
+        clip_low=args.clip_low,
     )
 
 
