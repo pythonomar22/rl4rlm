@@ -92,4 +92,37 @@ result = "\\n".join(f"{k}: {v}" for k, v in sorted(classifications.items()))
 FINAL_VAR("result")
 ```
 
+## Example 4: Multi-step reasoning (O(K) chain — find entity, then use it)
+
+```repl
+# Step 1: Find the bridge entity
+chunk_size = 20000
+overlap = 2000
+entity = None
+i = 0
+while i < len(context):
+    chunk = context[i:i+chunk_size]
+    answer = llm_query(f"Who is the VP of Engineering? Return ONLY the person's full name. If not found, say 'NOT FOUND'.\\n\\n{chunk}")
+    if "not found" not in answer.lower():
+        entity = answer.strip()
+        break
+    i += chunk_size - overlap
+```
+
+Then in the next turn, use the discovered entity:
+
+```repl
+# Step 2: Use the entity to find the final answer
+results = []
+i = 0
+while i < len(context):
+    chunk = context[i:i+chunk_size]
+    answer = llm_query(f"What project does {entity} lead? Return ONLY the project name. If not found, say 'NOT FOUND'.\\n\\n{chunk}")
+    if "not found" not in answer.lower():
+        results.append(answer.strip())
+    i += chunk_size - overlap
+result = results[0] if results else "Not found"
+FINAL_VAR("result")
+```
+
 Write code now. No explanations."""

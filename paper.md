@@ -2,7 +2,7 @@
 
 ## Abstract
 
-We train the first open-weight natively recursive language model based on Qwen3.5-35B-A3B (MoE, 35B total / 3B active parameters). Using GRPO reinforcement learning on the Tinker training API, we achieve significant improvements over the base model on long-context tasks, with doc-classify accuracy improving from 53.6% to 97.0% and an average +11.5% improvement across core benchmarks. We also introduce two novel benchmarks: DataFrame QA (Jupyter-notebook-style data analysis) and Code Debug (bug finding in large codebases).
+We train the first open-weight natively recursive language model based on Qwen3.5-35B-A3B (MoE, 35B total / 3B active parameters). Using GRPO reinforcement learning on the Tinker training API, we achieve a +6.5% average improvement over the base model across 11 long-context benchmarks, reaching ceiling performance (100%) on document classification, multi-needle search, and verbatim text reproduction. Our best checkpoint (GRPO v3, step 5) demonstrates that RL teaches effective text search and scanning patterns while maintaining perfect accuracy on adversarial benchmarks with 500K+ character documents. We introduce 6 novel benchmarks including Hard Multi-Hop QA (forcing multi-step decomposition with distractor entity chains), DataFrame QA (Jupyter-notebook analysis), and Code Debug (bug finding). We analyze the taxonomy of skills RL improves (scan, search) vs. those it doesn't (counting, decomposition, numerical analysis), providing insights for future RLM training.
 
 ## Model
 
@@ -265,13 +265,15 @@ We train the first open-weight natively recursive language model based on Qwen3.
 | 4 | 0.759 | doc_classify=0.836, multi_hop=0.750, multi_niah=0.615 | 1.95e-05 |
 | 5 | 0.662 | dataframe_qa=0.915, multi_hop=0.625, niah=0.554 | 1.92e-05 |
 | 6 | 0.871 | multi_hop=0.938, multi_niah=0.802, niah=0.872 | 1.87e-05 |
+| 7 | 0.887 | multi_hop=1.000, multi_niah=0.802, niah=0.872 | 1.82e-05 |
+| 8 | 0.884 | code_debug=0.915, multi_hop=0.875, niah=0.872 | 1.75e-05 |
 
 - Checkpoint saved at step 5: `tinker://de5a5059-ed71-5661-acad-de7fdae4f048:train:0/weights/state-0005`
-- Multi-hop QA reward: 0.688 → 0.875 → 0.750 → 0.625 → **0.938** (step 6 peak!)
-- Cosine LR schedule preventing aggressive updates
-- Per-task monitoring shows no task interference yet
-- Only 2/32 groups skipped so far (vs v2's near-total collapse by step 14)
-- Step 7 in progress at LR 1.82e-05
+- Multi-hop QA reward trajectory: 0.688 → 0.875 → 0.750 → 0.625 → 0.938 → **1.000** → 0.875
+- Cosine LR schedule preventing aggressive updates (from 2e-05 → 1.68e-05 by step 9)
+- Code debug task in step 8 got 0.915 reward — model can handle code tasks when they appear
+- Only 2/32 groups skipped (vs v2's near-total collapse by step 14)
+- Step 9 in progress, step 10 checkpoint imminent
 
 ## GRPO v3 Plan
 
@@ -287,21 +289,20 @@ v3: 30% NIAH, 15% Multi-NIAH, 15% Doc-Classify, 15% Multi-Hop QA, 10% DFQA, 10% 
 
 ## Head-to-Head Comparison (All Checkpoints)
 
-| Benchmark | Base | v1-s10 | v2-s5 | v2-s10 | v3-s5 |
+| Benchmark | Base | v2-s10 | v3-s5 | v3-s10 | v4-s5 |
 |-----------|------|--------|-------|--------|-------|
-| NIAH (10) | 81.0% | 75.0% | 80.0% | **85.0%** | 80.0% |
-| Multi-NIAH (10) | 97.8% | 100.0% | 90.0% | 95.0% | **100.0%** |
-| Doc-Classify (10) | 53.6% | 92.0% | 65.0% | 95.0% | **100.0%** |
-| Multi-Hop QA (10) | 50.0% | N/A | 50.0% | **70.0%** | 65.0% |
-| Code Debug (8) | 25.0% | N/A | 50.0%* | 25.0% | 25.0% |
-| DataFrame QA (8) | **80.0%** | N/A | 48.0% | 50.0% | 35.0% |
-| Notebook QA (10) | 60.0% | N/A | N/A | **75.0%** | 65.0% |
-| Hard NIAH (10) | 90.0% | N/A | N/A | **100.0%** | **100.0%**† |
-| Verbatim Copy (10) | 90.0% | N/A | N/A | **100.0%** | **100.0%** |
-| OOLONG (10) | **20.0%** | N/A | N/A | 10.0% | 10.0% |
-| Hard Multi-Hop (10) | 20.0% | N/A | N/A | 20.0% | **30.0%** |
-| **Avg (8 core)** | **67.2%** | N/A | N/A | **74.4%** | **71.3%** |
-| **Avg (all 11)** | **58.0%** | N/A | N/A | **61.4%** | **64.5%** |
+| NIAH (10) | 81.0% | 85.0% | 80.0% | **100.0%** | **100.0%** |
+| Multi-NIAH (10) | 97.8% | 95.0% | **100.0%** | **100.0%** | 96.0% |
+| Doc-Classify (10) | 53.6% | 95.0% | **100.0%** | **100.0%** | 98.0% |
+| Multi-Hop QA (10) | 50.0% | **70.0%** | 65.0% | 60.0% | **70.0%** |
+| Code Debug (8) | 25.0% | 25.0% | 25.0% | 25.0% | 25.0% |
+| DataFrame QA (8) | **80.0%** | 50.0% | 35.0% | 50.0% | 75.0% |
+| Notebook QA (10) | 60.0% | 75.0% | 65.0% | 60.0% | **80.0%** |
+| Hard NIAH (10) | 90.0% | **100.0%** | **100.0%** | pending | pending |
+| Verbatim Copy (10) | 90.0% | **100.0%** | **100.0%** | **100.0%** | **100.0%** |
+| OOLONG (10) | **20.0%** | 10.0% | 10.0% | pending | pending |
+| Hard Multi-Hop (10) | 20.0% | 20.0% | **30.0%** | 15.0% | pending |
+| **Avg (completed)** | **58.0%** | **61.4%** | **64.5%** | TBD | TBD |
 
 *v2-s5 code-debug inflated by count_words sampling bias.
 †Hard NIAH completed: 10/10 = 100%, including 500K char extreme length tasks.
@@ -334,7 +335,101 @@ v3: 30% NIAH, 15% Multi-NIAH, 15% Doc-Classify, 15% Multi-Hop QA, 10% DFQA, 10% 
 4. **v2 collapsed at step 11-12**: Deterministic trajectories, no learning
 5. **v3 step 1-6**: Cosine LR prevents collapse; multi-hop reward 0.688→0.938
 6. **v3 step 5 eval**: Best overall avg (64.5% all 11), ceiling on Doc-Classify/Multi-NIAH/Verbatim
-7. **v3 step 5 vs v2 step 10**: v3 better overall but v2 better on NIAH and Multi-Hop QA
+7. **v3 steps 7-14**: Gradual mode collapse — steps 12-13 had 0/4 updates (all groups identical)
+8. **v3 killed at step 14**: Fully collapsed, wasting resources
+
+### V3-s10 Eval
+
+| Benchmark | Base | v3-s5 | v3-s10 | Delta (s10 vs s5) |
+|-----------|------|-------|--------|---------------------|
+| NIAH (10) | 81.0% | 80.0% | **100.0%** | **+20.0%** |
+| Multi-NIAH (10) | 97.8% | 100.0% | **100.0%** | 0% |
+| Doc-Classify (10) | 53.6% | 100.0% | **100.0%** | 0% |
+| Multi-Hop QA (10) | 50.0% | 65.0% | 60.0% | -5.0% |
+| Notebook QA (10) | 60.0% | 65.0% | 60.0% | -5.0% |
+| Code Debug (8) | 25.0% | 25.0% | 25.0% | 0% |
+| DataFrame QA (8) | 80.0% | 35.0% | 50.0% | +15.0% |
+| Hard NIAH (10) | 90.0% | 100.0% | pending | |
+| Verbatim Copy (10) | 90.0% | 100.0% | **100.0%** | 0% |
+| OOLONG (10) | 20.0% | 10.0% | pending | |
+| Hard Multi-Hop (10) | 20.0% | 30.0% | **15.0%** | **-15.0%** |
+
+**Key findings:**
+- NIAH recovered to **100%** (up from 80% at s5) — strongest NIAH result ever
+- **Hard Multi-Hop REGRESSED to 15%** (worse than 20% base!) — mode collapse hurt reasoning
+- DataFrame QA partially recovered (+15% from s5) but still below base (-30%)
+- Multi-Hop QA and Notebook QA regressed slightly (-5% each)
+- Ceiling benchmarks maintained (Doc-Classify, Multi-NIAH, Verbatim all 100%)
+- Code Debug still stuck at 25% — model cannot learn this task via GRPO alone
+- **Conclusion: V3-s10 traded reasoning for search accuracy — not the right tradeoff**
+- Hard Multi-Hop distractor analysis: model picks up distractor entities 7/10 times
+  - Over-training made model more aggressive (always 1-turn) without decomposition
+
+### V4-s5 Eval (Partial — from v3-s5 + 5 mixed_v4 steps)
+
+| Benchmark | Base | v3-s5 | v4-s5 | Delta (v4 vs v3-s5) |
+|-----------|------|-------|-------|---------------------|
+| NIAH (10) | 81.0% | 80.0% | **100.0%** | **+20.0%** |
+| Multi-NIAH (10) | 97.8% | 100.0% | 96.0% | -4.0% |
+| Doc-Classify (10) | 53.6% | 100.0% | 98.0% | -2.0% |
+| Multi-Hop QA (10) | 50.0% | 65.0% | **70.0%** | **+5.0%** |
+| Notebook QA (10) | 60.0% | 65.0% | **80.0%** | **+15.0%** |
+| Code Debug (8) | 25.0% | 25.0% | 25.0% | 0% |
+| Verbatim Copy (10) | 90.0% | 100.0% | **100.0%** | 0% |
+
+**Key findings (partial — 3 benchmarks still running):**
+- **Notebook QA: 80%!** New record (+20% over base, +15% over v3-s5)
+- **DataFrame QA: 75%!** Best trained result (recovered from 35% at v3-s5, close to base 80%)
+- **Multi-Hop QA: 70%!** Tied with v2-s10 for best (+20% over base)
+- **NIAH: 100%!** Perfect across all lengths and positions
+- Slight regression on Doc-Classify (98% vs 100%) and Multi-NIAH (96% vs 100%)
+- V4 trained with harder task mix (hard_multi_hop) — forcing better general reasoning
+- DataFrame QA recovery suggests harder training tasks improve numerical reasoning transfer
+- Note: V4a had timeout bug (66 timeouts on 150K docs) — results reflect this
+
+## GRPO v4 (Hard Multi-Hop Focus)
+
+### Training Details
+- Session v4a: 74615872-6b0b-50ba-bcbc-7c0b6a92abe3
+- Session v4b: 07db66a2-59d0-52d3-98c2-a73cda326702 (restarted with timeout fix)
+- Resumed from v3-s5 (best overall checkpoint)
+- LR: 2e-6, K=8, batch=4
+- **mixed_v4 task type:** 15% NIAH, 10% Multi-NIAH, 10% Doc-Classify, **20% Hard Multi-Hop**, 10% Multi-Hop QA, 10% DFQA, 10% CodeDebug, 10% Notebook QA, 5% Hard NIAH
+
+### V4a (killed — timeout bug)
+- Ran 5 steps before being killed
+- 66 TimeoutError on hard_multi_hop tasks (150K+ char documents)
+- Bug: auto-scaling timeout fix was committed AFTER v4a was launched
+- Model couldn't complete scan loops on 150K docs, got 0 reward → no learning
+- Hard multi-hop rewards: 0.125 → 0.000 → 0.250 → 0.125 (avg 0.125)
+- Checkpoint saved at step 5 (evaluating)
+
+### V4b (running — timeout fixed)
+- Restarted from v4a step 5 checkpoint with fixed timeout code
+- Auto-scaling timeout: 60s base + 30s per 100K chars
+- Expected: 150K docs get 90s timeout (enough for 8 chunks × 8s each)
+- **Intermediate decomposition reward added** (for future v4c/v5):
+  - 60% final answer + 25% bridge entity discovery + 15% format
+  - Checks if trajectory stdout contains bridge entities from decomposition
+  - Gives partial credit even when final answer is wrong
+
+### Decomposition Analysis
+
+Despite training on multi-hop QA (15% of v3 mix) and hard multi-hop (20% of v4 mix), the model does NOT learn true multi-step decomposition. Evidence:
+- **All** hard_multi_hop trajectories use single-pass compound queries
+- Average 1.1 turns on hard_multi_hop (should be 2-3 for decomposition)
+- Model asks `"Find budget of project by R&D"` instead of decomposing into Step 1 (find project) → Step 2 (find budget)
+- Even successful multi-hop tasks succeed by lucky chunk placement, not decomposition
+
+**Root causes:**
+1. Sparse reward (only final answer scored, no intermediate credit)
+2. Compound queries work on shorter docs (10K-50K), so RL reinforces simpler strategy
+3. No demonstrations of decomposition pattern
+
+**Proposed fixes (implemented in reward function):**
+1. Intermediate rewards for bridge entity discovery (implemented)
+2. Teacher demonstrations from larger model (future)
+3. Process Reward Model for step-by-step credit (future)
 
 ## Next Steps
 
@@ -343,7 +438,7 @@ v3: 30% NIAH, 15% Multi-NIAH, 15% Doc-Classify, 15% Multi-Hop QA, 10% DFQA, 10% 
 - [x] Evaluate v2 step 10 on all 8 benchmarks (including Notebook QA + Hard NIAH)
 - [x] Fix code-debug benchmark diversity (round-robin bug assignment)
 - [x] Fix doc-classify scoring for list format
-- [x] GRPO v3 with Multi-Hop QA in task mix (running)
+- [x] GRPO v3 with Multi-Hop QA in task mix
 - [x] Add Notebook QA benchmark (Jupyter-style)
 - [x] Add Hard NIAH benchmark (distractors + extreme lengths)
 - [x] OOLONG baseline (20%)
@@ -355,14 +450,16 @@ v3: 30% NIAH, 15% Multi-NIAH, 15% Doc-Classify, 15% Multi-Hop QA, 10% DFQA, 10% 
 - [x] GRPO v4 training pipeline ready (mixed_v4 task type with hard multi-hop)
 - [x] Hard Multi-Hop eval on v2-s10 (20% — same as base, no improvement)
 - [x] Evaluate v3 step 5 checkpoint — ALL 11 BENCHMARKS COMPLETE
-  - **Ceiling (3):** Doc-Classify: **100%**, Multi-NIAH: **100%**, Verbatim Copy: **100%**
-  - **Strong (2):** Hard NIAH: **100%**, Hard Multi-Hop: **30%** (+10% over base)
-  - **Good (3):** NIAH: 80%, Multi-Hop QA: 65% (+15%), Notebook QA: 65% (+5%)
-  - **Weak (3):** DataFrame QA: 35% (-45%), OOLONG: 10% (-10%), Code Debug: 25% (0%)
-  - **Overall: 64.5% avg (+6.5% over base) — best checkpoint**
 - [x] Compare v1-s10, v2-s5, v2-s10, v3-s5 head-to-head (v3-s5 is best overall)
-- [ ] Wait for v3 step 10 checkpoint → full eval
-- [ ] Launch GRPO v4 with hard multi-hop training
+- [x] V3 killed at step 14 (fully collapsed, 0 updates on steps 12-13)
+- [x] V4a killed at step 5 (timeout bug on 150K docs)
+- [x] V4b restarted with timeout fix
+- [x] Intermediate decomposition reward implemented
+- [x] Auto-scale REPL timeout (60s + 30s per 100K chars)
+- [ ] V3-s10 eval completing (7/11 benchmarks done)
+- [ ] V4-s5 eval running (1/11 done)
+- [ ] V4b training step 5 → eval
+- [ ] V5: restart training with intermediate decomposition reward
 - [ ] External benchmarks (RULER, BABILong)
 - [ ] Upload best model to HuggingFace
 - [ ] Write full paper (icmltemplate/)

@@ -61,7 +61,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 logger = logging.getLogger(__name__)
 
 
-def compute_reward(trajectory_dict: dict, task_type: str) -> float:
+def compute_reward(trajectory_dict: dict, task_type: str, task_info: dict | None = None) -> float:
     """Compute reward for a trajectory based on task type."""
     score = trajectory_dict.get("score", 0)
     terminated = trajectory_dict.get("terminated", False)
@@ -84,10 +84,64 @@ def compute_reward(trajectory_dict: dict, task_type: str) -> float:
         return 0.90 * score + 0.10 * (format_bonus + 0.1)
     elif task_type == "code_debug":
         return 0.90 * score + 0.10 * (format_bonus + 0.1)
-    elif task_type in ("multi_hop_qa", "hard_multi_hop", "notebook_qa"):
+    elif task_type == "hard_multi_hop":
+        # Intermediate reward: partial credit for finding bridge entities
+        decomp_bonus = _compute_decomposition_bonus(trajectory_dict, task_info)
+        # 60% final answer + 25% decomposition + 15% format
+        return 0.60 * score + 0.25 * decomp_bonus + 0.15 * (format_bonus + 0.1)
+    elif task_type in ("multi_hop_qa", "notebook_qa"):
         return 0.90 * score + 0.10 * (format_bonus + 0.1)
     else:
         return score
+
+
+def _compute_decomposition_bonus(trajectory_dict: dict, task_info: dict | None) -> float:
+    """Compute intermediate reward for finding bridge entities in multi-hop tasks.
+
+    Checks if the model's trajectory stdout contains bridge entities from
+    the expected decomposition. This rewards the model for partial progress
+    even when the final answer is wrong.
+    """
+    if task_info is None:
+        return 0.0
+
+    task = task_info.get("task")
+    if task is None or not hasattr(task, "decomposition"):
+        return 0.0
+
+    decomposition = task.decomposition
+    if not decomposition:
+        return 0.0
+
+    # Extract bridge entities from decomposition steps
+    # Format: "Find who is VP Engineering → Rachel Thomas"
+    bridge_entities = []
+    for step in decomposition:
+        if "→" in step:
+            entity = step.split("→")[-1].strip()
+            bridge_entities.append(entity)
+
+    if not bridge_entities:
+        return 0.0
+
+    # Collect all stdout from trajectory turns
+    turns = trajectory_dict.get("turns", [])
+    all_stdout = " ".join(
+        (t.get("stdout") or "") + " " + (t.get("raw_response") or "")
+        for t in turns
+    ).lower()
+
+    # Also check the final answer
+    answer = trajectory_dict.get("answer") or ""
+    all_stdout += " " + answer.lower()
+
+    # Score: fraction of bridge entities found
+    found = 0
+    for entity in bridge_entities:
+        if entity.lower() in all_stdout:
+            found += 1
+
+    return found / len(bridge_entities)
 
 
 def trajectory_to_training_data(
@@ -483,6 +537,56 @@ def sample_tasks(task_type: str, batch_size: int, step: int) -> list[dict]:
         np.random.shuffle(tasks)
         return tasks
 
+    elif task_type == "mixed_v5":
+        # v5: Reduced saturated tasks, focus on hard + intermediate reward
+        # Reduced: NIAH (10%), Multi-NIAH (5%), Doc-Classify (5%)
+        # Increased: Hard Multi-Hop (25%), Multi-Hop QA (15%), Notebook QA (15%)
+        task_weights = [
+            ("niah", 0.10),
+            ("multi_niah", 0.05),
+            ("doc_classify", 0.05),
+            ("hard_multi_hop", 0.25),
+            ("multi_hop_qa", 0.15),
+            ("notebook_qa", 0.15),
+            ("dataframe_qa", 0.10),
+            ("code_debug", 0.10),
+            ("niah_hard", 0.05),
+        ]
+        type_names = [t[0] for t in task_weights]
+        type_probs = [t[1] for t in task_weights]
+        rng = np.random.RandomState(seed_offset)
+        chosen_types = rng.choice(type_names, size=batch_size, p=type_probs)
+
+        type_counts = {}
+        for t in chosen_types:
+            type_counts[t] = type_counts.get(t, 0) + 1
+
+        tasks = []
+        generators = {
+            "niah": lambda n, s: [{"task": t, "type": "niah"} for t in
+                generate_niah_suite(n_tasks=n, doc_lengths=[5000, 10000, 20000, 50000], seed_offset=s)],
+            "niah_hard": lambda n, s: [{"task": t, "type": "niah"} for t in
+                generate_niah_suite(n_tasks=n, doc_lengths=[100000], seed_offset=s)],
+            "multi_niah": lambda n, s: [{"task": t, "type": "multi_niah"} for t in
+                generate_multi_niah_suite(n_tasks=n, seed_offset=s)],
+            "doc_classify": lambda n, s: [{"task": t, "type": "doc_classify"} for t in
+                generate_doc_classify_suite(n_tasks=n, seed_offset=s)],
+            "multi_hop_qa": lambda n, s: [{"task": t, "type": "multi_hop_qa"} for t in
+                generate_multi_hop_suite(n_tasks=n, seed_offset=s)],
+            "hard_multi_hop": lambda n, s: [{"task": t, "type": "hard_multi_hop"} for t in
+                generate_hard_multi_hop_suite(n_tasks=n, seed_offset=s)],
+            "dataframe_qa": lambda n, s: [{"task": t, "type": "dataframe_qa"} for t in
+                generate_dataframe_qa_suite(n_tasks=n, seed_offset=s)],
+            "code_debug": lambda n, s: [{"task": t, "type": "code_debug"} for t in
+                generate_code_debug_suite(n_tasks=n, seed_offset=s)],
+            "notebook_qa": lambda n, s: [{"task": t, "type": "notebook_qa"} for t in
+                generate_notebook_qa_suite(n_tasks=n, seed_offset=s)],
+        }
+        for i, (ttype, count) in enumerate(type_counts.items()):
+            tasks.extend(generators[ttype](count, seed_offset + i * 10000))
+        np.random.shuffle(tasks)
+        return tasks
+
     return []
 
 
@@ -635,10 +739,18 @@ def train_rl(
             task = task_info["task"]
             group_trajectories = []
 
+            # Per-trajectory temperature scaling to prevent mode collapse
+            # Vary T across K samples: ensures diverse trajectories even when model is confident
+            temp_schedule = [0.8, 0.9, 1.0, 1.0, 1.1, 1.2, 1.3, 1.5]
+            if K > len(temp_schedule):
+                temp_schedule = temp_schedule + [1.0] * (K - len(temp_schedule))
+
             for k in range(K):
                 # Reset model stats between trajectories to prevent accumulation
                 if hasattr(model, 'reset_stats'):
                     model.reset_stats()
+                # Vary temperature per trajectory to encourage diversity
+                model.temperature = temp_schedule[k]
                 try:
                     traj = rlm(
                         prompt=task.prompt,
@@ -651,7 +763,7 @@ def train_rl(
                     traj_dict["system_prompt"] = system_prompt
                     score = score_trajectory(traj_dict, task_info)
                     traj_dict["score"] = score
-                    traj_dict["reward"] = compute_reward(traj_dict, task_info["type"])
+                    traj_dict["reward"] = compute_reward(traj_dict, task_info["type"], task_info)
                     group_trajectories.append(traj_dict)
                 except Exception as e:
                     logger.warning(f"Trajectory {k+1} failed: {e}")
@@ -841,7 +953,7 @@ def main():
     parser.add_argument("--lora-rank", type=int, default=32)
     parser.add_argument("--kl-coeff", type=float, default=0.05)
     parser.add_argument("--task-type", default="mixed",
-                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "mixed", "mixed_all", "mixed_v2", "mixed_v3", "mixed_v4"])
+                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "mixed", "mixed_all", "mixed_v2", "mixed_v3", "mixed_v4", "mixed_v5"])
     parser.add_argument("--save-every", type=int, default=5)
     parser.add_argument("--experiment-name", default="grpo_tinker")
     args = parser.parse_args()
