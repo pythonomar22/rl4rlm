@@ -700,6 +700,7 @@ def train_rl_v6(
     ngrpo_virtual_reward: bool = False,
     clip_high: float = 0.0,
     clip_low: float = 0.0,
+    maxrl: bool = False,
 ):
     """Run GRPO RL training V6 on Tinker.
 
@@ -724,6 +725,9 @@ def train_rl_v6(
     - Asymmetric advantage clipping (--clip-high, --clip-low): Clip positive
       advantages more aggressively than negative to preserve entropy.
       clip_high=0.15, clip_low=0.3 recommended (arXiv:2509.26114)
+    - MaxRL (--maxrl): Maximum Likelihood RL (arXiv:2602.02710). Normalize
+      advantages by number of SUCCESSES (K) rather than total samples (N).
+      Upweights hard problems, improves pass@k without hurting pass@1.
     """
 
     log_dir = Path("data/rl") / experiment_name
@@ -794,6 +798,7 @@ def train_rl_v6(
     logger.info(f"  Code diversity bonus: ON")
     logger.info(f"  Strategy conditioning: {'ON' if strategy_conditioning else 'OFF'}")
     logger.info(f"  NGRPO virtual reward: {'ON' if ngrpo_virtual_reward else 'OFF'}")
+    logger.info(f"  MaxRL advantage: {'ON' if maxrl else 'OFF'}")
     if clip_high > 0 or clip_low > 0:
         logger.info(f"  Asymmetric advantage: clip_high={clip_high}, clip_low={clip_low}")
     logger.info(f"{'='*60}\n")
@@ -1009,7 +1014,15 @@ def train_rl_v6(
                     continue
 
             for traj_dict, reward in zip(group["trajectories"], rewards):
-                advantage = (reward - mean_r) / (std_r + 1e-8)
+                if maxrl:
+                    # MaxRL (arXiv:2602.02710): normalize by K_success, not N.
+                    # Successful trajectories: advantage = reward / K_success
+                    # Failed trajectories: advantage = reward / K_success (negative or zero)
+                    # This upweights hard problems where K_success is small.
+                    k_success = max(1, sum(1 for r in rewards if r > 0.3))
+                    advantage = (reward - mean_r) / (std_r + 1e-8) * (len(rewards) / k_success)
+                else:
+                    advantage = (reward - mean_r) / (std_r + 1e-8)
 
                 # Asymmetric advantage scaling (inspired by arXiv:2509.26114):
                 # Positive advantages reinforce existing patterns → can cause collapse.
@@ -1225,6 +1238,8 @@ def main():
                         help="Asymmetric scaling for positive advantages (e.g., 0.5 = halve). 0=disabled")
     parser.add_argument("--clip-low", type=float, default=0.0,
                         help="Asymmetric scaling for negative advantages (e.g., 1.5 = amplify). 0=disabled")
+    parser.add_argument("--maxrl", action="store_true",
+                        help="MaxRL: normalize advantages by K_success (arXiv:2602.02710)")
     args = parser.parse_args()
 
     train_rl_v6(
@@ -1246,6 +1261,7 @@ def main():
         ngrpo_virtual_reward=args.ngrpo_virtual_reward,
         clip_high=args.clip_high,
         clip_low=args.clip_low,
+        maxrl=args.maxrl,
     )
 
 

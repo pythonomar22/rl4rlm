@@ -32,6 +32,14 @@ V7 (SC-GRPO) eliminated mode collapse. V8 adds research-backed improvements.
 - **Why:** Tests genuine multi-step reasoning (find A, find B, compare in Python)
 - **Strategy weights:** map_reduce=0.3, two_pass=0.3, extract_compute=0.2, standard=0.2
 
+### 4. MaxRL Advantage Normalization (arXiv:2602.02710)
+- **Problem:** Standard GRPO normalizes advantages by total samples N. On hard tasks
+  where only 1/8 trajectories succeed, the gradient signal is weak.
+- **Solution:** Normalize by K_success (number of successful trajectories). Hard tasks
+  with few successes get STRONGER gradient signal, not weaker.
+- **Impact:** 7.9x-19.2x test-time scaling efficiency on Qwen3-1.7B and 4B.
+- **Flag:** `--maxrl`
+
 ## V8 Launch Command
 ```bash
 mkdir -p data/rl/grpo_35b_v8 && uv run python training/rl_tinker_v6.py \
@@ -44,6 +52,7 @@ mkdir -p data/rl/grpo_35b_v8 && uv run python training/rl_tinker_v6.py \
     --strategy-conditioning \
     --ngrpo-virtual-reward \
     --clip-high 0.5 --clip-low 1.5 \
+    --maxrl \
     --experiment-name grpo_35b_v8
 ```
 
