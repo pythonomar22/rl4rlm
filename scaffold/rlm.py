@@ -96,7 +96,7 @@ def rlm(
     system_prompt: str,
     max_iterations: int = 10,
     stdout_max_chars: int = 1000,
-    code_timeout: int = 60,
+    code_timeout: int | None = None,
     verbose: bool = True,
 ) -> RLMTrajectory:
     """
@@ -108,7 +108,8 @@ def rlm(
         system_prompt: System prompt for the root LLM
         max_iterations: Max REPL turns before forced termination
         stdout_max_chars: Truncation limit for stdout metadata
-        code_timeout: Timeout per REPL execution in seconds
+        code_timeout: Timeout per REPL execution in seconds.
+            If None, auto-scales: 60s base + 30s per 100K chars of prompt.
         verbose: Print detailed execution info
 
     Returns:
@@ -119,6 +120,10 @@ def rlm(
         prompt=prompt,
         system_prompt=system_prompt,
     )
+
+    # Auto-scale timeout with document length: 60s base + 30s per 100K chars
+    if code_timeout is None:
+        code_timeout = max(60, 60 + (len(prompt) // 100000) * 30)
 
     # 1. Init REPL with prompt as context, model's sub_query as llm_query
     state = init_repl(
