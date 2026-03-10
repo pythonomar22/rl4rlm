@@ -35,6 +35,18 @@ We train the first open-weight natively recursive language model based on Qwen3.
 
 **Multi-Hop QA breakdown:** 100% on docs ≤20K chars, 0% on docs ≥50K chars. The model finds individual facts but cannot chain them across long contexts — exactly where RLMs should excel.
 
+### Event Counting Benchmark (Base Model)
+| Task Type | Score | Notes |
+|-----------|-------|-------|
+| count_value (2) | 0.0% | Expected 5 got 7, expected 2 got 3 |
+| count_entity (2) | 25.0% | Off-by-one counts (close but wrong) |
+| first_last (2) | 0.0% | "Not found" or wrong person |
+| per_entity (2) | 36.7% | Partial entity matches, counts off by 1-3 |
+| ratio (2) | 0.0% | Wildly wrong (expected 25 got 4, expected 14 got 0) |
+| **Average** | **12.3%** | Confirms OOLONG counting failure mode |
+
+**Key insight:** The model delegates counting to sub-model which hallucinates counts. The fix: extract raw items then count in Python. The teacher model (397B) naturally produces this pattern.
+
 ### External Benchmarks (Base Model)
 | Benchmark | Score | Notes |
 |-----------|-------|-------|
@@ -122,6 +134,8 @@ We train the first open-weight natively recursive language model based on Qwen3.
 6. **Mode collapse in code-generation GRPO** — code is more deterministic than text, causing faster mode collapse (step 10-14 in all runs). Novel mitigations: adaptive task difficulty, per-trajectory temperature scaling, code diversity bonus
 7. **Intermediate decomposition reward** — partial credit for bridge entity discovery in multi-hop tasks, enabling RL signal for multi-step reasoning
 8. **Analysis of task interference** — doc-classify improvement comes at NIAH cost; text-focused RL hurts numerical tasks
+9. **Strategy-Conditioned GRPO (SC-GRPO)** — solves mode collapse by injecting diversity through prompt space: each trajectory gets a randomly assigned strategy prompt (extract-compute, binary-search, map-reduce, two-pass, small-chunks). This is novel for code-generation RL where temperature alone cannot break template lock-in.
+10. **Event Counting benchmark** — tests extract-then-count-in-Python vs delegate-counting-to-LLM strategies. Base model: 12.3%. Directly measures the OOLONG counting failure mode.
 
 ## Benchmarks
 
@@ -150,6 +164,11 @@ We train the first open-weight natively recursive language model based on Qwen3.
 - **Notebook QA**: O(K) Jupyter notebook comprehension (62-256 cells)
   - Output lookup, variable trace, cross-cell reference tasks
   - Tests generalization of text search skills to structured documents
+- **Event Counting**: O(N) counting/aggregation over event logs (50K-200K chars)
+  - 5 task types: count_value, count_entity, first_last, per_entity, ratio
+  - Tests extract-then-count-in-Python strategy (vs delegate-to-LLM)
+  - Base model: 12.3% — validates OOLONG counting failure mode
+  - Directly tests whether model learns computational thinking
 - **Hard NIAH**: O(1) needle search with adversarial distractors (200K-1M chars)
   - Similar-but-wrong distractor values near needle
   - Extreme document lengths and boundary positions
@@ -304,6 +323,7 @@ v3: 30% NIAH, 15% Multi-NIAH, 15% Doc-Classify, 15% Multi-Hop QA, 10% DFQA, 10% 
 | Verbatim Copy (10) | 90.0% | **100.0%** | **100.0%** | **100.0%** | **100.0%** |
 | OOLONG (10) | **20.0%** | 10.0% | 10.0% | **20.0%** | 15.0% |
 | Hard Multi-Hop (10) | 20.0% | 20.0% | **30.0%** | 15.0% | 10.0% |
+| Event Counting (10) | 12.3% | — | — | — | — |
 | **Average (all 11)** | **57.0%** | **65.9%** | **64.5%** | **65.5%** | **69.0%** |
 
 *v2-s5 code-debug inflated by count_words sampling bias.
@@ -478,16 +498,26 @@ Despite training on multi-hop QA (15% of v3 mix) and hard multi-hop (20% of v4 m
 - [x] Auto-scale REPL timeout (60s + 30s per 100K chars)
 - [x] V3-s10 eval COMPLETE — 65.5% avg (NIAH 100%, OOLONG 20%, Hard Multi-Hop 15%)
 - [x] V4-s5 eval COMPLETE — **69.0% avg** (BEST CHECKPOINT, +12% over base)
-- [ ] V4b training running (step 2/25 in progress)
-- [ ] **V6: Novel anti-shortcut training** (implemented, ready to launch):
-  - Gradient accumulation (single optim_step per step)
-  - Adaptive task difficulty (auto-increase when saturated)
-  - Minimum 50K context (forces genuine chunking)
-  - Multi-turn persistence bonus
-  - Sub-call count reward bonus (rewards multi-chunk processing)
-  - Code diversity bonus (anti-mode-collapse)
-  - KL penalty via reward shaping
-  - Narrower temperature schedule [0.7-1.2]
+- [x] V4b training killed (old buggy code, wasting Tinker resources)
+- [x] **V6 training launched** (session c38cffc2, step 1 in progress):
+  - Gradient accumulation, adaptive difficulty, anti-shortcut (50K min)
+  - Multi-turn persistence bonus, sub-call count bonus, code diversity bonus
+  - KL penalty via reward shaping, narrower temps [0.7-1.2]
+- [x] **Event Counting benchmark created** (5 task types, 50K-200K docs)
+  - Base model baseline: **12.3%** — validates OOLONG counting failure
+  - count_value: 0%, count_entity: 25%, first_last: 0%, per_entity: 37%, ratio: 0%
+- [x] **Teacher trajectory collection started** (Qwen3.5-397B-A17B)
+  - Strategy-diverse prompts (extract-compute, binary-search, map-reduce, etc.)
+  - Collecting gold trajectories for SFT distillation
+- [x] **SC-GRPO designed and implemented** (Strategy-Conditioned GRPO):
+  - Each trajectory gets a randomly assigned strategy prompt
+  - 6 strategies: standard, extract_compute, binary_search, map_reduce, two_pass, small_chunks
+  - Strategy selection weighted by task type compatibility
+  - Directly combats mode collapse by injecting prompt-space diversity
+- [ ] V6 step 5 evaluation
+- [ ] V7 (SC-GRPO) training launch
+- [ ] Teacher distillation SFT
+- [ ] Online DPO as alternative to GRPO
 - [ ] External benchmarks (RULER, BABILong)
 - [ ] Upload best model to HuggingFace
 - [ ] Write full paper (icmltemplate/)
