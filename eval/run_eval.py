@@ -45,6 +45,8 @@ from scaffold.prompts.qwen2b import QWEN_2B_SYSTEM_PROMPT
 from eval.benchmarks.niah import generate_niah_suite, score_niah
 from eval.benchmarks.multi_niah import generate_multi_niah_suite, score_multi_niah
 from eval.benchmarks.doc_classify import generate_doc_classify_suite, score_doc_classify
+from eval.benchmarks.dataframe_qa import generate_dataframe_qa_suite, score_dataframe_qa
+from eval.benchmarks.code_debug import generate_code_debug_suite, score_code_debug
 
 logging.basicConfig(
     level=logging.INFO,
@@ -287,6 +289,150 @@ def run_doc_classify_eval(
     }
 
 
+def run_dataframe_qa_eval(
+    model,
+    system_prompt: str,
+    n_tasks: int = 20,
+    max_iterations: int = 10,
+    seed_offset: int = 90000,
+    verbose: bool = False,
+) -> dict:
+    """Run DataFrame QA benchmark."""
+    tasks = generate_dataframe_qa_suite(n_tasks=n_tasks, seed_offset=seed_offset)
+
+    results = []
+    trajectories = []
+
+    for task in tqdm(tasks, desc="DataFrame QA"):
+        logger.info(f"\nTask: {task.task_id} | {task.n_rows} rows, {len(task.prompt):,} chars")
+
+        traj = rlm(
+            prompt=task.prompt,
+            model=model,
+            system_prompt=system_prompt,
+            max_iterations=max_iterations,
+            verbose=verbose,
+        )
+
+        scores = score_dataframe_qa(traj.answer, task.expected_answer, task.task_type)
+
+        result = {
+            "task_id": task.task_id,
+            "task_type": task.task_type,
+            "n_rows": task.n_rows,
+            "n_tickers": task.n_tickers,
+            "difficulty": task.difficulty,
+            "expected": task.expected_answer,
+            "predicted": traj.answer,
+            "score": scores["score"],
+            "match_type": scores["match_type"],
+            "terminated": traj.terminated,
+            "num_turns": len(traj.turns),
+            "total_time": traj.total_time,
+            "prompt_chars": len(task.prompt),
+        }
+        results.append(result)
+        trajectories.append(trajectory_to_dict(traj))
+
+        logger.info(
+            f"  Score: {scores['score']:.2f} ({scores['match_type']}) | "
+            f"Answer: {str(traj.answer)[:60]} | Expected: {str(task.expected_answer)[:60]}"
+        )
+
+    avg_score = sum(r["score"] for r in results) / len(results) if results else 0
+
+    by_difficulty = {}
+    for r in results:
+        by_difficulty.setdefault(r["difficulty"], []).append(r["score"])
+    by_difficulty_avg = {k: sum(v) / len(v) for k, v in by_difficulty.items()}
+
+    by_type = {}
+    for r in results:
+        by_type.setdefault(r["task_type"], []).append(r["score"])
+    by_type_avg = {k: sum(v) / len(v) for k, v in by_type.items()}
+
+    return {
+        "benchmark": "dataframe_qa",
+        "accuracy": avg_score,
+        "score": avg_score,
+        "n_tasks": len(results),
+        "by_difficulty": by_difficulty_avg,
+        "by_type": by_type_avg,
+        "results": results,
+        "trajectories": trajectories,
+    }
+
+
+def run_code_debug_eval(
+    model,
+    system_prompt: str,
+    n_tasks: int = 15,
+    max_iterations: int = 10,
+    seed_offset: int = 95000,
+    verbose: bool = False,
+) -> dict:
+    """Run code debugging benchmark."""
+    tasks = generate_code_debug_suite(n_tasks=n_tasks, seed_offset=seed_offset)
+
+    results = []
+    trajectories = []
+
+    for task in tqdm(tasks, desc="CodeDebug"):
+        logger.info(f"\nTask: {task.task_id} | {task.n_bugs} bugs, {task.total_lines} lines")
+
+        traj = rlm(
+            prompt=task.prompt,
+            model=model,
+            system_prompt=system_prompt,
+            max_iterations=max_iterations,
+            verbose=verbose,
+        )
+
+        scores = score_code_debug(traj.answer, task.bugs)
+
+        result = {
+            "task_id": task.task_id,
+            "n_bugs": task.n_bugs,
+            "n_functions": task.n_functions,
+            "total_lines": task.total_lines,
+            "expected_bugs": [b["function"] for b in task.bugs],
+            "predicted": traj.answer,
+            "score": scores["score"],
+            "found": scores["found"],
+            "total": scores["total"],
+            "details": scores.get("details", []),
+            "terminated": traj.terminated,
+            "num_turns": len(traj.turns),
+            "total_time": traj.total_time,
+            "prompt_chars": len(task.prompt),
+        }
+        results.append(result)
+        trajectories.append(trajectory_to_dict(traj))
+
+        logger.info(
+            f"  Found: {scores['found']}/{scores['total']} ({scores['score']:.1%}) | "
+            f"Answer: {str(traj.answer)[:100]}"
+        )
+
+    avg_score = sum(r["score"] for r in results) / len(results) if results else 0
+
+    by_n_bugs = {}
+    for r in results:
+        k = f"{r['n_bugs']} bugs"
+        by_n_bugs.setdefault(k, []).append(r["score"])
+    by_n_bugs_avg = {k: sum(v) / len(v) for k, v in by_n_bugs.items()}
+
+    return {
+        "benchmark": "code_debug",
+        "accuracy": avg_score,
+        "score": avg_score,
+        "n_tasks": len(results),
+        "by_n_bugs": by_n_bugs_avg,
+        "results": results,
+        "trajectories": trajectories,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="Qwen/Qwen3.5-35B-A3B")
@@ -297,7 +443,7 @@ def main():
     parser.add_argument("--backend", default="tinker", choices=["tinker", "hf"],
                         help="Backend: tinker (remote) or hf (local GPU)")
     parser.add_argument("--benchmark", default="niah",
-                        choices=["niah", "multi_niah", "doc_classify", "all"])
+                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "all"])
     parser.add_argument("--n-tasks", type=int, default=10)
     parser.add_argument("--max-iterations", type=int, default=8)
     parser.add_argument("--experiment-name", default="eval")
@@ -358,7 +504,7 @@ def main():
 
     # Run eval
     benchmarks_to_run = (
-        ["niah", "multi_niah", "doc_classify"] if args.benchmark == "all"
+        ["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug"] if args.benchmark == "all"
         else [args.benchmark]
     )
 
@@ -394,6 +540,22 @@ def main():
                 model=model,
                 system_prompt=system_prompt,
                 n_tasks=min(args.n_tasks, 20),
+                max_iterations=args.max_iterations,
+                verbose=args.verbose,
+            )
+        elif bench == "dataframe_qa":
+            eval_results = run_dataframe_qa_eval(
+                model=model,
+                system_prompt=system_prompt,
+                n_tasks=min(args.n_tasks, 20),
+                max_iterations=args.max_iterations,
+                verbose=args.verbose,
+            )
+        elif bench == "code_debug":
+            eval_results = run_code_debug_eval(
+                model=model,
+                system_prompt=system_prompt,
+                n_tasks=min(args.n_tasks, 15),
                 max_iterations=args.max_iterations,
                 verbose=args.verbose,
             )

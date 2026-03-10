@@ -51,6 +51,8 @@ from scaffold.prompts.qwen35_35b import QWEN35_35B_SYSTEM_PROMPT
 from eval.benchmarks.niah import generate_niah_suite, score_niah
 from eval.benchmarks.multi_niah import generate_multi_niah_suite, score_multi_niah
 from eval.benchmarks.doc_classify import generate_doc_classify_suite, score_doc_classify
+from eval.benchmarks.dataframe_qa import generate_dataframe_qa_suite, score_dataframe_qa
+from eval.benchmarks.code_debug import generate_code_debug_suite, score_code_debug
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -74,6 +76,10 @@ def compute_reward(trajectory_dict: dict, task_type: str) -> float:
     elif task_type == "multi_niah":
         return 0.90 * score + 0.10 * (format_bonus + 0.1)
     elif task_type == "doc_classify":
+        return 0.90 * score + 0.10 * (format_bonus + 0.1)
+    elif task_type == "dataframe_qa":
+        return 0.90 * score + 0.10 * (format_bonus + 0.1)
+    elif task_type == "code_debug":
         return 0.90 * score + 0.10 * (format_bonus + 0.1)
     else:
         return score
@@ -178,6 +184,16 @@ def sample_tasks(task_type: str, batch_size: int, step: int) -> list[dict]:
             n_tasks=batch_size, seed_offset=seed_offset
         )
         return [{"task": t, "type": "doc_classify"} for t in tasks]
+    elif task_type == "dataframe_qa":
+        tasks = generate_dataframe_qa_suite(
+            n_tasks=batch_size, seed_offset=seed_offset
+        )
+        return [{"task": t, "type": "dataframe_qa"} for t in tasks]
+    elif task_type == "code_debug":
+        tasks = generate_code_debug_suite(
+            n_tasks=batch_size, seed_offset=seed_offset
+        )
+        return [{"task": t, "type": "code_debug"} for t in tasks]
     elif task_type == "mixed":
         # Allocate evenly: ~1/3 each of niah, multi_niah, doc_classify
         n_niah = max(1, batch_size // 3)
@@ -201,6 +217,34 @@ def sample_tasks(task_type: str, batch_size: int, step: int) -> list[dict]:
         tasks += [{"task": t, "type": "doc_classify"} for t in docclass_tasks]
         np.random.shuffle(tasks)
         return tasks
+    elif task_type == "mixed_all":
+        # Include all 5 task types — 1 each minimum
+        n_per = max(1, batch_size // 5)
+        niah_tasks = generate_niah_suite(
+            n_tasks=n_per,
+            doc_lengths=[5000, 10000, 20000, 50000, 100000],
+            seed_offset=seed_offset,
+        )
+        mniah_tasks = generate_multi_niah_suite(
+            n_tasks=n_per, seed_offset=seed_offset + 50000,
+        )
+        docclass_tasks = generate_doc_classify_suite(
+            n_tasks=n_per, seed_offset=seed_offset + 80000,
+        )
+        dfqa_tasks = generate_dataframe_qa_suite(
+            n_tasks=n_per, seed_offset=seed_offset + 90000,
+        )
+        debug_tasks = generate_code_debug_suite(
+            n_tasks=max(1, batch_size - 4 * n_per),
+            seed_offset=seed_offset + 95000,
+        )
+        tasks = [{"task": t, "type": "niah"} for t in niah_tasks]
+        tasks += [{"task": t, "type": "multi_niah"} for t in mniah_tasks]
+        tasks += [{"task": t, "type": "doc_classify"} for t in docclass_tasks]
+        tasks += [{"task": t, "type": "dataframe_qa"} for t in dfqa_tasks]
+        tasks += [{"task": t, "type": "code_debug"} for t in debug_tasks]
+        np.random.shuffle(tasks)
+        return tasks
 
     return []
 
@@ -219,6 +263,12 @@ def score_trajectory(traj_dict: dict, task_info: dict) -> float:
     elif task_type == "doc_classify":
         scores = score_doc_classify(answer, task.expected_labels)
         return scores["accuracy"]
+    elif task_type == "dataframe_qa":
+        scores = score_dataframe_qa(answer, task.expected_answer, task.task_type)
+        return scores["score"]
+    elif task_type == "code_debug":
+        scores = score_code_debug(answer, task.bugs)
+        return scores["score"]
     return 0
 
 
@@ -483,7 +533,7 @@ def main():
     parser.add_argument("--lora-rank", type=int, default=32)
     parser.add_argument("--kl-coeff", type=float, default=0.05)
     parser.add_argument("--task-type", default="mixed",
-                        choices=["niah", "multi_niah", "doc_classify", "mixed"])
+                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "mixed", "mixed_all"])
     parser.add_argument("--save-every", type=int, default=10)
     parser.add_argument("--experiment-name", default="grpo_tinker")
     args = parser.parse_args()
