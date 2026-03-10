@@ -325,6 +325,11 @@ def main():
         "--temperature", type=float, default=0.7,
         help="Generation temperature",
     )
+    parser.add_argument(
+        "--model-path", default=None,
+        help="Model state path (e.g., tinker://session:train:0/weights/state-0005). "
+             "If provided, loads fine-tuned weights instead of base model.",
+    )
     args = parser.parse_args()
 
     output_dir = Path(args.output)
@@ -332,15 +337,18 @@ def main():
 
     logger.info(f"Teacher Trajectory Collection")
     logger.info(f"  Model: {args.teacher_model}")
+    if args.model_path:
+        logger.info(f"  Model path: {args.model_path}")
     logger.info(f"  Tasks: {args.task_types}")
     logger.info(f"  N per type: {args.n_tasks}")
     logger.info(f"  Output: {args.output}")
 
-    # Create teacher model (base model, no fine-tuning)
+    # Create model (base or fine-tuned)
     model = TinkerModel(
         model_name=args.teacher_model,
         max_new_tokens=2048,
         temperature=args.temperature,
+        model_path=args.model_path,
     )
 
     t0 = time.time()

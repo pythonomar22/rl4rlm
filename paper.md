@@ -436,6 +436,29 @@ v3: 30% NIAH, 15% Multi-NIAH, 15% Doc-Classify, 15% Multi-Hop QA, 10% DFQA, 10% 
 - LR: 2e-6, K=8, batch=4
 - **mixed_v4 task type:** 15% NIAH, 10% Multi-NIAH, 10% Doc-Classify, **20% Hard Multi-Hop**, 10% Multi-Hop QA, 10% DFQA, 10% CodeDebug, 10% Notebook QA, 5% Hard NIAH
 
+## GRPO v6 (Killed — Mode Collapse Validation)
+
+### Purpose
+V6 was designed to test gradient accumulation, adaptive difficulty, KL penalty, and code diversity bonus — all aimed at extending training before mode collapse. Started from V4a-s5 checkpoint.
+
+### Quantitative Mode Collapse Analysis
+| Step | Group | Task Type | Doc Size | Rewards (K=8) | std | Signal? |
+|------|-------|-----------|----------|---------------|-----|---------|
+| 1 | 1 | code_debug | 14.6K | [0.02, 0.86, 0.02, ...] | 0.282 | YES |
+| 1 | 2 | notebook_qa | 62.0K | [0.72×7, 0.03] | 0.232 | YES |
+| 1 | 3 | dataframe_qa | 7.3K | [0.71×8] | 0.000 | NO |
+| 1 | 4 | notebook_qa | 41.4K | [0.72×8] | 0.000 | NO |
+| 2 | 1 | multi_niah | 10.2K | [0.77×8] | 0.000 | NO |
+
+**3/5 groups (60%) had zero variance → zero gradient → no learning.**
+
+Root cause analysis:
+1. **Short documents** (7K dataframe_qa, 10K multi_niah): fit in single llm_query call. No need for different strategies → identical outputs
+2. **Template lock-in**: Even at 41K (notebook_qa group 4), all 8 trajectories use identical 20K/2K chunking template
+3. **Temperature irrelevant**: Temperature randomization ([0.7-1.2]) cannot break structural template convergence
+
+**Decision: Kill V6 after step 2 and launch V7 (SC-GRPO) with anti-shortcut enforcement.**
+
 ### V4a (killed — timeout bug)
 - Ran 5 steps before being killed
 - 66 TimeoutError on hard_multi_hop tasks (150K+ char documents)
@@ -514,9 +537,30 @@ Despite training on multi-hop QA (15% of v3 mix) and hard multi-hop (20% of v4 m
   - 6 strategies: standard, extract_compute, binary_search, map_reduce, two_pass, small_chunks
   - Strategy selection weighted by task type compatibility
   - Directly combats mode collapse by injecting prompt-space diversity
-- [ ] V6 step 5 evaluation
-- [ ] V7 (SC-GRPO) training launch
-- [ ] Teacher distillation SFT
+- [x] **V6 killed after step 2** (session c38cffc2):
+  - 3/5 task groups had std=0 (total mode collapse) — 60% collapse rate
+  - Only groups with novel task types (code_debug) or failures had variance
+  - dataframe_qa at 7K chars: all K=8 identical (anti-shortcut not enforced in V6)
+  - multi_niah at 10K chars: all K=8 identical
+  - Conclusion: V6 wasting 60% of compute. Need SC-GRPO.
+- [x] **V7 (SC-GRPO) launched** (session 2e48210b):
+  - Strategy conditioning ON, anti-shortcut enforced (50K min for all tasks)
+  - **SC-GRPO ELIMINATES MODE COLLAPSE**: 0/7 groups with std=0 vs V6's 3/5 (60%)
+  - Avg reward std 0.177 (V7) vs 0.103 (V6) — 72% more learning signal
+  - Up to 4 strategies per group, 48 datums/step (vs V6's 38)
+  - Event counting (102K): std=0.350, 4/8 correct — high-variance learning signal
+  - dataframe_qa (7K): std=0.047 (V7) vs 0.000 (V6) — even short docs have variance!
+  - multi_niah (10K): std=0.083 (V7) vs 0.000 (V6) — strategy diversity works everywhere
+- [x] **Teacher batch 1 complete** (Qwen3.5-397B-A17B):
+  - 15 trajectories (event_counting + hard_multi_hop), 7 correct (47%), 2 gold
+  - Gold trajectories show genuine multi-turn decomposition (2-3 turns)
+  - 397B teacher also struggles with counting (avg 44% on event_counting)
+  - Key finding: even 17B active params can't count via llm_query delegation
+- [x] **Teacher batch 2 launched** (7 task types × 10 tasks = 70 tasks):
+  - niah, multi_niah, doc_classify, code_debug, multi_hop_qa, notebook_qa, dataframe_qa
+  - Session: 96a75f40
+- [ ] V7 step 5 evaluation (SC-GRPO vs V4-s5 baseline)
+- [ ] Teacher distillation SFT (batch 1 + batch 2 combined)
 - [ ] Online DPO as alternative to GRPO
 - [ ] External benchmarks (RULER, BABILong)
 - [ ] Upload best model to HuggingFace

@@ -1,0 +1,192 @@
+2026-03-09 23:51:41,109 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-09 23:51:43,979 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-09 23:51:49,570 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session c11b8154-6b97-586f-8fc9-8c75e9c3fbdf
+2026-03-09 23:51:49,762 scaffold.llm_query INFO: Loaded base model Qwen/Qwen3.5-35B-A3B
+2026-03-09 23:51:49,762 scaffold.llm_query INFO: TinkerModel ready in 5.8s
+2026-03-09 23:51:49,762 eval INFO: Model loaded in 8.7s
+2026-03-09 23:51:49,763 eval INFO: 
+============================================================
+2026-03-09 23:51:49,763 eval INFO: Running benchmark: doc_classify
+2026-03-09 23:51:49,763 eval INFO: ============================================================
+DocClassify:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-09 23:51:49,777 eval INFO: 
+Task: classify_000_5docs | 5 docs, 2406 chars
+2026-03-09 23:52:39,695 eval INFO:   Correct: 5/5 (100.0%) | Answer: 1: Science
+2: Sports
+3: Business
+4: Health
+5: Technology | 49.9s
+DocClassify:   5%|▌         | 1/20 [00:49<15:48, 49.92s/it]2026-03-09 23:52:39,696 eval INFO: 
+Task: classify_001_5docs | 5 docs, 2378 chars
+2026-03-09 23:52:52,218 eval INFO:   Correct: 2/5 (40.0%) | Answer: 1: Business
+2: World
+3: Sports
+4: Business | 12.5s
+DocClassify:  10%|█         | 2/20 [01:02<08:22, 27.92s/it]2026-03-09 23:52:52,218 eval INFO: 
+Task: classify_002_5docs | 5 docs, 2452 chars
+2026-03-09 23:53:05,602 eval INFO:   Correct: 4/5 (80.0%) | Answer: 1: Health
+2: Business
+3: World
+4: Technology
+5: Technology | 13.4s
+DocClassify:  15%|█▌        | 3/20 [01:15<06:01, 21.28s/it]2026-03-09 23:53:05,602 eval INFO: 
+Task: classify_003_5docs | 5 docs, 2369 chars
+2026-03-09 23:53:17,538 eval INFO:   Correct: 4/5 (80.0%) | Answer: 1: Technology
+2: Health
+3: Business
+4: Science
+5: Business | 11.9s
+DocClassify:  20%|██        | 4/20 [01:27<04:41, 17.59s/it]2026-03-09 23:53:17,539 eval INFO: 
+Task: classify_004_5docs | 5 docs, 2256 chars
+2026-03-09 23:53:32,021 eval INFO:   Correct: 2/5 (40.0%) | Answer: 1: Health
+1: World
+2: Business
+2: Science
+3: Technology
+4: World | 14.5s
+DocClassify:  25%|██▌       | 5/20 [01:42<04:07, 16.47s/it]2026-03-09 23:53:32,022 eval INFO: 
+Task: classify_005_10docs | 10 docs, 4558 chars
+2026-03-09 23:53:44,806 eval INFO:   Correct: 10/10 (100.0%) | Answer: 1: Sports
+2: World
+3: World
+4: Science
+5: Business
+6: Health
+7: Technology
+8: Sports
+9: Business
+10: Health | 12.8s
+DocClassify:  30%|███       | 6/20 [01:55<03:33, 15.22s/it]2026-03-09 23:53:44,806 eval INFO: 
+Task: classify_006_10docs | 10 docs, 4657 chars
+2026-03-09 23:54:05,582 eval INFO:   Correct: 7/10 (70.0%) | Answer: 1: 1: Science
+2: Health
+3: Sports
+4: World
+5: Business
+6: Science
+7: Technology
+8: World
+2: Science | 20.8s
+DocClassify:  35%|███▌      | 7/20 [02:15<03:41, 17.04s/it]2026-03-09 23:54:05,583 eval INFO: 
+Task: classify_007_10docs | 10 docs, 4456 chars
+2026-03-09 23:54:35,720 eval INFO:   Correct: 5/10 (50.0%) | Answer: 5: Health
+6: Science
+7: World
+8: Science
+9: World
+10: World | 30.1s
+DocClassify:  40%|████      | 8/20 [02:45<04:14, 21.21s/it]2026-03-09 23:54:35,722 eval INFO: 
+Task: classify_008_10docs | 10 docs, 4485 chars
+2026-03-09 23:54:52,236 eval INFO:   Correct: 0/10 (0.0%) | Answer: ['1: Science', '2: Sports', '3: Technology', '4: Sports', '5: World', '6: Health', '7: Business', '8: Science', '9: Spor | 16.5s
+DocClassify:  45%|████▌     | 9/20 [03:02<03:37, 19.74s/it]2026-03-09 23:54:52,237 eval INFO: 
+Task: classify_009_10docs | 10 docs, 4677 chars
+2026-03-09 23:55:15,676 eval INFO:   Correct: 9/10 (90.0%) | Answer: 1: Technology
+2: Health
+3: World
+4: Sports
+5: Business
+6: Sports
+7: Technology
+8: World
+9: Health
+10: Health | 23.4s
+DocClassify:  50%|█████     | 10/20 [03:25<03:28, 20.88s/it]2026-03-09 23:55:15,678 eval INFO: 
+Task: classify_010_15docs | 15 docs, 7331 chars
+2026-03-09 23:56:36,146 eval INFO:   Correct: 8/15 (53.3%) | Answer: 1: World
+2: Sports
+3: Health
+4: Science
+5: World
+6: Business
+7: World
+8: Business
+9: Health
+10: Business
+11: Sports
+12:  | 80.5s
+DocClassify:  55%|█████▌    | 11/20 [04:46<05:52, 39.12s/it]2026-03-09 23:56:36,146 eval INFO: 
+Task: classify_011_15docs | 15 docs, 6930 chars
+2026-03-09 23:57:02,565 eval INFO:   Correct: 14/15 (93.3%) | Answer: 1: Health
+2: Technology
+3: Sports
+4: World
+5: Science
+6: Science
+7: Business
+8: World
+9: Business
+10: Sports
+11: World
+1 | 26.4s
+DocClassify:  60%|██████    | 12/20 [05:12<04:42, 35.26s/it]2026-03-09 23:57:02,565 eval INFO: 
+Task: classify_012_15docs | 15 docs, 7067 chars
+2026-03-09 23:57:20,790 eval INFO:   Correct: 15/15 (100.0%) | Answer: 1: Business
+2: Health
+3: Business
+4: Health
+5: Technology
+6: Sports
+7: Business
+8: Sports
+9: Science
+10: World
+11: Scien | 18.2s
+DocClassify:  65%|██████▌   | 13/20 [05:31<03:30, 30.10s/it]2026-03-09 23:57:20,791 eval INFO: 
+Task: classify_013_15docs | 15 docs, 6781 chars
+2026-03-09 23:57:44,539 eval INFO:   Correct: 0/15 (0.0%) | Answer: ['1: Health', '2: Health', '3: World', '4: Science', '5: Technology', '6: Business', '7: Science', '8: Sports', '9: Scie | 23.7s
+DocClassify:  70%|███████   | 14/20 [05:54<02:49, 28.18s/it]2026-03-09 23:57:44,540 eval INFO: 
+Task: classify_014_15docs | 15 docs, 7030 chars
+2026-03-09 23:58:13,850 eval INFO:   Correct: 0/15 (0.0%) | Answer: ['1: World', '2: Technology', '3: Business', '4: Science', '5: World', '6: Science', '7: Business', '8: Technology', '9: | 29.3s
+DocClassify:  75%|███████▌  | 15/20 [06:24<02:22, 28.52s/it]2026-03-09 23:58:13,852 eval INFO: 
+Task: classify_015_20docs | 20 docs, 9267 chars
+2026-03-09 23:58:38,847 eval INFO:   Correct: 16/20 (80.0%) | Answer: 1: Science
+2: World
+3: Health
+4: Sports
+5: World
+6: Business
+7: Health
+8: Science
+9: Technology
+10: Sports
+11: World
+12: | 25.0s
+DocClassify:  80%|████████  | 16/20 [06:49<01:49, 27.46s/it]2026-03-09 23:58:38,848 eval INFO: 
+Task: classify_016_20docs | 20 docs, 9265 chars
+2026-03-09 23:58:58,079 eval INFO:   Correct: 19/20 (95.0%) | Answer: 1: Sports
+2: World
+3: Health
+4: Science
+5: Health
+6: World
+7: Health
+8: Business
+9: Technology
+10: Technology
+11: Scienc | 19.2s
+DocClassify:  85%|████████▌ | 17/20 [07:08<01:14, 24.99s/it]2026-03-09 23:58:58,079 eval INFO: 
+Task: classify_017_20docs | 20 docs, 9268 chars
+2026-03-09 23:59:17,331 eval INFO:   Correct: 0/20 (0.0%) | Answer: ['1: Health', '2: Technology', '3: Health', '4: Sports', '5: Science', '6: Business', '7: Business', '8: Science', '9: T | 19.3s
+DocClassify:  90%|█████████ | 18/20 [07:27<00:46, 23.26s/it]2026-03-09 23:59:17,332 eval INFO: 
+Task: classify_018_20docs | 20 docs, 9228 chars
+2026-03-09 23:59:38,385 eval INFO:   Correct: 0/20 (0.0%) | Answer: ['1: Technology', '2: Technology', '3: Business', '4: Science', '5: Technology', '6: Technology'] | 21.1s
+DocClassify:  95%|█████████▌| 19/20 [07:48<00:22, 22.60s/it]2026-03-09 23:59:38,385 eval INFO: 
+Task: classify_019_20docs | 20 docs, 9264 chars
+2026-03-10 00:00:34,746 eval INFO:   Correct: 0/20 (0.0%) | Answer: ['1: World', '2: Science', '3: Business', '4: Technology', '5: Sports', '6: Business', '7: Health', '8: Business', '9: S | 56.4s
+DocClassify: 100%|██████████| 20/20 [08:44<00:00, 32.74s/it]DocClassify: 100%|██████████| 20/20 [08:44<00:00, 26.25s/it]
+2026-03-10 00:00:34,747 eval INFO: 
+--- doc_classify Results ---
+2026-03-10 00:00:34,747 eval INFO: Accuracy/Recall: 53.6%
+2026-03-10 00:00:34,747 eval INFO: Tasks: 20
+2026-03-10 00:00:34,748 eval INFO: By document count:
+2026-03-10 00:00:34,748 eval INFO:   10 docs: 62.0%
+2026-03-10 00:00:34,748 eval INFO:   15 docs: 49.3%
+2026-03-10 00:00:34,748 eval INFO:   20 docs: 35.0%
+2026-03-10 00:00:34,748 eval INFO:   5 docs: 68.0%
+2026-03-10 00:00:34,798 eval INFO: 
+============================================================
+2026-03-10 00:00:34,798 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-10 00:00:34,798 eval INFO: ============================================================
+2026-03-10 00:00:34,798 eval INFO:   doc_classify: 53.6% (20 tasks)
+2026-03-10 00:00:34,798 eval INFO: Total time: 525.0s
+2026-03-10 00:00:34,803 eval INFO: Model stats: {'root_calls': 21, 'sub_calls': 94, 'total_input_tokens': 57590, 'total_output_tokens': 9358, 'total_time': 524.2605834007263}
+2026-03-10 00:00:34,803 eval INFO: Results saved to: results/baseline_35b_a3b_docclassify/20260309_235141

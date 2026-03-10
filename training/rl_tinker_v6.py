@@ -773,7 +773,8 @@ def train_rl_v6(
     # Temperature schedule
     if strategy_conditioning:
         # Wider range for SC-GRPO: strategies provide diversity, temperature adds variation
-        temp_schedule = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.3, 1.5]
+        # Cap at 1.3 — T=1.5 produces gibberish on Qwen3.5 (validated empirically)
+        temp_schedule = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3]
     else:
         # Narrower range for standard GRPO (1.2+ mainly causes failures)
         temp_schedule = [0.7, 0.8, 0.9, 1.0, 1.0, 1.1, 1.1, 1.2]
@@ -881,6 +882,7 @@ def train_rl_v6(
                     group_trajectories.append({
                         "score": 0, "reward": 0, "error": str(e),
                         "turns": [], "terminated": False,
+                        "strategy": strategy_name if strategy_conditioning else "standard",
                     })
 
             task_time = time.time() - task_t0

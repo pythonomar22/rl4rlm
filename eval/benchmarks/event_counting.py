@@ -375,11 +375,15 @@ def score_event_counting(answer: str | None, expected: str) -> dict:
         expected_num = int(expected)
         if answer_num == expected_num:
             return {"score": 1.0, "match_type": "numeric"}
-        # Partial credit for being close (within 20%)
+        # Granular partial credit based on closeness
         if expected_num > 0:
             ratio = abs(answer_num - expected_num) / expected_num
-            if ratio <= 0.2:
+            if ratio <= 0.1:
+                return {"score": 0.7, "match_type": "close"}
+            elif ratio <= 0.2:
                 return {"score": 0.5, "match_type": "close"}
+            elif ratio <= 0.5:
+                return {"score": 0.2, "match_type": "approximate"}
         return {"score": 0.0, "match_type": "wrong_number"}
     except ValueError:
         pass
@@ -406,10 +410,38 @@ def score_event_counting(answer: str | None, expected: str) -> dict:
                     pass
 
         if expected_pairs and answer_pairs:
-            correct = sum(
-                1 for name, count in expected_pairs.items()
-                if answer_pairs.get(name) == count
+            n_entities = len(expected_pairs)
+            # Entity identification: did the model find the right entities?
+            matched_entities = sum(
+                1 for name in expected_pairs if name in answer_pairs
             )
-            return {"score": correct / len(expected_pairs), "match_type": "partial_entity"}
+            entity_score = matched_entities / n_entities  # 0-1
+
+            # Count accuracy: for matched entities, how close are the counts?
+            count_scores = []
+            for name, expected_count in expected_pairs.items():
+                if name in answer_pairs:
+                    answer_count = answer_pairs[name]
+                    if answer_count == expected_count:
+                        count_scores.append(1.0)
+                    elif expected_count > 0:
+                        ratio = abs(answer_count - expected_count) / expected_count
+                        if ratio <= 0.1:
+                            count_scores.append(0.8)
+                        elif ratio <= 0.2:
+                            count_scores.append(0.5)
+                        elif ratio <= 0.5:
+                            count_scores.append(0.2)
+                        else:
+                            count_scores.append(0.0)
+                    else:
+                        count_scores.append(0.0 if answer_count != 0 else 1.0)
+                else:
+                    count_scores.append(0.0)
+
+            avg_count_score = sum(count_scores) / n_entities if count_scores else 0
+            # 40% entity identification + 60% count accuracy
+            final_score = 0.4 * entity_score + 0.6 * avg_count_score
+            return {"score": final_score, "match_type": "partial_entity"}
 
     return {"score": 0.0, "match_type": "none"}
