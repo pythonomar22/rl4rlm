@@ -93,8 +93,18 @@ def score_oolong(predicted: str | None, expected: str) -> dict:
         return {"score": 1.0, "match_type": "exact"}
 
     # Containment (prediction contains expected)
+    # For short numeric answers, require word boundary match to avoid "1" matching "14"
     if exp.lower() in pred.lower():
-        return {"score": 1.0, "match_type": "contains"}
+        # Check if it's a numeric answer — require word boundaries
+        try:
+            float(exp)
+            # Numeric — check word boundary
+            import re
+            if re.search(r'\b' + re.escape(exp) + r'\b', pred):
+                return {"score": 1.0, "match_type": "contains"}
+        except ValueError:
+            # Non-numeric — containment is fine
+            return {"score": 1.0, "match_type": "contains"}
 
     # Numeric tolerance
     try:

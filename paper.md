@@ -35,6 +35,13 @@ We train the first open-weight natively recursive language model based on Qwen3.
 
 **Multi-Hop QA breakdown:** 100% on docs ≤20K chars, 0% on docs ≥50K chars. The model finds individual facts but cannot chain them across long contexts — exactly where RLMs should excel.
 
+### External Benchmarks (Base Model)
+| Benchmark | Score | Notes |
+|-----------|-------|-------|
+| OOLONG (10 tasks) | 20.0% | Real D&D transcript aggregation (152K chars) |
+
+**OOLONG breakdown:** Only spell name lookup works (1/10). All counting/aggregation tasks fail — model gets wrong counts (expected 11 got 2, expected 3 got 42). Even frontier models get <50% on OOLONG at 128K context.
+
 ## Training Results
 
 ### GRPO v1 — Step 10 vs Step 20
@@ -230,10 +237,16 @@ We train the first open-weight natively recursive language model based on Qwen3.
 - Batch size: 4 (up from 3 in v2)
 - Mixed_v3 task type: includes Multi-Hop QA (15%) and Hard NIAH (5%)
 
-### Step 1 Results
-- Reward: 0.790 | Updates: 32 (+24/-8)
-- Per-task rewards: doc_classify=0.892 | multi_hop_qa=0.688
-- Multi-hop QA showing immediate training signal with mixed success/failure
+### Reward Trajectory (V3)
+| Step | Reward | Per-Task | LR |
+|------|--------|----------|------|
+| 1 | 0.790 | doc_classify=0.892, multi_hop=0.688 | 2.00e-05 |
+| 2 | 0.839 | doc_classify=0.735, multi_hop=0.875, niah=0.872 | 1.99e-05 |
+| 3 | 0.804 | doc_classify=0.780, multi_niah=0.878 | 1.98e-05 |
+
+- Multi-hop QA jumped from 0.688 → 0.875 in one step
+- Cosine LR schedule preventing aggressive updates
+- Per-task monitoring shows no task interference yet
 
 ## GRPO v3 Plan
 
