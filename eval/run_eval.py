@@ -50,6 +50,8 @@ from eval.benchmarks.code_debug import generate_code_debug_suite, score_code_deb
 from eval.benchmarks.multi_hop_qa import generate_multi_hop_suite, score_multi_hop
 from eval.benchmarks.notebook_qa import generate_notebook_qa_suite, score_notebook_qa
 from eval.benchmarks.hard_niah import generate_hard_niah_suite, score_hard_niah
+from eval.benchmarks.verbatim_copy import generate_verbatim_copy_suite, score_verbatim_copy
+from eval.benchmarks.oolong import load_oolong_tasks, score_oolong
 
 logging.basicConfig(
     level=logging.INFO,
@@ -503,6 +505,133 @@ def run_multi_hop_eval(
     }
 
 
+def run_oolong_eval(
+    model,
+    system_prompt: str,
+    n_tasks: int = 10,
+    max_iterations: int = 12,
+    max_context_chars: int = 200000,
+    verbose: bool = False,
+) -> dict:
+    """Run OOLONG benchmark (real D&D transcript aggregation tasks)."""
+    tasks = load_oolong_tasks(
+        n_tasks=n_tasks,
+        max_context_chars=max_context_chars,
+    )
+
+    results = []
+    trajectories = []
+
+    for task in tqdm(tasks, desc="OOLONG"):
+        logger.info(f"\nTask: {task.task_id} | {task.question_type} | {task.context_length:,} chars")
+        logger.info(f"  Q: {task.question[:100]}")
+
+        traj = rlm(
+            prompt=task.prompt,
+            model=model,
+            system_prompt=system_prompt,
+            max_iterations=max_iterations,
+            verbose=verbose,
+        )
+
+        scores = score_oolong(traj.answer, task.expected_answer)
+
+        result = {
+            "task_id": task.task_id,
+            "question_type": task.question_type,
+            "expected": task.expected_answer,
+            "predicted": traj.answer,
+            "score": scores["score"],
+            "match_type": scores["match_type"],
+            "terminated": traj.terminated,
+            "num_turns": len(traj.turns),
+            "total_time": traj.total_time,
+            "context_length": task.context_length,
+        }
+        results.append(result)
+        trajectories.append(trajectory_to_dict(traj))
+
+        logger.info(
+            f"  Score: {scores['score']:.1f} ({scores['match_type']}) | "
+            f"Expected: {task.expected_answer[:60]} | Got: {str(traj.answer)[:60]}"
+        )
+
+    avg_score = sum(r["score"] for r in results) / len(results) if results else 0
+
+    by_type = {}
+    for r in results:
+        by_type.setdefault(r["question_type"], []).append(r["score"])
+    by_type_avg = {k: sum(v) / len(v) for k, v in by_type.items()}
+
+    return {
+        "benchmark": "oolong",
+        "accuracy": avg_score,
+        "score": avg_score,
+        "n_tasks": len(results),
+        "by_question_type": by_type_avg,
+        "results": results,
+        "trajectories": trajectories,
+    }
+
+
+def run_verbatim_copy_eval(
+    model,
+    system_prompt: str,
+    n_tasks: int = 10,
+    max_iterations: int = 10,
+    seed_offset: int = 100000,
+    verbose: bool = False,
+) -> dict:
+    """Run verbatim copy benchmark."""
+    tasks = generate_verbatim_copy_suite(n_tasks=n_tasks, seed_offset=seed_offset)
+
+    results = []
+    trajectories = []
+
+    for task in tqdm(tasks, desc="VerbatimCopy"):
+        logger.info(f"\nTask: {task.task_id} | {task.doc_length} chars, target {task.target_paragraph_length} chars")
+
+        traj = rlm(
+            prompt=task.prompt,
+            model=model,
+            system_prompt=system_prompt,
+            max_iterations=max_iterations,
+            verbose=verbose,
+        )
+
+        score = score_verbatim_copy(traj.answer, task.expected_answer)
+
+        result = {
+            "task_id": task.task_id,
+            "expected_length": task.target_paragraph_length,
+            "predicted": traj.answer,
+            "score": score,
+            "target_position": task.target_paragraph_position,
+            "terminated": traj.terminated,
+            "num_turns": len(traj.turns),
+            "total_time": traj.total_time,
+            "doc_length": task.doc_length,
+        }
+        results.append(result)
+        trajectories.append(trajectory_to_dict(traj))
+
+        logger.info(
+            f"  Score: {score:.2f} | "
+            f"Expected: {task.expected_answer[:60]}... | Got: {str(traj.answer)[:60]}..."
+        )
+
+    avg_score = sum(r["score"] for r in results) / len(results) if results else 0
+
+    return {
+        "benchmark": "verbatim_copy",
+        "accuracy": avg_score,
+        "score": avg_score,
+        "n_tasks": len(results),
+        "results": results,
+        "trajectories": trajectories,
+    }
+
+
 def run_hard_niah_eval(
     model,
     system_prompt: str,
@@ -646,7 +775,7 @@ def main():
     parser.add_argument("--backend", default="tinker", choices=["tinker", "hf"],
                         help="Backend: tinker (remote) or hf (local GPU)")
     parser.add_argument("--benchmark", default="niah",
-                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "all"])
+                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "all"])
     parser.add_argument("--n-tasks", type=int, default=10)
     parser.add_argument("--max-iterations", type=int, default=8)
     parser.add_argument("--experiment-name", default="eval")
@@ -707,7 +836,7 @@ def main():
 
     # Run eval
     benchmarks_to_run = (
-        ["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah"] if args.benchmark == "all"
+        ["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong"] if args.benchmark == "all"
         else [args.benchmark]
     )
 
@@ -784,6 +913,22 @@ def main():
                 system_prompt=system_prompt,
                 n_tasks=min(args.n_tasks, 15),
                 max_iterations=args.max_iterations,
+                verbose=args.verbose,
+            )
+        elif bench == "verbatim_copy":
+            eval_results = run_verbatim_copy_eval(
+                model=model,
+                system_prompt=system_prompt,
+                n_tasks=min(args.n_tasks, 10),
+                max_iterations=args.max_iterations,
+                verbose=args.verbose,
+            )
+        elif bench == "oolong":
+            eval_results = run_oolong_eval(
+                model=model,
+                system_prompt=system_prompt,
+                n_tasks=min(args.n_tasks, 10),
+                max_iterations=12,  # OOLONG tasks are complex, need more iterations
                 verbose=args.verbose,
             )
 
