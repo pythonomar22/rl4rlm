@@ -84,6 +84,8 @@ def compute_reward(trajectory_dict: dict, task_type: str) -> float:
         return 0.90 * score + 0.10 * (format_bonus + 0.1)
     elif task_type == "code_debug":
         return 0.90 * score + 0.10 * (format_bonus + 0.1)
+    elif task_type in ("multi_hop_qa", "hard_multi_hop", "notebook_qa"):
+        return 0.90 * score + 0.10 * (format_bonus + 0.1)
     else:
         return score
 
