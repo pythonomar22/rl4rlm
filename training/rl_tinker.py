@@ -55,6 +55,7 @@ from eval.benchmarks.dataframe_qa import generate_dataframe_qa_suite, score_data
 from eval.benchmarks.code_debug import generate_code_debug_suite, score_code_debug
 from eval.benchmarks.multi_hop_qa import generate_multi_hop_suite, score_multi_hop
 from eval.benchmarks.notebook_qa import generate_notebook_qa_suite, score_notebook_qa
+from eval.benchmarks.multi_hop_hard import generate_hard_multi_hop_suite, score_hard_multi_hop
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -430,6 +431,55 @@ def sample_tasks(task_type: str, batch_size: int, step: int) -> list[dict]:
             tasks.extend(generators[ttype](count, seed_offset + i * 10000))
         np.random.shuffle(tasks)
         return tasks
+    elif task_type == "mixed_v4":
+        # v4: Heavy multi-hop focus for decomposition learning
+        # 15% NIAH, 10% Multi-NIAH, 10% Doc-Classify, 20% Hard Multi-Hop, 10% Multi-Hop QA,
+        # 10% DFQA, 10% CodeDebug, 10% Notebook QA, 5% Hard NIAH
+        task_weights = [
+            ("niah", 0.15),
+            ("multi_niah", 0.10),
+            ("doc_classify", 0.10),
+            ("hard_multi_hop", 0.20),
+            ("multi_hop_qa", 0.10),
+            ("dataframe_qa", 0.10),
+            ("code_debug", 0.10),
+            ("notebook_qa", 0.10),
+            ("niah_hard", 0.05),
+        ]
+        type_names = [t[0] for t in task_weights]
+        type_probs = [t[1] for t in task_weights]
+        rng = np.random.RandomState(seed_offset)
+        chosen_types = rng.choice(type_names, size=batch_size, p=type_probs)
+
+        type_counts = {}
+        for t in chosen_types:
+            type_counts[t] = type_counts.get(t, 0) + 1
+
+        tasks = []
+        generators = {
+            "niah": lambda n, s: [{"task": t, "type": "niah"} for t in
+                generate_niah_suite(n_tasks=n, doc_lengths=[5000, 10000, 20000, 50000], seed_offset=s)],
+            "niah_hard": lambda n, s: [{"task": t, "type": "niah"} for t in
+                generate_niah_suite(n_tasks=n, doc_lengths=[100000], seed_offset=s)],
+            "multi_niah": lambda n, s: [{"task": t, "type": "multi_niah"} for t in
+                generate_multi_niah_suite(n_tasks=n, seed_offset=s)],
+            "doc_classify": lambda n, s: [{"task": t, "type": "doc_classify"} for t in
+                generate_doc_classify_suite(n_tasks=n, seed_offset=s)],
+            "multi_hop_qa": lambda n, s: [{"task": t, "type": "multi_hop_qa"} for t in
+                generate_multi_hop_suite(n_tasks=n, seed_offset=s)],
+            "hard_multi_hop": lambda n, s: [{"task": t, "type": "hard_multi_hop"} for t in
+                generate_hard_multi_hop_suite(n_tasks=n, seed_offset=s)],
+            "dataframe_qa": lambda n, s: [{"task": t, "type": "dataframe_qa"} for t in
+                generate_dataframe_qa_suite(n_tasks=n, seed_offset=s)],
+            "code_debug": lambda n, s: [{"task": t, "type": "code_debug"} for t in
+                generate_code_debug_suite(n_tasks=n, seed_offset=s)],
+            "notebook_qa": lambda n, s: [{"task": t, "type": "notebook_qa"} for t in
+                generate_notebook_qa_suite(n_tasks=n, seed_offset=s)],
+        }
+        for i, (ttype, count) in enumerate(type_counts.items()):
+            tasks.extend(generators[ttype](count, seed_offset + i * 10000))
+        np.random.shuffle(tasks)
+        return tasks
 
     return []
 
@@ -459,6 +509,9 @@ def score_trajectory(traj_dict: dict, task_info: dict) -> float:
         return scores["score"]
     elif task_type == "notebook_qa":
         scores = score_notebook_qa(answer, task.expected_answer)
+        return scores["score"]
+    elif task_type == "hard_multi_hop":
+        scores = score_hard_multi_hop(answer, task.expected_answer)
         return scores["score"]
     return 0
 
@@ -786,7 +839,7 @@ def main():
     parser.add_argument("--lora-rank", type=int, default=32)
     parser.add_argument("--kl-coeff", type=float, default=0.05)
     parser.add_argument("--task-type", default="mixed",
-                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "mixed", "mixed_all", "mixed_v2", "mixed_v3"])
+                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "mixed", "mixed_all", "mixed_v2", "mixed_v3", "mixed_v4"])
     parser.add_argument("--save-every", type=int, default=5)
     parser.add_argument("--experiment-name", default="grpo_tinker")
     args = parser.parse_args()

@@ -155,6 +155,11 @@ def rlm(
             "time": 0.0,
         }
 
+        # Capture per-turn logprobs for RL training (importance sampling)
+        if hasattr(model, 'last_logprobs') and model.last_logprobs is not None:
+            turn_record["logprobs"] = model.last_logprobs
+            turn_record["tokens"] = model.last_tokens
+
         if code is None:
             # Model didn't produce parseable code
             error_msg = (

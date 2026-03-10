@@ -140,6 +140,20 @@ We train the first open-weight natively recursive language model based on Qwen3.
   - 2-3 hop questions requiring chaining scattered facts
   - Tests recursive search + reasoning, not just retrieval
   - Base model: 100% at ≤20K, 0% at ≥50K — clear scaling wall
+- **Hard Multi-Hop QA**: O(K) sequential reasoning over 100K-200K char docs
+  - 2-3 hop questions with distractor entity chains
+  - Questions require entity discovery before next search step
+  - Forces true multi-step decomposition (single-pass compound queries fail)
+  - Base model: 20% — consistently picks up distractor answers
+- **Notebook QA**: O(K) Jupyter notebook comprehension (62-256 cells)
+  - Output lookup, variable trace, cross-cell reference tasks
+  - Tests generalization of text search skills to structured documents
+- **Hard NIAH**: O(1) needle search with adversarial distractors (200K-1M chars)
+  - Similar-but-wrong distractor values near needle
+  - Extreme document lengths and boundary positions
+- **Verbatim Copy**: O(1) faithful paragraph reproduction from long docs
+  - Tests precision extraction, not just search
+  - Critical for legal/medical/compliance applications
 
 ## GRPO v2 (In Progress)
 
@@ -218,14 +232,19 @@ We train the first open-weight natively recursive language model based on Qwen3.
 7. **Multi-NIAH slight regression**: 95% vs 97.8% base, but recovery from 90% at step 5
 
 ### V2 Reward Trajectory (Extended)
-| Step | Reward | Updates |
-|------|--------|---------|
-| 1 | 0.757 | 21 |
-| 5 | 0.865 | 16 |
-| 8 | 0.480 | 15 |
-| 9 | 0.464 | 16 |
-| 10 | 0.565 | 16 |
-| 11 | 0.888 | 8 |
+| Step | Reward | Updates | Skip Rate |
+|------|--------|---------|-----------|
+| 1 | 0.757 | 21 | 0/3 |
+| 5 | 0.865 | 16 | 0/3 |
+| 8 | 0.480 | 15 | 0/3 |
+| 9 | 0.464 | 16 | 0/3 |
+| 10 | 0.565 | 16 | 1/3 |
+| 11 | 0.888 | 8 | 2/3 |
+| 12 | — | 0 | 3/3 |
+| 13 | — | ~0 | 2/3 |
+| 14 | — | ~0 | 1/3 |
+
+**V2 mode collapse confirmed at step 11-12.** All trajectories converge to deterministic templates (identical K=8 groups → 0 advantage → 0 updates). Same pattern as v1 step 17+. V2's best checkpoint is step 10.
 
 ## GRPO v3 (Running)
 
@@ -243,10 +262,14 @@ We train the first open-weight natively recursive language model based on Qwen3.
 | 1 | 0.790 | doc_classify=0.892, multi_hop=0.688 | 2.00e-05 |
 | 2 | 0.839 | doc_classify=0.735, multi_hop=0.875, niah=0.872 | 1.99e-05 |
 | 3 | 0.804 | doc_classify=0.780, multi_niah=0.878 | 1.98e-05 |
+| 4 | 0.759 | doc_classify=0.836, multi_hop=0.750, multi_niah=0.615 | 1.95e-05 |
+| 5 | 0.698 | dataframe_qa=0.915, multi_hop=0.625, niah=0.554 | 1.92e-05 |
 
+- Checkpoint saved at step 5: `tinker://de5a5059-ed71-5661-acad-de7fdae4f048:train:0/weights/state-0005`
 - Multi-hop QA jumped from 0.688 → 0.875 in one step
 - Cosine LR schedule preventing aggressive updates
 - Per-task monitoring shows no task interference yet
+- Only 2/32 groups skipped so far (vs v2's near-total collapse by step 14)
 
 ## GRPO v3 Plan
 
@@ -260,6 +283,43 @@ v3: 30% NIAH, 15% Multi-NIAH, 15% Doc-Classify, 15% Multi-Hop QA, 10% DFQA, 10% 
 - Hard NIAH (100K+) tests long-context generalization
 - Resume from v2's best checkpoint (step 5 or step 10 depending on eval)
 
+## Head-to-Head Comparison (All Checkpoints)
+
+| Benchmark | Base | v1-s10 | v2-s5 | v2-s10 | v3-s5 (pending) |
+|-----------|------|--------|-------|--------|-----------------|
+| NIAH (20) | 81.0% | 75.0% | 80.0% | **85.0%** | — |
+| Multi-NIAH (12) | **97.8%** | 100.0% | 90.0% | 95.0% | — |
+| Doc-Classify (10) | 53.6% | 92.0% | 65.0% | **95.0%** | — |
+| Multi-Hop QA (10) | 50.0% | N/A | 50.0% | **70.0%** | — |
+| Code Debug (8) | 25.0% | N/A | 50.0%* | 25.0% | — |
+| DataFrame QA (10) | **80.0%** | N/A | 48.0% | 50.0% | — |
+| Notebook QA (10) | 60.0% | N/A | N/A | **75.0%** | — |
+| Hard NIAH (10) | 90.0% | N/A | N/A | **100.0%** | — |
+| Verbatim Copy (10) | 90.0% | N/A | N/A | **100.0%** | — |
+| OOLONG (10) | 20.0% | N/A | N/A | 10.0% | — |
+| Hard Multi-Hop (10) | 20.0% | N/A | N/A | 20.0% | — |
+| **Avg (8 core)** | **67.2%** | N/A | N/A | **74.4%** | — |
+| **Avg (all 11)** | **58.0%** | N/A | N/A | — | — |
+
+*v2-s5 code-debug inflated by count_words sampling bias.
+
+### Best Checkpoint: v2 Step 10
+- +7.2% average improvement over base model (8 benchmarks)
+- +41.4% Doc-Classify (largest single improvement)
+- +20.0% Multi-Hop QA (validates RLM thesis)
+- +15.0% Notebook QA (transfer learning without training)
+- +10.0% Hard NIAH (perfect at 1M chars)
+- +10.0% Verbatim Copy (90% → 100%, perfect text reproduction)
+- -30.0% DataFrame QA (text-focused RL hurts numerical tasks)
+- OOLONG regression (20% → 10%): counting/aggregation tasks need different training signal
+
+### Training Progression Analysis
+1. **v1 step 10**: Strong Doc-Classify gain but NIAH regression
+2. **v2 step 5**: Recovered NIAH but lost Multi-NIAH and Doc-Classify
+3. **v2 step 10**: Best overall — recovered all metrics + new gains
+4. **v2 collapsed at step 11-12**: Deterministic trajectories, no learning
+5. **v3 step 1-4**: Cosine LR prevents collapse so far; multi-hop reward improving
+
 ## Next Steps
 
 - [x] GRPO v2: Resume from step 10, lower LR, negative advantages
@@ -270,9 +330,17 @@ v3: 30% NIAH, 15% Multi-NIAH, 15% Doc-Classify, 15% Multi-Hop QA, 10% DFQA, 10% 
 - [x] GRPO v3 with Multi-Hop QA in task mix (running)
 - [x] Add Notebook QA benchmark (Jupyter-style)
 - [x] Add Hard NIAH benchmark (distractors + extreme lengths)
-- [ ] Evaluate v3 step 5 checkpoint
+- [x] OOLONG baseline (20%)
+- [x] V2 mode collapse analysis (steps 11-14)
+- [x] Verbatim copy baseline (90%) and v2-s10 (100%)
+- [x] OOLONG v2-s10 eval (10% — regression from 20% base)
+- [x] Hard Multi-Hop benchmark created (100K-200K docs, distractor chains)
+- [x] Hard Multi-Hop baseline (20%)
+- [x] GRPO v4 training pipeline ready (mixed_v4 task type with hard multi-hop)
+- [x] Hard Multi-Hop eval on v2-s10 (20% — same as base, no improvement)
+- [ ] Evaluate v3 step 5 checkpoint (all 11 benchmarks launched)
+- [ ] Launch GRPO v4 with hard multi-hop training
 - [ ] Compare v1-s10, v2-s5, v2-s10, v3-s5 head-to-head
-- [ ] Add verbatim copy benchmark
-- [ ] External benchmarks (OOLONG, RULER, BABILong)
+- [ ] External benchmarks (RULER, BABILong)
 - [ ] Upload best model to HuggingFace
 - [ ] Write full paper (icmltemplate/)
