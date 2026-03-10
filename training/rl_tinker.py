@@ -116,20 +116,35 @@ def trajectory_to_training_data(
                     full_msgs = full_context + [assistant_msg]
                     model_input, weights = renderer.build_supervised_example(full_msgs)
 
-                    # Convert weights to advantage-weighted
-                    weights_np = np.array(
-                        [float(w) for w in weights], dtype=np.float32
+                    # Use cookbook utility for proper token shifting
+                    from tinker_cookbook.supervised.common import create_rightshifted_model_input_and_leftshifted_targets
+                    input_model_input, target_tokens = create_rightshifted_model_input_and_leftshifted_targets(
+                        model_input.chunks
                     )
-                    # Advantages only on response tokens (where weight > 0)
-                    advantages_np = weights_np * advantage
 
-                    # For importance_sampling, we need target_tokens and logprobs
-                    # Use cross_entropy with weighted advantages instead
+                    # Shift weights to match target tokens
+                    if hasattr(weights, 'tolist'):
+                        weights_list = weights.tolist()
+                    else:
+                        weights_list = list(weights)
+                    weights_shifted = weights_list[1:len(target_tokens) + 1]
+
+                    # Scale weights by advantage (positive only for GRPO)
+                    advantage_weight = max(advantage, 0)
+                    weighted = [float(w) * advantage_weight for w in weights_shifted]
+
                     datum = tinker.Datum(
-                        model_input=model_input,
+                        model_input=input_model_input,
                         loss_fn_inputs={
-                            "weights": tinker.TensorData.from_numpy(
-                                weights_np * max(advantage, 0)
+                            "target_tokens": tinker.TensorData(
+                                data=target_tokens,
+                                dtype="int64",
+                                shape=[len(target_tokens)],
+                            ),
+                            "weights": tinker.TensorData(
+                                data=weighted,
+                                dtype="float32",
+                                shape=[len(weighted)],
                             ),
                         }
                     )
@@ -158,18 +173,32 @@ def sample_tasks(task_type: str, batch_size: int, step: int) -> list[dict]:
             n_tasks=batch_size, seed_offset=seed_offset
         )
         return [{"task": t, "type": "multi_niah"} for t in tasks]
+    elif task_type == "doc_classify":
+        tasks = generate_doc_classify_suite(
+            n_tasks=batch_size, seed_offset=seed_offset
+        )
+        return [{"task": t, "type": "doc_classify"} for t in tasks]
     elif task_type == "mixed":
+        # Allocate evenly: ~1/3 each of niah, multi_niah, doc_classify
+        n_niah = max(1, batch_size // 3)
+        n_mniah = max(1, batch_size // 3)
+        n_docclass = max(1, batch_size - n_niah - n_mniah)
         niah_tasks = generate_niah_suite(
-            n_tasks=batch_size // 2,
+            n_tasks=n_niah,
             doc_lengths=[5000, 10000, 20000, 50000, 100000],
             seed_offset=seed_offset,
         )
         mniah_tasks = generate_multi_niah_suite(
-            n_tasks=batch_size - batch_size // 2,
+            n_tasks=n_mniah,
             seed_offset=seed_offset + 50000,
+        )
+        docclass_tasks = generate_doc_classify_suite(
+            n_tasks=n_docclass,
+            seed_offset=seed_offset + 80000,
         )
         tasks = [{"task": t, "type": "niah"} for t in niah_tasks]
         tasks += [{"task": t, "type": "multi_niah"} for t in mniah_tasks]
+        tasks += [{"task": t, "type": "doc_classify"} for t in docclass_tasks]
         np.random.shuffle(tasks)
         return tasks
 
@@ -354,11 +383,12 @@ def train_rl(
                 result = fwd_bwd.result()
                 optim.result()
 
-                if hasattr(result, 'loss') and result.loss is not None:
-                    step_loss = float(result.loss)
+                loss = result.metrics.get("loss:sum") if hasattr(result, 'metrics') else None
+                if loss is not None:
+                    step_loss = float(loss)
 
         # 5. Refresh sampling client with updated weights
-        if step % 5 == 4 or step == steps - 1:
+        if step % 3 == 2 or step == steps - 1:
             sampling_client = training_client.save_weights_and_get_sampling_client(
                 name=f"rl-step-{step+1}"
             )
@@ -453,7 +483,7 @@ def main():
     parser.add_argument("--lora-rank", type=int, default=32)
     parser.add_argument("--kl-coeff", type=float, default=0.05)
     parser.add_argument("--task-type", default="mixed",
-                        choices=["niah", "multi_niah", "mixed"])
+                        choices=["niah", "multi_niah", "doc_classify", "mixed"])
     parser.add_argument("--save-every", type=int, default=10)
     parser.add_argument("--experiment-name", default="grpo_tinker")
     args = parser.parse_args()

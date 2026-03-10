@@ -99,6 +99,9 @@ class TinkerModel:
         self.max_new_tokens = max_new_tokens
         self.temperature = temperature
         self.generation_log: list[dict] = []
+        self.capture_logprobs = False  # Enable for RL training
+        self.last_logprobs: list[float] | None = None
+        self.last_tokens: list[int] | None = None
 
         # Setup tokenizer and renderer
         self.tokenizer = tokenizer_utils.get_tokenizer(model_name)
@@ -161,6 +164,14 @@ class TinkerModel:
 
         # Strip think tags if present
         response = strip_think_tags(response)
+
+        # Capture logprobs and tokens for RL training
+        if self.capture_logprobs and hasattr(seq, 'logprobs') and seq.logprobs is not None:
+            self.last_logprobs = list(seq.logprobs)
+            self.last_tokens = list(seq.tokens)
+        else:
+            self.last_logprobs = None
+            self.last_tokens = None
 
         self.generation_log.append({
             "type": "root",
