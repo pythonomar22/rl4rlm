@@ -590,20 +590,31 @@ def sample_tasks_v6(
             items = generate_doc_classify_suite(n_tasks=count, seed_offset=s)
             tasks.extend({"task": t, "type": "doc_classify"} for t in items)
         elif ttype == "multi_hop_qa":
-            items = generate_multi_hop_suite(n_tasks=count, seed_offset=s)
+            # ANTI-SHORTCUT: minimum 50K contexts
+            items = generate_multi_hop_suite(
+                n_tasks=count, doc_lengths=[50000, 100000, 150000], seed_offset=s
+            )
             tasks.extend({"task": t, "type": "multi_hop_qa"} for t in items)
         elif ttype == "hard_multi_hop":
             items = generate_hard_multi_hop_suite(n_tasks=count, seed_offset=s)
             tasks.extend({"task": t, "type": "hard_multi_hop"} for t in items)
         elif ttype == "dataframe_qa":
-            items = generate_dataframe_qa_suite(n_tasks=count, seed_offset=s)
+            # ANTI-SHORTCUT: filter out small configs (8K chars)
+            items = generate_dataframe_qa_suite(n_tasks=count * 3, seed_offset=s)
+            # Keep only tasks with prompt >= 30K chars (medium+ difficulty)
+            items = [t for t in items if len(t.prompt) >= 30000][:count]
+            if not items:
+                items = generate_dataframe_qa_suite(n_tasks=count, seed_offset=s)
             tasks.extend({"task": t, "type": "dataframe_qa"} for t in items)
         elif ttype == "code_debug":
             # Exception: code is naturally short, keep as-is
             items = generate_code_debug_suite(n_tasks=count, seed_offset=s)
             tasks.extend({"task": t, "type": "code_debug"} for t in items)
         elif ttype == "notebook_qa":
-            items = generate_notebook_qa_suite(n_tasks=count, seed_offset=s)
+            # ANTI-SHORTCUT: minimum 50K contexts
+            items = generate_notebook_qa_suite(
+                n_tasks=count, doc_lengths=[50000, 100000], seed_offset=s
+            )
             tasks.extend({"task": t, "type": "notebook_qa"} for t in items)
         elif ttype == "event_counting":
             # ANTI-SHORTCUT: 50K-200K event logs, trains extract-then-count
