@@ -57,6 +57,7 @@ from eval.benchmarks.code_debug import generate_code_debug_suite, score_code_deb
 from eval.benchmarks.multi_hop_qa import generate_multi_hop_suite, score_multi_hop
 from eval.benchmarks.notebook_qa import generate_notebook_qa_suite, score_notebook_qa
 from eval.benchmarks.multi_hop_hard import generate_hard_multi_hop_suite, score_hard_multi_hop
+from eval.benchmarks.event_counting import generate_event_counting_suite, score_event_counting
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -133,6 +134,9 @@ def compute_reward(trajectory_dict: dict, task_type: str, task_info: dict | None
     elif task_type == "code_debug":
         # Code debug keeps short contexts, no subcall bonus
         return 0.85 * score + 0.10 * (format_bonus + 0.1) + 0.05 * persistence_bonus
+    elif task_type == "event_counting":
+        # Event counting: reward Python-based counting (not sub-model counting)
+        return 0.70 * score + 0.10 * (format_bonus + 0.1) + 0.10 * persistence_bonus + 0.10 * subcall_bonus
     else:
         return score
 
@@ -471,9 +475,10 @@ def sample_tasks_v6(
     seed_offset = step * 1000
 
     task_weights = [
-        ("hard_multi_hop", 0.25),
-        ("multi_hop_qa", 0.20),
-        ("notebook_qa", 0.15),
+        ("hard_multi_hop", 0.20),
+        ("multi_hop_qa", 0.15),
+        ("event_counting", 0.15),  # NEW: teaches extract-then-count-in-Python
+        ("notebook_qa", 0.10),
         ("dataframe_qa", 0.10),
         ("code_debug", 0.10),
         ("doc_classify", 0.10),
@@ -523,6 +528,10 @@ def sample_tasks_v6(
         elif ttype == "notebook_qa":
             items = generate_notebook_qa_suite(n_tasks=count, seed_offset=s)
             tasks.extend({"task": t, "type": "notebook_qa"} for t in items)
+        elif ttype == "event_counting":
+            # ANTI-SHORTCUT: 50K-200K event logs, trains extract-then-count
+            items = generate_event_counting_suite(n_tasks=count, seed_offset=s)
+            tasks.extend({"task": t, "type": "event_counting"} for t in items)
 
     rng.shuffle(tasks)
     return tasks
@@ -560,6 +569,9 @@ def score_trajectory(traj_dict: dict, task_info: dict) -> float:
         return scores["score"]
     elif task_type == "hard_multi_hop":
         scores = score_hard_multi_hop(answer, task.expected_answer)
+        return scores["score"]
+    elif task_type == "event_counting":
+        scores = score_event_counting(answer, task.expected_answer)
         return scores["score"]
     return 0
 

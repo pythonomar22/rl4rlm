@@ -53,6 +53,7 @@ from eval.benchmarks.hard_niah import generate_hard_niah_suite, score_hard_niah
 from eval.benchmarks.verbatim_copy import generate_verbatim_copy_suite, score_verbatim_copy
 from eval.benchmarks.oolong import load_oolong_tasks, score_oolong
 from eval.benchmarks.multi_hop_hard import generate_hard_multi_hop_suite, score_hard_multi_hop
+from eval.benchmarks.event_counting import generate_event_counting_suite, score_event_counting
 
 logging.basicConfig(
     level=logging.INFO,
@@ -701,6 +702,72 @@ def run_hard_multi_hop_eval(
     }
 
 
+def run_event_counting_eval(
+    model,
+    system_prompt: str,
+    n_tasks: int = 10,
+    max_iterations: int = 12,
+    verbose: bool = False,
+) -> dict:
+    """Run event counting benchmark (counting/aggregation over long docs)."""
+    tasks = generate_event_counting_suite(n_tasks=n_tasks)
+
+    results = []
+    trajectories = []
+
+    for task in tqdm(tasks, desc="EventCount"):
+        logger.info(f"\nTask: {task.task_id} | {task.task_type} | {task.doc_length:,} chars | {task.n_events} events")
+        logger.info(f"  Q: {task.question[:100]}")
+
+        traj = rlm(
+            prompt=task.prompt,
+            model=model,
+            system_prompt=system_prompt,
+            max_iterations=max_iterations,
+            verbose=verbose,
+        )
+
+        scores = score_event_counting(traj.answer, task.expected_answer)
+
+        result = {
+            "task_id": task.task_id,
+            "task_type": task.task_type,
+            "expected": task.expected_answer,
+            "predicted": traj.answer,
+            "score": scores["score"],
+            "match_type": scores["match_type"],
+            "terminated": traj.terminated,
+            "num_turns": len(traj.turns),
+            "total_time": traj.total_time,
+            "doc_length": task.doc_length,
+            "n_events": task.n_events,
+        }
+        results.append(result)
+        trajectories.append(trajectory_to_dict(traj))
+
+        logger.info(
+            f"  Score: {scores['score']:.1f} ({scores['match_type']}) | "
+            f"Expected: {task.expected_answer[:60]} | Got: {str(traj.answer)[:60]}"
+        )
+
+    avg_score = sum(r["score"] for r in results) / len(results) if results else 0
+
+    by_type = {}
+    for r in results:
+        by_type.setdefault(r["task_type"], []).append(r["score"])
+    by_type_avg = {k: sum(v) / len(v) for k, v in by_type.items()}
+
+    return {
+        "benchmark": "event_counting",
+        "accuracy": avg_score,
+        "score": avg_score,
+        "n_tasks": len(results),
+        "by_type": by_type_avg,
+        "results": results,
+        "trajectories": trajectories,
+    }
+
+
 def run_hard_niah_eval(
     model,
     system_prompt: str,
@@ -844,7 +911,7 @@ def main():
     parser.add_argument("--backend", default="tinker", choices=["tinker", "hf"],
                         help="Backend: tinker (remote) or hf (local GPU)")
     parser.add_argument("--benchmark", default="niah",
-                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "all"])
+                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "event_counting", "all"])
     parser.add_argument("--n-tasks", type=int, default=10)
     parser.add_argument("--max-iterations", type=int, default=8)
     parser.add_argument("--experiment-name", default="eval")
@@ -905,7 +972,7 @@ def main():
 
     # Run eval
     benchmarks_to_run = (
-        ["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop"] if args.benchmark == "all"
+        ["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "event_counting"] if args.benchmark == "all"
         else [args.benchmark]
     )
 
@@ -1006,6 +1073,14 @@ def main():
                 system_prompt=system_prompt,
                 n_tasks=min(args.n_tasks, 10),
                 max_iterations=args.max_iterations,
+                verbose=args.verbose,
+            )
+        elif bench == "event_counting":
+            eval_results = run_event_counting_eval(
+                model=model,
+                system_prompt=system_prompt,
+                n_tasks=args.n_tasks,
+                max_iterations=12,  # Counting tasks need more iterations
                 verbose=args.verbose,
             )
 
