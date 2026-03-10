@@ -110,8 +110,16 @@ class TinkerModel:
 
         # Create sampling client
         self.service_client = tinker.ServiceClient()
-        if model_path:
-            # Fine-tuned checkpoint
+        if model_path and "/weights/state-" in model_path:
+            # State checkpoint — must load via training client
+            logger.info(f"Loading from state checkpoint: {model_path}")
+            tc = self.service_client.create_training_client_from_state(model_path)
+            self.sampling_client = tc.save_weights_and_get_sampling_client(
+                name="eval-from-state"
+            )
+            logger.info(f"Loaded fine-tuned model from state: {model_path}")
+        elif model_path:
+            # Sampler weights checkpoint
             self.sampling_client = self.service_client.create_sampling_client(
                 model_path=model_path
             )
@@ -223,6 +231,12 @@ class TinkerModel:
 
         logger.debug(f"Sub-query: {len(seq.tokens)} tokens in {elapsed:.2f}s")
         return response
+
+    def reset_stats(self):
+        """Reset generation stats. Call between trajectory collections."""
+        self.generation_log = []
+        self.last_logprobs = None
+        self.last_tokens = None
 
     def refresh_sampling_client(self, model_path: str | None = None):
         """Refresh sampling client after training (gets updated weights)."""

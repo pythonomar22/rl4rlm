@@ -375,8 +375,14 @@ def generate_code_debug_task(
     n_bugs: int = 1,
     n_filler_functions: int = 20,
     seed: int | None = None,
+    forced_bugs: list[str] | None = None,
 ) -> CodeDebugTask:
-    """Generate a code debugging task with planted bugs."""
+    """Generate a code debugging task with planted bugs.
+
+    Args:
+        forced_bugs: If provided, use these specific bug function names
+                     instead of random selection (for stratified sampling).
+    """
     seed = seed if seed is not None else task_idx + 95000
     rng = random.Random(seed)
 
@@ -385,9 +391,15 @@ def generate_code_debug_task(
     rng.shuffle(available_funcs)
 
     # Select n_bugs functions to have bugs
-    buggable = [f for f in available_funcs if f["name"] in BUG_TEMPLATES]
-    n_bugs = min(n_bugs, len(buggable))
-    buggy_funcs = buggable[:n_bugs]
+    if forced_bugs:
+        # Use specified bug functions for diversity
+        buggy_funcs = [f for f in available_funcs if f["name"] in forced_bugs]
+        n_bugs = min(n_bugs, len(buggy_funcs))
+        buggy_funcs = buggy_funcs[:n_bugs]
+    else:
+        buggable = [f for f in available_funcs if f["name"] in BUG_TEMPLATES]
+        n_bugs = min(n_bugs, len(buggable))
+        buggy_funcs = buggable[:n_bugs]
     clean_funcs = [f for f in available_funcs if f not in buggy_funcs][:8]
 
     # Create bugs
@@ -503,6 +515,9 @@ def generate_code_debug_suite(
     - 1 bug in large codebase (~500 lines): medium
     - 2 bugs in large codebase: hard
     - 3 bugs in very large codebase (~1000 lines): very hard
+
+    Uses stratified bug selection to ensure each bug type appears roughly
+    equally across the suite (avoids oversampling easy bugs like count_words).
     """
     configs = [
         # (n_bugs, n_filler, count)
@@ -512,8 +527,16 @@ def generate_code_debug_suite(
         (3, 50, 3),     # Very hard: ~1000 lines, 3 bugs
     ]
 
+    # Pre-compute bug assignments using round-robin for single-bug tasks
+    # to ensure diversity across the suite
+    all_bug_names = list(BUG_TEMPLATES.keys())
+    rng = random.Random(seed_offset)
+    rng.shuffle(all_bug_names)
+    bug_cycle = list(all_bug_names)  # cycle through all bug types
+
     tasks = []
     idx = 0
+    bug_idx = 0
     for n_bugs, n_filler, count in configs:
         for _ in range(count):
             if len(tasks) >= n_tasks:
@@ -523,7 +546,9 @@ def generate_code_debug_suite(
                 n_bugs=n_bugs,
                 n_filler_functions=n_filler,
                 seed=idx + seed_offset,
+                forced_bugs=bug_cycle[bug_idx:bug_idx + n_bugs] if n_bugs <= 2 else None,
             ))
+            bug_idx = (bug_idx + n_bugs) % len(bug_cycle)
             idx += 1
 
     return tasks

@@ -53,6 +53,7 @@ from eval.benchmarks.multi_niah import generate_multi_niah_suite, score_multi_ni
 from eval.benchmarks.doc_classify import generate_doc_classify_suite, score_doc_classify
 from eval.benchmarks.dataframe_qa import generate_dataframe_qa_suite, score_dataframe_qa
 from eval.benchmarks.code_debug import generate_code_debug_suite, score_code_debug
+from eval.benchmarks.multi_hop_qa import generate_multi_hop_suite, score_multi_hop
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -135,8 +136,10 @@ def trajectory_to_training_data(
                         weights_list = list(weights)
                     weights_shifted = weights_list[1:len(target_tokens) + 1]
 
-                    # Scale weights by advantage (positive only for GRPO)
-                    advantage_weight = max(advantage, 0)
+                    # Scale weights by advantage (allow BOTH positive AND negative)
+                    # Positive advantage → reinforce these tokens
+                    # Negative advantage → push away from these tokens
+                    advantage_weight = max(min(advantage, 5.0), -5.0)  # Clip for stability
                     weighted = [float(w) * advantage_weight for w in weights_shifted]
 
                     datum = tinker.Datum(
@@ -159,6 +162,107 @@ def trajectory_to_training_data(
                 except Exception as e:
                     logger.warning(f"Failed to convert turn {i}: {e}")
                     continue
+
+    return data
+
+
+def trajectory_to_training_data_is(
+    trajectory_dict: dict,
+    advantage: float,
+    renderer,
+    tokenizer,
+) -> list[tinker.Datum]:
+    """Convert trajectory to importance_sampling Datum format.
+
+    Uses per-token logprobs from sampling for proper GRPO.
+    Requires logprobs to be stored in turn records.
+    """
+    data = []
+    all_messages = trajectory_dict.get("messages", [])
+    turns = trajectory_dict.get("turns", [])
+
+    if not all_messages:
+        return data
+
+    turn_idx = 0
+    for i, msg in enumerate(all_messages):
+        if msg["role"] != "assistant":
+            continue
+
+        # Find matching turn record with logprobs
+        if turn_idx >= len(turns):
+            break
+        turn = turns[turn_idx]
+        turn_idx += 1
+
+        turn_logprobs = turn.get("logprobs")
+        turn_tokens = turn.get("tokens")
+        if turn_logprobs is None or turn_tokens is None:
+            continue
+
+        try:
+            # Build full conversation context for this turn
+            full_msgs = all_messages[:i] + [msg]
+            model_input, weights = renderer.build_supervised_example(full_msgs)
+
+            from tinker_cookbook.supervised.common import create_rightshifted_model_input_and_leftshifted_targets
+            input_model_input, target_tokens = create_rightshifted_model_input_and_leftshifted_targets(
+                model_input.chunks
+            )
+
+            # Shift weights to align with targets
+            if hasattr(weights, 'tolist'):
+                weights_list = weights.tolist()
+            else:
+                weights_list = list(weights)
+            weights_shifted = weights_list[1:len(target_tokens) + 1]
+
+            # Build logprobs array aligned with target_tokens
+            # weights_shifted has 0 for prompt positions, 1 for response positions
+            # We need to map sampling logprobs to the response positions
+            n_targets = len(target_tokens)
+            logprobs_aligned = [0.0] * n_targets
+            advantages_aligned = [0.0] * n_targets
+
+            # Find where response tokens start (first non-zero weight)
+            resp_start = None
+            for j, w in enumerate(weights_shifted):
+                if float(w) > 0:
+                    resp_start = j
+                    break
+
+            if resp_start is not None:
+                # Map sampling logprobs to response positions
+                n_resp = min(len(turn_logprobs), n_targets - resp_start)
+                for j in range(n_resp):
+                    logprobs_aligned[resp_start + j] = float(turn_logprobs[j])
+                    advantages_aligned[resp_start + j] = float(advantage)
+
+            datum = tinker.Datum(
+                model_input=input_model_input,
+                loss_fn_inputs={
+                    "target_tokens": tinker.TensorData(
+                        data=target_tokens,
+                        dtype="int64",
+                        shape=[len(target_tokens)],
+                    ),
+                    "logprobs": tinker.TensorData(
+                        data=logprobs_aligned,
+                        dtype="float32",
+                        shape=[len(logprobs_aligned)],
+                    ),
+                    "advantages": tinker.TensorData(
+                        data=advantages_aligned,
+                        dtype="float32",
+                        shape=[len(advantages_aligned)],
+                    ),
+                }
+            )
+            data.append(datum)
+
+        except Exception as e:
+            logger.warning(f"Failed to convert turn for importance_sampling: {e}")
+            continue
 
     return data
 
@@ -245,6 +349,86 @@ def sample_tasks(task_type: str, batch_size: int, step: int) -> list[dict]:
         tasks += [{"task": t, "type": "code_debug"} for t in debug_tasks]
         np.random.shuffle(tasks)
         return tasks
+    elif task_type == "mixed_v2":
+        # Weighted random sampling of task types per slot
+        # 40% NIAH, 20% Multi-NIAH, 20% Doc-Classify, 10% DataFrame QA, 10% Code Debug
+        # This prevents NIAH regression by overweighting NIAH
+        task_weights = [
+            ("niah", 0.40),
+            ("multi_niah", 0.20),
+            ("doc_classify", 0.20),
+            ("dataframe_qa", 0.10),
+            ("code_debug", 0.10),
+        ]
+        type_names = [t[0] for t in task_weights]
+        type_probs = [t[1] for t in task_weights]
+        rng = np.random.RandomState(seed_offset)
+        chosen_types = rng.choice(type_names, size=batch_size, p=type_probs)
+
+        # Count how many of each type
+        type_counts = {}
+        for t in chosen_types:
+            type_counts[t] = type_counts.get(t, 0) + 1
+
+        tasks = []
+        generators = {
+            "niah": lambda n, s: [{"task": t, "type": "niah"} for t in
+                generate_niah_suite(n_tasks=n, doc_lengths=[5000, 10000, 20000, 50000], seed_offset=s)],
+            "multi_niah": lambda n, s: [{"task": t, "type": "multi_niah"} for t in
+                generate_multi_niah_suite(n_tasks=n, seed_offset=s)],
+            "doc_classify": lambda n, s: [{"task": t, "type": "doc_classify"} for t in
+                generate_doc_classify_suite(n_tasks=n, seed_offset=s)],
+            "dataframe_qa": lambda n, s: [{"task": t, "type": "dataframe_qa"} for t in
+                generate_dataframe_qa_suite(n_tasks=n, seed_offset=s)],
+            "code_debug": lambda n, s: [{"task": t, "type": "code_debug"} for t in
+                generate_code_debug_suite(n_tasks=n, seed_offset=s)],
+        }
+        for i, (ttype, count) in enumerate(type_counts.items()):
+            tasks.extend(generators[ttype](count, seed_offset + i * 10000))
+        np.random.shuffle(tasks)
+        return tasks
+    elif task_type == "mixed_v3":
+        # v3: Adds multi-hop QA + hard NIAH (100K docs)
+        # 30% NIAH, 15% Multi-NIAH, 15% Doc-Classify, 15% Multi-Hop QA, 10% DFQA, 10% CodeDebug, 5% Hard NIAH
+        task_weights = [
+            ("niah", 0.30),
+            ("multi_niah", 0.15),
+            ("doc_classify", 0.15),
+            ("multi_hop_qa", 0.15),
+            ("dataframe_qa", 0.10),
+            ("code_debug", 0.10),
+            ("niah_hard", 0.05),
+        ]
+        type_names = [t[0] for t in task_weights]
+        type_probs = [t[1] for t in task_weights]
+        rng = np.random.RandomState(seed_offset)
+        chosen_types = rng.choice(type_names, size=batch_size, p=type_probs)
+
+        type_counts = {}
+        for t in chosen_types:
+            type_counts[t] = type_counts.get(t, 0) + 1
+
+        tasks = []
+        generators = {
+            "niah": lambda n, s: [{"task": t, "type": "niah"} for t in
+                generate_niah_suite(n_tasks=n, doc_lengths=[5000, 10000, 20000, 50000], seed_offset=s)],
+            "niah_hard": lambda n, s: [{"task": t, "type": "niah"} for t in
+                generate_niah_suite(n_tasks=n, doc_lengths=[100000], seed_offset=s)],
+            "multi_niah": lambda n, s: [{"task": t, "type": "multi_niah"} for t in
+                generate_multi_niah_suite(n_tasks=n, seed_offset=s)],
+            "doc_classify": lambda n, s: [{"task": t, "type": "doc_classify"} for t in
+                generate_doc_classify_suite(n_tasks=n, seed_offset=s)],
+            "multi_hop_qa": lambda n, s: [{"task": t, "type": "multi_hop_qa"} for t in
+                generate_multi_hop_suite(n_tasks=n, seed_offset=s)],
+            "dataframe_qa": lambda n, s: [{"task": t, "type": "dataframe_qa"} for t in
+                generate_dataframe_qa_suite(n_tasks=n, seed_offset=s)],
+            "code_debug": lambda n, s: [{"task": t, "type": "code_debug"} for t in
+                generate_code_debug_suite(n_tasks=n, seed_offset=s)],
+        }
+        for i, (ttype, count) in enumerate(type_counts.items()):
+            tasks.extend(generators[ttype](count, seed_offset + i * 10000))
+        np.random.shuffle(tasks)
+        return tasks
 
     return []
 
@@ -269,6 +453,9 @@ def score_trajectory(traj_dict: dict, task_info: dict) -> float:
     elif task_type == "code_debug":
         scores = score_code_debug(answer, task.bugs)
         return scores["score"]
+    elif task_type == "multi_hop_qa":
+        scores = score_multi_hop(answer, task.expected_answer)
+        return scores["score"]
     return 0
 
 
@@ -291,6 +478,12 @@ def train_rl(
     log_dir = Path("data/rl") / experiment_name
     log_dir.mkdir(parents=True, exist_ok=True)
 
+    # Add file handler for persistent logging
+    file_handler = logging.FileHandler(log_dir / "training.log")
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)-6s %(message)s"))
+    logging.getLogger().addHandler(file_handler)
+
     # Setup tokenizer and renderer
     tokenizer = tokenizer_utils.get_tokenizer(model_name)
     renderer = renderers.get_renderer("qwen3_disable_thinking", tokenizer)
@@ -312,6 +505,10 @@ def train_rl(
             seed=42,
         )
 
+    # Log model_id for checkpoint access
+    logger.info(f"  Training model_id: {training_client.model_id}")
+    logger.info(f"  State checkpoint format: tinker://{training_client.model_id}/weights/state-XXXX")
+
     # Create sampling client for trajectory generation
     sampling_client = training_client.save_weights_and_get_sampling_client(
         name="rl-init"
@@ -321,8 +518,9 @@ def train_rl(
     model = TinkerModel(
         model_name=model_name,
         max_new_tokens=2048,
-        temperature=0.8,
+        temperature=1.0,  # Higher temp for exploration (v2: was 0.8)
     )
+    model.capture_logprobs = True  # Enable logprob capture for importance_sampling
     # Override the sampling client with our training one
     model.sampling_client = sampling_client
 
@@ -333,7 +531,6 @@ def train_rl(
     except Exception:
         effective_lr = lr
 
-    adam_params = tinker.AdamParams(learning_rate=effective_lr)
     system_prompt = QWEN35_35B_SYSTEM_PROMPT
 
     logger.info(f"\n{'='*60}")
@@ -348,14 +545,27 @@ def train_rl(
     logger.info(f"  Task type: {task_type}")
     logger.info(f"  KL coeff: {kl_coeff}")
     logger.info(f"  LoRA rank: {lora_rank}")
+    logger.info(f"  LR schedule: cosine (min_lr = 10% of base)")
     logger.info(f"{'='*60}\n")
+
+    # Determine loss function (v2: try importance_sampling if logprobs available)
+    use_importance_sampling = True  # Will fall back to cross_entropy if no logprobs
+    loss_fn = "importance_sampling"  # Default for v2
 
     training_log = []
     t0 = time.time()
 
     for step in range(steps):
         step_t0 = time.time()
-        logger.info(f"\n--- Step {step + 1}/{steps} ---")
+
+        # Cosine LR schedule: decay from effective_lr to 10% over training
+        import math
+        min_lr = effective_lr * 0.1
+        cosine_decay = 0.5 * (1 + math.cos(math.pi * step / max(steps - 1, 1)))
+        step_lr = min_lr + (effective_lr - min_lr) * cosine_decay
+        adam_params = tinker.AdamParams(learning_rate=step_lr)
+
+        logger.info(f"\n--- Step {step + 1}/{steps} --- (LR: {step_lr:.2e})")
 
         # 1. Sample tasks
         tasks = sample_tasks(task_type, batch_size, step)
@@ -367,6 +577,9 @@ def train_rl(
             group_trajectories = []
 
             for k in range(K):
+                # Reset model stats between trajectories to prevent accumulation
+                if hasattr(model, 'reset_stats'):
+                    model.reset_stats()
                 try:
                     traj = rlm(
                         prompt=task.prompt,
@@ -395,12 +608,19 @@ def train_rl(
         step_advantages = []
         training_data = []
         n_updates = 0
+        per_task_rewards = {}  # Track rewards by task type
 
         for group in all_groups:
             rewards = [t["reward"] for t in group["trajectories"]]
             mean_r = np.mean(rewards)
             std_r = np.std(rewards)
             step_rewards.extend(rewards)
+
+            # Track per-task-type rewards
+            ttype = group["task_info"]["type"]
+            if ttype not in per_task_rewards:
+                per_task_rewards[ttype] = []
+            per_task_rewards[ttype].append(mean_r)
 
             if std_r < 1e-6:
                 # All same reward — skip this group (no learning signal)
@@ -410,25 +630,39 @@ def train_rl(
             for traj_dict, reward in zip(group["trajectories"], rewards):
                 advantage = (reward - mean_r) / (std_r + 1e-8)
 
-                if abs(advantage) < 0.1:
-                    continue  # Skip near-zero advantages
+                if abs(advantage) < 0.05:
+                    continue  # Skip near-zero advantages (tighter threshold)
 
                 step_advantages.append(advantage)
 
-                # Convert to training data
-                data = trajectory_to_training_data(
-                    traj_dict, advantage, renderer, tokenizer
+                # Convert to training data — try importance_sampling first, fall back to cross_entropy
+                turn_has_logprobs = any(
+                    t.get("logprobs") is not None for t in traj_dict.get("turns", [])
                 )
+                if use_importance_sampling and turn_has_logprobs:
+                    data = trajectory_to_training_data_is(
+                        traj_dict, advantage, renderer, tokenizer
+                    )
+                else:
+                    data = trajectory_to_training_data(
+                        traj_dict, advantage, renderer, tokenizer
+                    )
                 training_data.extend(data)
                 n_updates += 1
 
         # 4. Train on collected data
         step_loss = None
         if training_data:
+            # Determine loss function based on data format
+            # If data has "logprobs" and "advantages" keys → importance_sampling
+            # If data has "weights" key → cross_entropy
+            sample_inputs = training_data[0].loss_fn_inputs if training_data else {}
+            actual_loss_fn = "importance_sampling" if "advantages" in sample_inputs else "cross_entropy"
+
             # Batch the training data
             for i in range(0, len(training_data), 4):
                 batch = training_data[i:i+4]
-                fwd_bwd = training_client.forward_backward(batch, "cross_entropy")
+                fwd_bwd = training_client.forward_backward(batch, actual_loss_fn)
                 optim = training_client.optim_step(adam_params)
                 result = fwd_bwd.result()
                 optim.result()
@@ -437,8 +671,8 @@ def train_rl(
                 if loss is not None:
                     step_loss = float(loss)
 
-        # 5. Refresh sampling client with updated weights
-        if step % 3 == 2 or step == steps - 1:
+        # 5. Refresh sampling client with updated weights (every step for v2)
+        if training_data:  # Only refresh if we actually trained
             sampling_client = training_client.save_weights_and_get_sampling_client(
                 name=f"rl-step-{step+1}"
             )
@@ -449,15 +683,22 @@ def train_rl(
         avg_reward = np.mean(step_rewards) if step_rewards else 0
         avg_advantage = np.mean(np.abs(step_advantages)) if step_advantages else 0
 
+        # Log negative/positive advantage counts
+        n_pos = sum(1 for a in step_advantages if a > 0)
+        n_neg = sum(1 for a in step_advantages if a < 0)
+
         step_info = {
             "step": step + 1,
             "avg_reward": float(avg_reward),
             "max_reward": float(max(step_rewards)) if step_rewards else 0,
             "min_reward": float(min(step_rewards)) if step_rewards else 0,
             "n_updates": n_updates,
+            "n_pos_advantages": n_pos,
+            "n_neg_advantages": n_neg,
             "n_training_data": len(training_data),
             "avg_advantage_abs": float(avg_advantage),
             "loss": step_loss,
+            "lr": step_lr,
             "time": step_time,
             "elapsed": time.time() - t0,
         }
@@ -466,10 +707,18 @@ def train_rl(
         logger.info(
             f"  Reward: {avg_reward:.3f} [{min(step_rewards) if step_rewards else 0:.3f}, "
             f"{max(step_rewards) if step_rewards else 0:.3f}] | "
-            f"Updates: {n_updates} | Data: {len(training_data)} | "
+            f"Updates: {n_updates} (+{n_pos}/-{n_neg}) | Data: {len(training_data)} | "
             f"Loss: {step_loss if step_loss is not None else 'N/A'} | "
             f"Time: {step_time:.1f}s"
         )
+
+        # Log per-task-type rewards for monitoring task interference
+        if per_task_rewards:
+            parts = []
+            for ttype, rewards in sorted(per_task_rewards.items()):
+                avg_r = np.mean(rewards)
+                parts.append(f"{ttype}={avg_r:.3f}")
+            logger.info(f"  Per-task rewards: {' | '.join(parts)}")
 
         # Save checkpoint
         if (step + 1) % save_every == 0:
@@ -533,8 +782,8 @@ def main():
     parser.add_argument("--lora-rank", type=int, default=32)
     parser.add_argument("--kl-coeff", type=float, default=0.05)
     parser.add_argument("--task-type", default="mixed",
-                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "mixed", "mixed_all"])
-    parser.add_argument("--save-every", type=int, default=10)
+                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "mixed", "mixed_all", "mixed_v2", "mixed_v3"])
+    parser.add_argument("--save-every", type=int, default=5)
     parser.add_argument("--experiment-name", default="grpo_tinker")
     args = parser.parse_args()
 

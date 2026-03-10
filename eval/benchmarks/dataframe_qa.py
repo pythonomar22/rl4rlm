@@ -273,6 +273,86 @@ def _generate_sector_question(rows: list[dict], rng: random.Random) -> tuple[str
     return question, answer
 
 
+def _generate_multi_step_question(rows: list[dict], rng: random.Random) -> tuple[str, str]:
+    """Multi-step analysis: requires chaining 2+ computations.
+
+    These simulate real Jupyter notebook workflows where you do:
+    1. Filter/aggregate to find something
+    2. Use that result to ask a follow-up question
+    """
+    tickers = list(set(r["ticker"] for r in rows))
+    sectors = list(set(r["sector"] for r in rows))
+
+    question_type = rng.choice(["best_sector_top_stock", "volatile_stock_max_day", "worst_performer_sector"])
+
+    if question_type == "best_sector_top_stock":
+        # Step 1: Find best performing sector
+        sector_returns = {}
+        for s in sectors:
+            sector_tickers = list(set(r["ticker"] for r in rows if r["sector"] == s))
+            returns = []
+            for t in sector_tickers:
+                prices = sorted(
+                    [(r["date"], r["close"]) for r in rows if r["ticker"] == t],
+                    key=lambda x: x[0]
+                )
+                if len(prices) >= 2:
+                    ret = (prices[-1][1] - prices[0][1]) / prices[0][1]
+                    returns.append((t, ret))
+            sector_returns[s] = returns
+        best_sector = max(sector_returns, key=lambda s: sum(r for _, r in sector_returns[s]) / max(len(sector_returns[s]), 1))
+
+        # Step 2: Find the top stock in that sector
+        best_stock = max(sector_returns[best_sector], key=lambda x: x[1])
+        question = f"First find the sector with the best average return (first date to last date). Then within that sector, which stock had the highest individual return? Return just the ticker symbol."
+        answer = best_stock[0]
+
+    elif question_type == "volatile_stock_max_day":
+        # Step 1: Find most volatile stock
+        vols = {}
+        for t in tickers:
+            prices = [r["close"] for r in rows if r["ticker"] == t]
+            if len(prices) > 1:
+                returns = [(prices[i] - prices[i-1]) / prices[i-1] for i in range(1, len(prices))]
+                mean_r = sum(returns) / len(returns)
+                var = sum((r - mean_r)**2 for r in returns) / (len(returns) - 1)
+                vols[t] = math.sqrt(var)
+            else:
+                vols[t] = 0
+        most_vol = max(vols, key=vols.get)
+
+        # Step 2: Find its highest single-day gain
+        ticker_rows = sorted([r for r in rows if r["ticker"] == most_vol], key=lambda r: r["date"])
+        max_gain = 0
+        max_gain_date = ticker_rows[0]["date"]
+        for i in range(1, len(ticker_rows)):
+            gain = (ticker_rows[i]["close"] - ticker_rows[i-1]["close"]) / ticker_rows[i-1]["close"]
+            if gain > max_gain:
+                max_gain = gain
+                max_gain_date = ticker_rows[i]["date"]
+        question = f"First find the most volatile stock (highest std of daily returns). Then find the date when that stock had its biggest single-day gain. Return just the date (YYYY-MM-DD)."
+        answer = max_gain_date
+
+    elif question_type == "worst_performer_sector":
+        # Step 1: Find worst performing stock
+        stock_returns = {}
+        for t in tickers:
+            prices = sorted(
+                [(r["date"], r["close"]) for r in rows if r["ticker"] == t],
+                key=lambda x: x[0]
+            )
+            if len(prices) >= 2:
+                stock_returns[t] = (prices[-1][1] - prices[0][1]) / prices[0][1]
+        worst_stock = min(stock_returns, key=stock_returns.get)
+
+        # Step 2: Return its sector
+        sector = next(r["sector"] for r in rows if r["ticker"] == worst_stock)
+        question = f"Which sector does the worst-performing stock (lowest total return from first to last date) belong to? Return just the sector name."
+        answer = sector
+
+    return question, answer
+
+
 def generate_dataframe_qa_task(
     task_idx: int,
     n_tickers: int = 10,
@@ -298,7 +378,7 @@ def generate_dataframe_qa_task(
 
     # Generate question
     if task_type == "mixed":
-        task_type_actual = rng.choice(["lookup", "aggregation", "ranking", "sector"])
+        task_type_actual = rng.choice(["lookup", "aggregation", "ranking", "sector", "multi_step"])
     else:
         task_type_actual = task_type
 
@@ -310,6 +390,8 @@ def generate_dataframe_qa_task(
         question, answer = _generate_ranking_question(data, rng)
     elif task_type_actual == "sector":
         question, answer = _generate_sector_question(data, rng)
+    elif task_type_actual == "multi_step":
+        question, answer = _generate_multi_step_question(data, rng)
     else:
         question, answer = _generate_aggregation_question(data, rng)
 

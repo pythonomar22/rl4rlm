@@ -363,9 +363,21 @@ def score_doc_classify(predicted: str | None, expected_labels: list[str]) -> dic
             "per_doc": [False] * n_docs,
         }
 
+    # Handle Python list format: "['1: Sports', '2: Business', ...]"
+    text = predicted.strip()
+    if text.startswith("[") and text.endswith("]"):
+        import ast
+        try:
+            items = ast.literal_eval(text)
+            text = "\n".join(str(item) for item in items)
+        except (ValueError, SyntaxError):
+            # Strip brackets and split on commas
+            text = text[1:-1]
+            text = "\n".join(item.strip().strip("'\"") for item in text.split(","))
+
     # Parse predictions
     predicted_labels = {}
-    for line in predicted.strip().split("\n"):
+    for line in text.strip().split("\n"):
         line = line.strip()
         if not line:
             continue
