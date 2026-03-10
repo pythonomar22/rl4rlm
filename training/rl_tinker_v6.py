@@ -64,6 +64,83 @@ logger = logging.getLogger(__name__)
 
 
 # ============================================================================
+# Strategy-conditioned training (SC-GRPO)
+# ============================================================================
+
+# Strategy prompts: inject diversity through the prompt space, not temperature space.
+# Each trajectory in the K-group gets a randomly assigned strategy, forcing the model
+# to generate structurally different code patterns. This directly combats mode collapse
+# (where all K trajectories use identical 20K/2K chunking template).
+
+STRATEGY_SUFFIXES = {
+    "standard": "",  # Base system prompt, no additional instruction
+
+    "extract_compute": """
+
+## Strategy: Extract-Then-Compute
+For this task, extract ALL relevant raw data items from the document first.
+Then use Python code to count, filter, aggregate, sort, or compute the answer.
+NEVER delegate counting or arithmetic to llm_query — do it in Python.""",
+
+    "binary_search": """
+
+## Strategy: Targeted Search
+For this task, search efficiently. Don't process every chunk — check specific locations.
+Consider: does the answer appear early, middle, or late in the document?
+Start with the middle, then narrow your search based on what you find.""",
+
+    "map_reduce": """
+
+## Strategy: Map-Reduce
+For this task, use map-reduce:
+1. MAP: Process each chunk, extract structured data (dicts, lists, tuples)
+2. REDUCE: Merge all extracted data in Python (combine dicts, extend lists)
+3. COMPUTE: Calculate the final answer from the merged data
+Store intermediate results in Python data structures, not as text.""",
+
+    "two_pass": """
+
+## Strategy: Two-Pass Verification
+For this task, use two passes:
+1. SCAN PASS: Quickly scan all chunks, collect candidate answers
+2. VERIFY PASS: Re-read only the chunks with candidates, verify each one
+3. Return the most confident verified answer
+This catches hallucinations from single-pass approaches.""",
+
+    "small_chunks": """
+
+## Strategy: Fine-Grained Processing
+For this task, use small chunks (5000-8000 chars) with large overlap (2000 chars).
+This ensures you don't miss information at boundaries.
+Process each chunk carefully and aggregate all findings before answering.""",
+}
+
+# Which strategies to prefer for each task type
+TASK_STRATEGY_WEIGHTS = {
+    "niah": {"standard": 0.3, "binary_search": 0.3, "small_chunks": 0.2, "two_pass": 0.2},
+    "multi_niah": {"standard": 0.2, "map_reduce": 0.3, "small_chunks": 0.3, "extract_compute": 0.2},
+    "doc_classify": {"standard": 0.2, "map_reduce": 0.4, "extract_compute": 0.2, "small_chunks": 0.2},
+    "event_counting": {"extract_compute": 0.4, "map_reduce": 0.3, "small_chunks": 0.2, "standard": 0.1},
+    "hard_multi_hop": {"two_pass": 0.3, "standard": 0.2, "small_chunks": 0.2, "extract_compute": 0.15, "binary_search": 0.15},
+    "multi_hop_qa": {"two_pass": 0.3, "standard": 0.3, "binary_search": 0.2, "small_chunks": 0.2},
+    "code_debug": {"standard": 0.4, "two_pass": 0.3, "small_chunks": 0.3},
+    "notebook_qa": {"extract_compute": 0.3, "standard": 0.3, "map_reduce": 0.2, "small_chunks": 0.2},
+    "dataframe_qa": {"extract_compute": 0.4, "map_reduce": 0.3, "standard": 0.2, "small_chunks": 0.1},
+}
+
+
+def select_strategy(task_type: str, rng=None) -> str:
+    """Select a strategy for a trajectory based on task type."""
+    if rng is None:
+        rng = np.random.RandomState()
+    weights = TASK_STRATEGY_WEIGHTS.get(task_type, {"standard": 1.0})
+    strategies = list(weights.keys())
+    probs = [weights[s] for s in strategies]
+    probs = [p / sum(probs) for p in probs]  # normalize
+    return rng.choice(strategies, p=probs)
+
+
+# ============================================================================
 # Reward computation
 # ============================================================================
 
@@ -595,6 +672,7 @@ def train_rl_v6(
     warmup_steps: int = 2,
     grad_accum_batch: int = 4,
     timeout_retry_limit: int = 2,
+    strategy_conditioning: bool = False,
 ):
     """Run GRPO RL training V6 on Tinker.
 
@@ -605,6 +683,11 @@ def train_rl_v6(
     - Warmup phase (linear LR warmup before cosine decay)
     - KL penalty via reward shaping
     - Timeout retry limiting
+
+    V7 addition (--strategy-conditioning):
+    - Each trajectory gets a randomly assigned strategy prompt
+    - Different strategies produce different code patterns
+    - Combats mode collapse by injecting diversity through prompt space
     """
 
     log_dir = Path("data/rl") / experiment_name
@@ -673,10 +756,16 @@ def train_rl_v6(
     logger.info(f"  Adaptive difficulty: ON")
     logger.info(f"  Multi-turn persistence bonus: ON")
     logger.info(f"  Code diversity bonus: ON")
+    logger.info(f"  Strategy conditioning: {'ON' if strategy_conditioning else 'OFF'}")
     logger.info(f"{'='*60}\n")
 
-    # Temperature schedule: narrower range than V5 (1.2+ mainly causes failures)
-    temp_schedule = [0.7, 0.8, 0.9, 1.0, 1.0, 1.1, 1.1, 1.2]
+    # Temperature schedule
+    if strategy_conditioning:
+        # Wider range for SC-GRPO: strategies provide diversity, temperature adds variation
+        temp_schedule = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.3, 1.5]
+    else:
+        # Narrower range for standard GRPO (1.2+ mainly causes failures)
+        temp_schedule = [0.7, 0.8, 0.9, 1.0, 1.0, 1.1, 1.1, 1.2]
     if K > len(temp_schedule):
         temp_schedule = temp_schedule + [1.0] * (K - len(temp_schedule))
 
@@ -725,22 +814,34 @@ def train_rl_v6(
             task_t0 = time.time()
             logger.info(f"  Task {task_idx+1}/{len(tasks)}: {task_info['type']} ({len(task.prompt)} chars)")
 
+            # Strategy RNG for this task (deterministic per step+task)
+            strategy_rng = np.random.RandomState(step * 1000 + task_idx)
+
             for k in range(K):
                 if hasattr(model, 'reset_stats'):
                     model.reset_stats()
                 model.temperature = temp_schedule[k]
 
+                # Strategy-conditioned prompt (SC-GRPO)
+                if strategy_conditioning:
+                    strategy_name = select_strategy(task_info["type"], strategy_rng)
+                    traj_system_prompt = system_prompt + STRATEGY_SUFFIXES[strategy_name]
+                else:
+                    strategy_name = "standard"
+                    traj_system_prompt = system_prompt
+
                 try:
                     traj = rlm(
                         prompt=task.prompt,
                         model=model,
-                        system_prompt=system_prompt,
+                        system_prompt=traj_system_prompt,
                         max_iterations=8,
                     )
                     traj_dict = trajectory_to_dict(traj)
                     traj_dict["messages"] = traj.messages
-                    traj_dict["system_prompt"] = system_prompt
+                    traj_dict["system_prompt"] = traj_system_prompt
                     traj_dict["temperature"] = temp_schedule[k]
+                    traj_dict["strategy"] = strategy_name
 
                     score = score_trajectory(traj_dict, task_info)
                     traj_dict["score"] = score
@@ -773,10 +874,12 @@ def train_rl_v6(
 
             task_time = time.time() - task_t0
             rewards = [t["reward"] for t in group_trajectories]
+            strategies_used = [t.get("strategy", "standard") for t in group_trajectories]
+            unique_strategies = len(set(strategies_used))
             logger.info(
                 f"    → rewards: [{', '.join(f'{r:.2f}' for r in rewards)}] "
                 f"mean={np.mean(rewards):.3f} std={np.std(rewards):.3f} "
-                f"({task_time:.1f}s)"
+                f"strategies={unique_strategies} ({task_time:.1f}s)"
             )
 
             all_groups.append({
@@ -953,6 +1056,20 @@ def train_rl_v6(
             parts.append(f"{ttype}={avg_r:.3f}(skip={skip}/{total})")
         logger.info(f"  Per-task: {' | '.join(parts)}")
 
+        # Strategy stats (SC-GRPO)
+        if strategy_conditioning:
+            strategy_rewards = defaultdict(list)
+            for group in all_groups:
+                for traj in group["trajectories"]:
+                    s = traj.get("strategy", "standard")
+                    strategy_rewards[s].append(traj["reward"])
+            strategy_parts = []
+            for s in sorted(strategy_rewards.keys()):
+                avg_r = np.mean(strategy_rewards[s])
+                n = len(strategy_rewards[s])
+                strategy_parts.append(f"{s}={avg_r:.3f}(n={n})")
+            logger.info(f"  Strategies: {' | '.join(strategy_parts)}")
+
         # Save checkpoint
         if (step + 1) % save_every == 0:
             ckpt_name = f"checkpoint-{step+1:04d}"
@@ -1021,6 +1138,8 @@ def main():
     parser.add_argument("--warmup-steps", type=int, default=2)
     parser.add_argument("--grad-accum-batch", type=int, default=4)
     parser.add_argument("--timeout-retry-limit", type=int, default=2)
+    parser.add_argument("--strategy-conditioning", action="store_true",
+                        help="Enable SC-GRPO: strategy-conditioned training")
     args = parser.parse_args()
 
     train_rl_v6(
@@ -1038,6 +1157,7 @@ def main():
         warmup_steps=args.warmup_steps,
         grad_accum_batch=args.grad_accum_batch,
         timeout_retry_limit=args.timeout_retry_limit,
+        strategy_conditioning=args.strategy_conditioning,
     )
 
 
