@@ -79,7 +79,8 @@ FILLER_SENTENCES = [
 ]
 
 
-def _generate_event_line(entity: str, event_type: str, value: int, event_id: int) -> str:
+def _generate_event_line(entity: str, event_type: str, value: int, event_id: int,
+                         rng: random.Random | None = None) -> str:
     """Generate a single event line embedded in narrative text."""
     templates = [
         f"[EVENT #{event_id}] User: {entity} | Action: {event_type} | Value: {value}",
@@ -87,15 +88,20 @@ def _generate_event_line(entity: str, event_type: str, value: int, event_id: int
         f"The log shows event #{event_id}: {entity} executed {event_type} with value {value}.",
         f"Event #{event_id} recorded: {entity} — {event_type} — value {value}.",
     ]
+    if rng is not None:
+        return rng.choice(templates)
     return random.choice(templates)
 
 
-def _generate_filler_block(target_chars: int) -> str:
+def _generate_filler_block(target_chars: int, rng: random.Random | None = None) -> str:
     """Generate filler text of approximately target_chars length."""
     lines = []
     total = 0
     while total < target_chars:
-        line = random.choice(FILLER_SENTENCES)
+        if rng is not None:
+            line = rng.choice(FILLER_SENTENCES)
+        else:
+            line = random.choice(FILLER_SENTENCES)
         lines.append(line)
         total += len(line) + 1
     return "\n".join(lines)
@@ -137,17 +143,18 @@ def generate_event_document(
     for i, event in enumerate(events):
         # Filler before this event
         filler_chars = max(100, int(chars_per_event * (0.8 + 0.4 * rng.random())))
-        parts.append(_generate_filler_block(filler_chars))
+        parts.append(_generate_filler_block(filler_chars, rng=rng))
         # The event line
         event_line = _generate_event_line(
-            event["entity"], event["event_type"], event["value"], event["event_id"]
+            event["entity"], event["event_type"], event["value"], event["event_id"],
+            rng=rng,
         )
         parts.append(event_line)
 
     # Final filler
     remaining = doc_length - sum(len(p) for p in parts)
     if remaining > 100:
-        parts.append(_generate_filler_block(remaining))
+        parts.append(_generate_filler_block(remaining, rng=rng))
 
     document = "\n".join(parts)
     return document, events

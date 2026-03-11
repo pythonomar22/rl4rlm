@@ -1,0 +1,151 @@
+{
+  "benchmark": "cross_doc_compare",
+  "accuracy": 0.28610833333333335,
+  "n_tasks": 12,
+  "per_task": [
+    {
+      "task_id": "cross_doc_000",
+      "task_type": "overlap_entities",
+      "expected": "Hannah Stone, Ivan Edwards, Kyle Owens",
+      "predicted": "No common employees found",
+      "score": 0.0,
+      "match_type": "no_overlap",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 116.20627403259277,
+      "doc_length": 206710
+    },
+    {
+      "task_id": "cross_doc_001",
+      "task_type": "budget_diff",
+      "expected": "Project Tau",
+      "predicted": "Project Iota",
+      "score": 0.8,
+      "match_type": "partial_words",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 117.36241436004639,
+      "doc_length": 208206
+    },
+    {
+      "task_id": "cross_doc_002",
+      "task_type": "timeline_conflict",
+      "expected": "Budget Approval, Partnership Signing, Product Launch",
+      "predicted": "No conflicting events found",
+      "score": 0.0,
+      "match_type": "no_overlap",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 78.86500024795532,
+      "doc_length": 155194
+    },
+    {
+      "task_id": "cross_doc_003",
+      "task_type": "metric_comparison",
+      "expected": "Eastern Region",
+      "predicted": "Eastern Region",
+      "score": 1.0,
+      "match_type": "exact",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 81.08433485031128,
+      "doc_length": 110300
+    },
+    {
+      "task_id": "cross_doc_004",
+      "task_type": "overlap_entities",
+      "expected": "Brenda Jackson, Diana Thomas, Rachel Martin, Thomas Jackson, Zachary Johnson",
+      "predicted": "Brenda Jackson, Diana Thomas, Iris King, Rachel Martin, Thomas Jackson, Zachary Johnson, Zachary Martinez",
+      "score": 0.8333,
+      "match_type": "partial",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 195.01022267341614,
+      "doc_length": 207970
+    },
+    {
+      "task_id": "cross_doc_005",
+      "task_type": "budget_diff",
+      "expected": "Project Lambda",
+      "predicted": "Project Pi",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 258.430153131485,
+      "doc_length": 159011
+    },
+    {
+      "task_id": "cross_doc_006",
+      "task_type": "timeline_conflict",
+      "expected": "Audit Completion, Board Meeting, Stakeholder Meeting, Strategy Retreat",
+      "predicted": "No conflicting dates found",
+      "score": 0.0,
+      "match_type": "no_overlap",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 217.0133740901947,
+      "doc_length": 207813
+    },
+    {
+      "task_id": "cross_doc_007",
+      "task_type": "metric_comparison",
+      "expected": "Commercial Services Group",
+      "predicted": "Not found",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 116.44108009338379,
+      "doc_length": 208149
+    },
+    {
+      "task_id": "cross_doc_008",
+      "task_type": "overlap_entities",
+      "expected": "Oscar Adams, Wendy Wright, Xavier Lopez, Yara Johnson",
+      "predicted": "Carol Edwards, Carol Mitchell, Charles Clark, Charles Hill, Hannah Walker, Henry Long, Ivan James, Julia Reed, Karen James, Karen Owens, Laura Clark, Maria Price, Nathan Taylor, Nina Baker, Olivia Baker, Oscar Adams, Oscar Hill, Quinn Taylor, Rachel King, Raymond Young, Samuel Thompson, Thomas Jackson, Thomas Taylor, Tina Thompson, Victor Hernandez, Victor Hill, Wendy Wright, Xavier Allen, Xavier Lopez, Yara Irwin, Yara Johnson",
+      "score": 0.2286,
+      "match_type": "low_overlap",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 118.94327735900879,
+      "doc_length": 106619
+    },
+    {
+      "task_id": "cross_doc_009",
+      "task_type": "budget_diff",
+      "expected": "Project Mu",
+      "predicted": "Not found",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 63.543596029281616,
+      "doc_length": 68849
+    },
+    {
+      "task_id": "cross_doc_010",
+      "task_type": "timeline_conflict",
+      "expected": "Annual Conference, Merger Announcement, Strategy Retreat, System Migration",
+      "predicted": "Annual Conference, Stakeholder Meeting, Strategy Retreat",
+      "score": 0.5714,
+      "match_type": "partial",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 76.15106201171875,
+      "doc_length": 157311
+    },
+    {
+      "task_id": "cross_doc_011",
+      "task_type": "metric_comparison",
+      "expected": "Global Operations Unit",
+      "predicted": "Digital Transformation Division",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 95.37956666946411,
+      "doc_length": 159316
+    }
+  ]
+}

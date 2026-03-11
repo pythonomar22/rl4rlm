@@ -342,7 +342,11 @@ def trajectory_to_training_data(
                 weights_list = list(weights)
             weights_shifted = weights_list[1:len(target_tokens) + 1]
 
-            advantage_weight = max(min(advantage, 5.0), -5.0)
+            # V9 FIX: With Dr. GRPO (no std normalization), advantages are raw
+            # (typically -1 to +1). With MaxRL, can be up to ~8.
+            # Clamp to ±3 to prevent gradient explosions while preserving
+            # MaxRL's signal amplification.
+            advantage_weight = max(min(advantage, 3.0), -3.0)
             weighted = [float(w) * advantage_weight for w in weights_shifted]
 
             datum = tinker.Datum(
@@ -554,7 +558,10 @@ def sample_tasks_v6(
     - 5% niah (50K-200K, forces real chunking)
     - 5% multi_niah (50K-200K, forces real chunking)
     """
-    seed_offset = step * 1000
+    # V9 FIX: offset training seeds to avoid overlap with eval seeds.
+    # Eval uses seed_offset=10000 (run_eval.py:74). Steps 10-19 previously
+    # produced seeds 10000-19000 which overlapped with eval.
+    seed_offset = step * 1000 + 100000
 
     task_weights = [
         ("hard_multi_hop", 0.15),
@@ -979,7 +986,7 @@ def train_rl_v6(
             per_task_groups[ttype] += 1
 
             if std_r < 1e-6:
-                if ngrpo_virtual_reward and mean_r < 0.5:
+                if ngrpo_virtual_reward and mean_r < 0.9:
                     # NGRPO virtual max-reward (arXiv:2509.18851):
                     # For all-wrong groups, add a virtual optimal completion with reward=1.0.
                     # This gives negative advantage to all actual completions, pushing the
@@ -989,7 +996,7 @@ def train_rl_v6(
                     logger.info(f"  NGRPO virtual reward for {ttype}: mean {mean_r:.3f} → "
                                 f"virtual_mean {virtual_mean:.3f}, virtual_std {virtual_std:.3f}")
                     for traj_dict, reward in zip(group["trajectories"], rewards):
-                        advantage = (reward - virtual_mean) / (virtual_std + 1e-8)
+                        advantage = reward - virtual_mean  # Dr. GRPO: no std normalization
                         # All real completions get negative advantage (pushed away)
                         step_advantages.append(advantage)
                         turn_has_logprobs = any(
@@ -1014,15 +1021,17 @@ def train_rl_v6(
                     continue
 
             for traj_dict, reward in zip(group["trajectories"], rewards):
+                # Dr. GRPO (arXiv:2503.20783): remove std normalization.
+                # The Tinker cookbook uses raw advantages (reward - mean), NOT
+                # normalized by std. Std normalization amplifies small differences
+                # (e.g., rewards [0.72, 0.73] → advantage 1.43 instead of 0.01),
+                # which combined with unclipped IS loss produces gradient explosions.
                 if maxrl:
                     # MaxRL (arXiv:2602.02710): normalize by K_success, not N.
-                    # Successful trajectories: advantage = reward / K_success
-                    # Failed trajectories: advantage = reward / K_success (negative or zero)
-                    # This upweights hard problems where K_success is small.
                     k_success = max(1, sum(1 for r in rewards if r > 0.3))
-                    advantage = (reward - mean_r) / (std_r + 1e-8) * (len(rewards) / k_success)
+                    advantage = (reward - mean_r) * (len(rewards) / k_success)
                 else:
-                    advantage = (reward - mean_r) / (std_r + 1e-8)
+                    advantage = reward - mean_r
 
                 # Asymmetric advantage scaling (inspired by arXiv:2509.26114):
                 # Positive advantages reinforce existing patterns → can cause collapse.
@@ -1034,8 +1043,8 @@ def train_rl_v6(
                 if clip_low > 0 and advantage < 0:
                     advantage *= clip_low  # e.g., 1.5 = amplify negative advantages
 
-                if abs(advantage) < 0.05:
-                    continue
+                if abs(advantage) < 0.01:
+                    continue  # Dr. GRPO: lower threshold since advantages are raw (not normalized)
 
                 step_advantages.append(advantage)
 
@@ -1062,17 +1071,31 @@ def train_rl_v6(
         upgraded = scheduler.check_and_adapt()
 
         # 7. Train with gradient accumulation (V6: single optim_step per step)
+        # V9 FIX: Use PPO loss (clipped IS ratio) instead of importance_sampling
+        # (unclipped). The Tinker docs confirm IS has NO clipping — the ratio
+        # π_new/π_old is unbounded. With gradient accumulation across 12+ batches,
+        # the policy drifts within a step, causing ratio explosion (V7 losses
+        # reached 11M vs V4's 107). PPO clips to [1-ε, 1+ε].
         step_losses = []
         if training_data:
-            sample_inputs = training_data[0].loss_fn_inputs if training_data else {}
-            actual_loss_fn = "importance_sampling" if "advantages" in sample_inputs else "cross_entropy"
+            # Separate datums by format to avoid mixing PPO and cross_entropy
+            ppo_data = [d for d in training_data if "advantages" in d.loss_fn_inputs]
+            ce_data = [d for d in training_data if "advantages" not in d.loss_fn_inputs]
 
-            logger.info(f"  Training: {len(training_data)} datums, loss_fn={actual_loss_fn}")
+            if ppo_data and ce_data:
+                logger.warning(f"  Mixed datum formats: {len(ppo_data)} PPO + {len(ce_data)} CE")
+
+            actual_loss_fn = "ppo" if ppo_data else "cross_entropy"
+            active_data = ppo_data if ppo_data else ce_data
+
+            logger.info(f"  Training: {len(active_data)} datums, loss_fn={actual_loss_fn}")
+            if ce_data and ppo_data:
+                logger.warning(f"  Dropping {len(ce_data)} cross_entropy datums (mixed format)")
 
             # Submit all forward_backward calls
             fwd_bwd_futures = []
-            for i in range(0, len(training_data), grad_accum_batch):
-                batch = training_data[i:i+grad_accum_batch]
+            for i in range(0, len(active_data), grad_accum_batch):
+                batch = active_data[i:i+grad_accum_batch]
                 fwd_bwd = training_client.forward_backward(batch, actual_loss_fn)
                 fwd_bwd_futures.append(fwd_bwd)
 

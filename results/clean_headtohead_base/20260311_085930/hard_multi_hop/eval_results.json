@@ -1,0 +1,180 @@
+{
+  "benchmark": "hard_multi_hop",
+  "accuracy": 0.4,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "hard_multihop_3hop_0",
+      "n_hops": 3,
+      "expected": "Boston",
+      "predicted": "Boston",
+      "score": 1.0,
+      "match_type": "contains",
+      "decomposition": [
+        "Find what initiative Frank Anderson leads \u2192 Project Summit",
+        "Find where Project Summit is headquartered \u2192 Boston"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 60.09295725822449,
+      "doc_length": 200091
+    },
+    {
+      "task_id": "hard_multihop_2hop_1",
+      "n_hops": 2,
+      "expected": "$3.1 million",
+      "predicted": "$3.1 million",
+      "score": 1.0,
+      "match_type": "contains",
+      "decomposition": [
+        "Find what project Samuel Walker leads \u2192 Project Forge",
+        "Find the budget of Project Forge \u2192 $3.1 million"
+      ],
+      "n_distractors": 2,
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 24.261289358139038,
+      "doc_length": 100120
+    },
+    {
+      "task_id": "hard_multihop_3hop_2",
+      "n_hops": 3,
+      "expected": "January 10, 2027",
+      "predicted": "April 5, 2026",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find what milestone Marketing completed \u2192 delivery of Project Orion",
+        "Find what project was delivered \u2192 Project Orion",
+        "Find the delivery date of Project Orion \u2192 January 10, 2027"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 17.385271072387695,
+      "doc_length": 200158
+    },
+    {
+      "task_id": "hard_multihop_3hop_3",
+      "n_hops": 3,
+      "expected": "Berlin",
+      "predicted": "Berlin",
+      "score": 1.0,
+      "match_type": "contains",
+      "decomposition": [
+        "Find what initiative Xavier King leads \u2192 Project Atlas",
+        "Find where Project Atlas is headquartered \u2192 Berlin"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 45.768346071243286,
+      "doc_length": 150112
+    },
+    {
+      "task_id": "hard_multihop_3hop_4",
+      "n_hops": 3,
+      "expected": "$1.9 million",
+      "predicted": "Project Meridian: $1.9 million",
+      "score": 1.0,
+      "match_type": "contains",
+      "decomposition": [
+        "Find who is Chief of Finance \u2192 Yara Wright",
+        "Find what project the Chief of Finance sponsors \u2192 Project Meridian",
+        "Find the budget of Project Meridian \u2192 $1.9 million"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 18.093623638153076,
+      "doc_length": 150166
+    },
+    {
+      "task_id": "hard_multihop_2hop_5",
+      "n_hops": 2,
+      "expected": "Toronto",
+      "predicted": "Chicago",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find who is the Principal of Sales \u2192 Victor Hall",
+        "Find where Victor Hall is based \u2192 Toronto"
+      ],
+      "n_distractors": 2,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 11.717812299728394,
+      "doc_length": 100077
+    },
+    {
+      "task_id": "hard_multihop_2hop_6",
+      "n_hops": 2,
+      "expected": "Zurich",
+      "predicted": "Amsterdam",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find who is the Senior Manager of Data Science \u2192 Wendy Allen",
+        "Find where Wendy Allen is based \u2192 Zurich"
+      ],
+      "n_distractors": 2,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 15.90183138847351,
+      "doc_length": 100120
+    },
+    {
+      "task_id": "hard_multihop_3hop_7",
+      "n_hops": 3,
+      "expected": "February 28, 2027",
+      "predicted": "Not found",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find what milestone Sales completed \u2192 delivery of Project Horizon",
+        "Find what project was delivered \u2192 Project Horizon",
+        "Find the delivery date of Project Horizon \u2192 February 28, 2027"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 171.23696112632751,
+      "doc_length": 150113
+    },
+    {
+      "task_id": "hard_multihop_2hop_8",
+      "n_hops": 2,
+      "expected": "Seoul",
+      "predicted": "Zurich",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find who is the Chief of Marketing \u2192 Frank Anderson",
+        "Find where Frank Anderson is based \u2192 Seoul"
+      ],
+      "n_distractors": 2,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 14.844160318374634,
+      "doc_length": 150073
+    },
+    {
+      "task_id": "hard_multihop_2hop_9",
+      "n_hops": 2,
+      "expected": "$6.4 million",
+      "predicted": "Not found",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find what project Emma Martinez leads \u2192 Project Horizon",
+        "Find the budget of Project Horizon \u2192 $6.4 million"
+      ],
+      "n_distractors": 2,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 69.48961997032166,
+      "doc_length": 100125
+    }
+  ]
+}

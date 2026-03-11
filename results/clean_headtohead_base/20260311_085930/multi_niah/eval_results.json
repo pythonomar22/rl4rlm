@@ -1,0 +1,437 @@
+{
+  "benchmark": "multi_niah",
+  "accuracy": 0.9145833333333334,
+  "n_tasks": 20,
+  "per_task": [
+    {
+      "task_id": "mniah_000_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "BH1-PEARL",
+        "YM2-BRONZE",
+        "0R9-CYAN"
+      ],
+      "predicted": "YM2-BRONZE, 0R9-CYAN",
+      "recall": 0.6666666666666666,
+      "f1": 0.6666666666666666,
+      "found": 2,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 22.17662787437439,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_001_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "4H7-PURPLE",
+        "8M4-GREEN",
+        "6T5-WHITE"
+      ],
+      "predicted": "4H7-PURPLE, 8M4-GREEN, 6T5-WHITE",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 3,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 9.873969554901123,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_002_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "UC7-CHROME",
+        "6T5-WHITE",
+        "BH1-PEARL"
+      ],
+      "predicted": "UC7-CHROME, 6T5-WHITE, BH1-PEARL",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 3,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 13.171581268310547,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_003_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "7X9-BLUE",
+        "VL2-JADE",
+        "XP5-SLATE"
+      ],
+      "predicted": "7X9-BLUE, VL2-JADE, XP5-SLATE",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 3,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 12.06289005279541,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_004_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "VL2-JADE",
+        "WN8-IVORY",
+        "BH1-PEARL",
+        "FS7-ONYX",
+        "0R9-CYAN"
+      ],
+      "predicted": "VL2-JADE, WN8-IVORY, BH1-PEARL, FS7-ONYX, 0R9-CYAN",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 13.956252098083496,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_005_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "BH1-PEARL",
+        "6T5-WHITE",
+        "FS7-ONYX",
+        "2W6-SILVER",
+        "DK6-AMBER"
+      ],
+      "predicted": "BH1-PEARL, 6T5-WHITE, FS7-ONYX, 2W6-SILVER, DK6-AMBER",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 10.490860223770142,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_006_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "BH1-PEARL",
+        "XP5-SLATE",
+        "6T5-WHITE",
+        "9J3-ORANGE",
+        "4H7-PURPLE"
+      ],
+      "predicted": "",
+      "recall": 0.0,
+      "f1": 0.0,
+      "found": 0,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 52.547210454940796,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_007_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "UC7-CHROME",
+        "0R9-CYAN",
+        "1N8-BLACK",
+        "7X9-BLUE",
+        "DK6-AMBER"
+      ],
+      "predicted": "UC7-CHROME, 0R9-CYAN, 1N8-BLACK, 7X9-BLUE, DK6-AMBER",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 14.704241275787354,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_008_50000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "BH1-PEARL",
+        "YM2-BRONZE",
+        "2W6-SILVER",
+        "1N8-BLACK",
+        "7X9-BLUE"
+      ],
+      "predicted": "BH1-PEARL, YM2-BRONZE, 2W6-SILVER, 1N8-BLACK, 7X9-BLUE",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 21.081161737442017,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_009_50000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "1N8-BLACK",
+        "WN8-IVORY",
+        "FS7-ONYX",
+        "6T5-WHITE",
+        "QZ4-RUBY"
+      ],
+      "predicted": "1N8-BLACK, WN8-IVORY, FS7-ONYX, 6T5-WHITE, QZ4-RUBY",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 13.528404474258423,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_010_50000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "GT3-CORAL",
+        "1N8-BLACK",
+        "7X9-BLUE",
+        "DK6-AMBER",
+        "2W6-SILVER"
+      ],
+      "predicted": "GT3-CORAL, 1N8-BLACK, 7X9-BLUE, DK6-AMBER, 2W6-SILVER",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 18.512040853500366,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_011_50000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "FS7-ONYX",
+        "YM2-BRONZE",
+        "XP5-SLATE",
+        "DK6-AMBER",
+        "7X9-BLUE"
+      ],
+      "predicted": "FS7-ONYX, YM2-BRONZE, XP5-SLATE, DK6-AMBER, 7X9-BLUE",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 40.26139545440674,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_012_50000_8needles",
+      "n_needles": 8,
+      "expected": [
+        "5P1-GOLD",
+        "UC7-CHROME",
+        "BH1-PEARL",
+        "GT3-CORAL",
+        "DK6-AMBER",
+        "8M4-GREEN",
+        "6T5-WHITE",
+        "1N8-BLACK"
+      ],
+      "predicted": "5P1-GOLD, UC7-CHROME, BH1-PEARL, GT3-CORAL, DK6-AMBER, 8M4-GREEN, 6T5-WHITE, 1N8-BLACK",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 8,
+      "total": 8,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 16.43466305732727,
+      "doc_length": 49999
+    },
+    {
+      "task_id": "mniah_013_50000_8needles",
+      "n_needles": 8,
+      "expected": [
+        "UC7-CHROME",
+        "6T5-WHITE",
+        "9J3-ORANGE",
+        "2W6-SILVER",
+        "4H7-PURPLE",
+        "8M4-GREEN",
+        "DK6-AMBER",
+        "FS7-ONYX"
+      ],
+      "predicted": "UC7-CHROME, 6T5-WHITE, 9J3-ORANGE, 2W6-SILVER, 4H7-PURPLE, 8M4-GREEN, DK6-AMBER, FS7-ONYX",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 8,
+      "total": 8,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 16.835564613342285,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_014_50000_8needles",
+      "n_needles": 8,
+      "expected": [
+        "5P1-GOLD",
+        "WN8-IVORY",
+        "XP5-SLATE",
+        "VL2-JADE",
+        "2W6-SILVER",
+        "3K2-RED",
+        "YM2-BRONZE",
+        "8M4-GREEN"
+      ],
+      "predicted": "5P1-GOLD, WN8-IVORY, XP5-SLATE, VL2-JADE, 2W6-SILVER, 3K2-RED, YM2-BRONZE, 8M4-GREEN",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 8,
+      "total": 8,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 13.952028036117554,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_015_50000_8needles",
+      "n_needles": 8,
+      "expected": [
+        "6T5-WHITE",
+        "QZ4-RUBY",
+        "3K2-RED",
+        "5P1-GOLD",
+        "1N8-BLACK",
+        "VL2-JADE",
+        "8M4-GREEN",
+        "GT3-CORAL"
+      ],
+      "predicted": "5P1-GOLD, 1N8-BLACK, VL2-JADE, 8M4-GREEN, GT3-CORAL",
+      "recall": 0.625,
+      "f1": 0.625,
+      "found": 5,
+      "total": 8,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 17.343506813049316,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_016_100000_8needles",
+      "n_needles": 8,
+      "expected": [
+        "WN8-IVORY",
+        "UC7-CHROME",
+        "FS7-ONYX",
+        "XP5-SLATE",
+        "2W6-SILVER",
+        "0R9-CYAN",
+        "7X9-BLUE",
+        "DK6-AMBER"
+      ],
+      "predicted": "WN8-IVORY, UC7-CHROME, FS7-ONYX, XP5-SLATE, 2W6-SILVER, 0R9-CYAN, 7X9-BLUE, DK6-AMBER",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 8,
+      "total": 8,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 13.376900434494019,
+      "doc_length": 100000
+    },
+    {
+      "task_id": "mniah_017_100000_8needles",
+      "n_needles": 8,
+      "expected": [
+        "8M4-GREEN",
+        "7X9-BLUE",
+        "FS7-ONYX",
+        "WN8-IVORY",
+        "1N8-BLACK",
+        "DK6-AMBER",
+        "2W6-SILVER",
+        "4H7-PURPLE"
+      ],
+      "predicted": "8M4-GREEN, 7X9-BLUE, FS7-ONYX, WN8-IVORY, 1N8-BLACK, DK6-AMBER, 2W6-SILVER, 4H7-PURPLE",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 8,
+      "total": 8,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 18.177014589309692,
+      "doc_length": 100000
+    },
+    {
+      "task_id": "mniah_018_100000_8needles",
+      "n_needles": 8,
+      "expected": [
+        "DK6-AMBER",
+        "QZ4-RUBY",
+        "4H7-PURPLE",
+        "3K2-RED",
+        "9J3-ORANGE",
+        "BH1-PEARL",
+        "7X9-BLUE",
+        "VL2-JADE"
+      ],
+      "predicted": "DK6-AMBER, QZ4-RUBY, 4H7-PURPLE, 3K2-RED, 9J3-ORANGE, BH1-PEARL, 7X9-BLUE, VL2-JADE",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 8,
+      "total": 8,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 19.654911518096924,
+      "doc_length": 100000
+    },
+    {
+      "task_id": "mniah_019_100000_8needles",
+      "n_needles": 8,
+      "expected": [
+        "BH1-PEARL",
+        "6T5-WHITE",
+        "UC7-CHROME",
+        "QZ4-RUBY",
+        "WN8-IVORY",
+        "FS7-ONYX",
+        "7X9-BLUE",
+        "XP5-SLATE"
+      ],
+      "predicted": "BH1-PEARL, 6T5-WHITE, UC7-CHROME, QZ4-RUBY, WN8-IVORY, FS7-ONYX, 7X9-BLUE, XP5-SLATE",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 8,
+      "total": 8,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 16.978968381881714,
+      "doc_length": 100000
+    }
+  ],
+  "by_doc_length": {
+    "10K": 0.9166666666666666,
+    "20K": 0.75,
+    "50K": 0.9464285714285714,
+    "49K": 1.0,
+    "100K": 1.0
+  },
+  "by_n_needles": {
+    "3 needles": 0.9166666666666666,
+    "5 needles": 0.875,
+    "8 needles": 0.953125
+  },
+  "avg_recall": 0.9145833333333334,
+  "avg_f1": 0.9145833333333334
+}

@@ -1,0 +1,1037 @@
+2026-03-11 08:59:30,701 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-11 08:59:35,639 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-11 08:59:43,751 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session b35e15eb-416b-5380-b001-925077293693
+2026-03-11 08:59:44,058 scaffold.llm_query INFO: Loaded base model Qwen/Qwen3.5-35B-A3B
+2026-03-11 08:59:44,058 scaffold.llm_query INFO: TinkerModel ready in 8.4s
+2026-03-11 08:59:44,058 eval INFO: Model loaded in 13.4s
+2026-03-11 08:59:44,058 eval INFO: 
+============================================================
+2026-03-11 08:59:44,059 eval INFO: Running benchmark: niah
+2026-03-11 08:59:44,059 eval INFO: ============================================================
+NIAH:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-11 08:59:44,093 eval INFO: 
+Task: niah_10000_5000_0.1 | Q: Who is the key contact person? | Expected: BRAVO-42
+2026-03-11 08:59:53,617 eval INFO:   Score: 1.0 | Answer: BRAVO-42 | 9.5s
+NIAH:   5%|▌         | 1/20 [00:09<03:00,  9.52s/it]2026-03-11 08:59:53,618 eval INFO: 
+Task: niah_10001_5000_0.2 | Q: What is the budget total? | Expected: CHARLIE-19
+2026-03-11 09:00:21,791 eval INFO:   Score: 1.0 | Answer: CHARLIE-19 | 28.2s
+NIAH:  10%|█         | 2/20 [00:37<06:08, 20.50s/it]2026-03-11 09:00:21,799 eval INFO: 
+Task: niah_10002_5000_0.5 | Q: What is the critical deadline? | Expected: HOTEL-256
+2026-03-11 09:00:33,149 eval INFO:   Score: 1.0 | Answer: HOTEL-256 | 11.3s
+NIAH:  15%|█▌        | 3/20 [00:49<04:37, 16.32s/it]2026-03-11 09:00:33,150 eval INFO: 
+Task: niah_10003_5000_0.8 | Q: What is the project codename? | Expected: ALPHA-7
+2026-03-11 09:00:47,916 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 14.8s
+NIAH:  20%|██        | 4/20 [01:03<04:11, 15.71s/it]2026-03-11 09:00:47,917 eval INFO: 
+Task: niah_10004_5000_0.9 | Q: What is the assigned location? | Expected: Sector 9 North Wing
+2026-03-11 09:00:57,897 eval INFO:   Score: 1.0 | Answer: Sector 9 North Wing | 10.0s
+NIAH:  25%|██▌       | 5/20 [01:13<03:24, 13.64s/it]2026-03-11 09:00:57,897 eval INFO: 
+Task: niah_10005_10000_0.1 | Q: What is the assigned location? | Expected: CHARLIE-19
+2026-03-11 09:01:08,031 eval INFO:   Score: 1.0 | Answer: CHARLIE-19 | 10.1s
+NIAH:  30%|███       | 6/20 [01:23<02:54, 12.45s/it]2026-03-11 09:01:08,032 eval INFO: 
+Task: niah_10006_10000_0.2 | Q: What is the project codename? | Expected: BRAVO-42
+2026-03-11 09:01:18,004 eval INFO:   Score: 1.0 | Answer: BRAVO-42 | 10.0s
+NIAH:  35%|███▌      | 7/20 [01:33<02:31, 11.64s/it]2026-03-11 09:01:18,004 eval INFO: 
+Task: niah_10007_10000_0.5 | Q: Who is the key contact person? | Expected: JULIET-99
+2026-03-11 09:01:25,868 eval INFO:   Score: 1.0 | Answer: JULIET-99 | 7.9s
+NIAH:  40%|████      | 8/20 [01:41<02:05, 10.44s/it]2026-03-11 09:01:25,869 eval INFO: 
+Task: niah_10008_10000_0.8 | Q: When is the meeting scheduled? | Expected: Professor James Chen
+2026-03-11 09:01:35,629 eval INFO:   Score: 0.0 | Answer: Not found | 9.8s
+NIAH:  45%|████▌     | 9/20 [01:51<01:52, 10.23s/it]2026-03-11 09:01:35,630 eval INFO: 
+Task: niah_10009_10000_0.9 | Q: What is the budget total? | Expected: GOLF-77
+2026-03-11 09:02:16,041 eval INFO:   Score: 0.0 | Answer: The budget total is 77.0 | 40.4s
+NIAH:  50%|█████     | 10/20 [02:31<03:15, 19.55s/it]2026-03-11 09:02:16,042 eval INFO: 
+Task: niah_10010_20000_0.1 | Q: Who is the key contact person? | Expected: ALPHA-7
+2026-03-11 09:02:28,213 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 12.2s
+NIAH:  55%|█████▌    | 11/20 [02:44<02:35, 17.29s/it]2026-03-11 09:02:28,213 eval INFO: 
+Task: niah_10011_20000_0.2 | Q: When is the meeting scheduled? | Expected: $850,000
+2026-03-11 09:02:40,078 eval INFO:   Score: 0.0 | Answer: Not found | 11.9s
+NIAH:  60%|██████    | 12/20 [02:56<02:05, 15.65s/it]2026-03-11 09:02:40,103 eval INFO: 
+Task: niah_10012_20000_0.5 | Q: What is the assigned location? | Expected: January 22 2026
+2026-03-11 09:02:50,340 eval INFO:   Score: 1.0 | Answer: January 22 2026 | 10.2s
+NIAH:  65%|██████▌   | 13/20 [03:06<01:38, 14.01s/it]2026-03-11 09:02:50,341 eval INFO: 
+Task: niah_10013_20000_0.8 | Q: What is the budget total? | Expected: Agent Sarah Miller
+2026-03-11 09:03:00,410 eval INFO:   Score: 0.0 | Answer: Not found | 10.1s
+NIAH:  70%|███████   | 14/20 [03:16<01:16, 12.82s/it]2026-03-11 09:03:00,413 eval INFO: 
+Task: niah_10014_20000_0.9 | Q: What is the critical deadline? | Expected: GOLF-77
+2026-03-11 09:03:11,844 eval INFO:   Score: 1.0 | Answer: GOLF-77 | 11.4s
+NIAH:  75%|███████▌  | 15/20 [03:27<01:02, 12.40s/it]2026-03-11 09:03:11,844 eval INFO: 
+Task: niah_10015_50000_0.1 | Q: When is the meeting scheduled? | Expected: HOTEL-256
+2026-03-11 09:03:24,530 eval INFO:   Score: 0.0 | Answer: Not found | 12.7s
+NIAH:  80%|████████  | 16/20 [03:40<00:49, 12.49s/it]2026-03-11 09:03:24,531 eval INFO: 
+Task: niah_10016_50000_0.2 | Q: What is the assigned location? | Expected: March 15 2025
+2026-03-11 09:03:34,441 eval INFO:   Score: 0.0 | Answer: Not found | 9.9s
+NIAH:  85%|████████▌ | 17/20 [03:50<00:35, 11.71s/it]2026-03-11 09:03:34,442 eval INFO: 
+Task: niah_10017_50000_0.5 | Q: What is the critical deadline? | Expected: Dr. Elena Rodriguez
+2026-03-11 09:03:43,952 eval INFO:   Score: 0.0 | Answer: Not found | 9.5s
+NIAH:  90%|█████████ | 18/20 [03:59<00:22, 11.05s/it]2026-03-11 09:03:43,953 eval INFO: 
+Task: niah_10018_50000_0.8 | Q: What is the project codename? | Expected: ECHO-365
+2026-03-11 09:03:54,995 eval INFO:   Score: 1.0 | Answer: ECHO-365 | 11.0s
+NIAH:  95%|█████████▌| 19/20 [04:10<00:11, 11.05s/it]2026-03-11 09:03:54,995 eval INFO: 
+Task: niah_10019_50000_0.9 | Q: What is the assigned location? | Expected: Professor James Chen
+2026-03-11 09:04:05,421 eval INFO:   Score: 0.0 | Answer: Not found | 10.4s
+NIAH: 100%|██████████| 20/20 [04:21<00:00, 10.86s/it]NIAH: 100%|██████████| 20/20 [04:21<00:00, 13.07s/it]
+2026-03-11 09:04:05,424 eval INFO: 
+--- niah Results ---
+2026-03-11 09:04:05,425 eval INFO: Accuracy/Recall: 60.0%
+2026-03-11 09:04:05,425 eval INFO: Tasks: 20
+2026-03-11 09:04:05,425 eval INFO: By doc length:
+2026-03-11 09:04:05,425 eval INFO:   10K: 60.0%
+2026-03-11 09:04:05,425 eval INFO:   20K: 60.0%
+2026-03-11 09:04:05,425 eval INFO:   50K: 20.0%
+2026-03-11 09:04:05,425 eval INFO:   5K: 100.0%
+2026-03-11 09:04:05,425 eval INFO: By needle position:
+2026-03-11 09:04:05,425 eval INFO:   0.10: 75.0%
+2026-03-11 09:04:05,425 eval INFO:   0.25: 50.0%
+2026-03-11 09:04:05,425 eval INFO:   0.50: 75.0%
+2026-03-11 09:04:05,425 eval INFO:   0.75: 50.0%
+2026-03-11 09:04:05,425 eval INFO:   0.90: 50.0%
+2026-03-11 09:04:05,425 eval INFO: 
+============================================================
+2026-03-11 09:04:05,425 eval INFO: Running benchmark: multi_niah
+2026-03-11 09:04:05,425 eval INFO: ============================================================
+Multi-NIAH:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-11 09:04:05,474 eval INFO: 
+Task: mniah_000_10000_3needles | 3 needles in 10000 chars
+2026-03-11 09:04:27,651 eval INFO:   Found 2/3 | Recall: 0.67 | Answer: YM2-BRONZE, 0R9-CYAN | 22.2s
+Multi-NIAH:   5%|▌         | 1/20 [00:22<07:01, 22.18s/it]2026-03-11 09:04:27,652 eval INFO: 
+Task: mniah_001_10000_3needles | 3 needles in 10000 chars
+2026-03-11 09:04:37,527 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: 4H7-PURPLE, 8M4-GREEN, 6T5-WHITE | 9.9s
+Multi-NIAH:  10%|█         | 2/20 [00:32<04:28, 14.94s/it]2026-03-11 09:04:37,527 eval INFO: 
+Task: mniah_002_10000_3needles | 3 needles in 10000 chars
+2026-03-11 09:04:50,699 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: UC7-CHROME, 6T5-WHITE, BH1-PEARL | 13.2s
+Multi-NIAH:  15%|█▌        | 3/20 [00:45<04:00, 14.13s/it]2026-03-11 09:04:50,700 eval INFO: 
+Task: mniah_003_10000_3needles | 3 needles in 10000 chars
+2026-03-11 09:05:02,764 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: 7X9-BLUE, VL2-JADE, XP5-SLATE | 12.1s
+Multi-NIAH:  20%|██        | 4/20 [00:57<03:33, 13.32s/it]2026-03-11 09:05:02,764 eval INFO: 
+Task: mniah_004_20000_5needles | 5 needles in 20000 chars
+2026-03-11 09:05:16,721 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: VL2-JADE, WN8-IVORY, BH1-PEARL, FS7-ONYX, 0R9-CYAN | 14.0s
+Multi-NIAH:  25%|██▌       | 5/20 [01:11<03:23, 13.55s/it]2026-03-11 09:05:16,721 eval INFO: 
+Task: mniah_005_20000_5needles | 5 needles in 20000 chars
+2026-03-11 09:05:27,213 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: BH1-PEARL, 6T5-WHITE, FS7-ONYX, 2W6-SILVER, DK6-AMBER | 10.5s
+Multi-NIAH:  30%|███       | 6/20 [01:21<02:55, 12.52s/it]2026-03-11 09:05:27,236 eval INFO: 
+Task: mniah_006_20000_5needles | 5 needles in 20000 chars
+2026-03-11 09:06:19,784 eval INFO:   Found 0/5 | Recall: 0.00 | Answer:  | 52.5s
+Multi-NIAH:  35%|███▌      | 7/20 [02:14<05:32, 25.60s/it]2026-03-11 09:06:19,785 eval INFO: 
+Task: mniah_007_20000_5needles | 5 needles in 20000 chars
+2026-03-11 09:06:34,489 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: UC7-CHROME, 0R9-CYAN, 1N8-BLACK, 7X9-BLUE, DK6-AMBER | 14.7s
+Multi-NIAH:  40%|████      | 8/20 [02:29<04:25, 22.14s/it]2026-03-11 09:06:34,510 eval INFO: 
+Task: mniah_008_50000_5needles | 5 needles in 50000 chars
+2026-03-11 09:06:55,593 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: BH1-PEARL, YM2-BRONZE, 2W6-SILVER, 1N8-BLACK, 7X9-BLUE | 21.1s
+Multi-NIAH:  45%|████▌     | 9/20 [02:50<03:59, 21.81s/it]2026-03-11 09:06:55,594 eval INFO: 
+Task: mniah_009_50000_5needles | 5 needles in 50000 chars
+2026-03-11 09:07:09,123 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: 1N8-BLACK, WN8-IVORY, FS7-ONYX, 6T5-WHITE, QZ4-RUBY | 13.5s
+Multi-NIAH:  50%|█████     | 10/20 [03:03<03:12, 19.26s/it]2026-03-11 09:07:09,145 eval INFO: 
+Task: mniah_010_50000_5needles | 5 needles in 50000 chars
+2026-03-11 09:07:27,657 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: GT3-CORAL, 1N8-BLACK, 7X9-BLUE, DK6-AMBER, 2W6-SILVER | 18.5s
+Multi-NIAH:  55%|█████▌    | 11/20 [03:22<02:51, 19.03s/it]2026-03-11 09:07:27,658 eval INFO: 
+Task: mniah_011_50000_5needles | 5 needles in 50000 chars
+2026-03-11 09:08:07,920 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: FS7-ONYX, YM2-BRONZE, XP5-SLATE, DK6-AMBER, 7X9-BLUE | 40.3s
+Multi-NIAH:  60%|██████    | 12/20 [04:02<03:23, 25.49s/it]2026-03-11 09:08:07,921 eval INFO: 
+Task: mniah_012_50000_8needles | 8 needles in 49999 chars
+2026-03-11 09:08:24,356 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: 5P1-GOLD, UC7-CHROME, BH1-PEARL, GT3-CORAL, DK6-AMBER, 8M4-GREEN, 6T5-WHITE, 1N8-BLACK | 16.4s
+Multi-NIAH:  65%|██████▌   | 13/20 [04:18<02:39, 22.75s/it]2026-03-11 09:08:24,357 eval INFO: 
+Task: mniah_013_50000_8needles | 8 needles in 50000 chars
+2026-03-11 09:08:41,193 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: UC7-CHROME, 6T5-WHITE, 9J3-ORANGE, 2W6-SILVER, 4H7-PURPLE, 8M4-GREEN, DK6-AMBER, FS7-ONYX | 16.8s
+Multi-NIAH:  70%|███████   | 14/20 [04:35<02:05, 20.96s/it]2026-03-11 09:08:41,214 eval INFO: 
+Task: mniah_014_50000_8needles | 8 needles in 50000 chars
+2026-03-11 09:08:55,167 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: 5P1-GOLD, WN8-IVORY, XP5-SLATE, VL2-JADE, 2W6-SILVER, 3K2-RED, YM2-BRONZE, 8M4-GREEN | 14.0s
+Multi-NIAH:  75%|███████▌  | 15/20 [04:49<01:34, 18.86s/it]2026-03-11 09:08:55,169 eval INFO: 
+Task: mniah_015_50000_8needles | 8 needles in 50000 chars
+2026-03-11 09:09:12,513 eval INFO:   Found 5/8 | Recall: 0.62 | Answer: 5P1-GOLD, 1N8-BLACK, VL2-JADE, 8M4-GREEN, GT3-CORAL | 17.3s
+Multi-NIAH:  80%|████████  | 16/20 [05:07<01:13, 18.40s/it]2026-03-11 09:09:12,514 eval INFO: 
+Task: mniah_016_100000_8needles | 8 needles in 100000 chars
+2026-03-11 09:09:25,891 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: WN8-IVORY, UC7-CHROME, FS7-ONYX, XP5-SLATE, 2W6-SILVER, 0R9-CYAN, 7X9-BLUE, DK6-AMBER | 13.4s
+Multi-NIAH:  85%|████████▌ | 17/20 [05:20<00:50, 16.89s/it]2026-03-11 09:09:25,891 eval INFO: 
+Task: mniah_017_100000_8needles | 8 needles in 100000 chars
+2026-03-11 09:09:44,069 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: 8M4-GREEN, 7X9-BLUE, FS7-ONYX, WN8-IVORY, 1N8-BLACK, DK6-AMBER, 2W6-SILVER, 4H7-PURPLE | 18.2s
+Multi-NIAH:  90%|█████████ | 18/20 [05:38<00:34, 17.28s/it]2026-03-11 09:09:44,070 eval INFO: 
+Task: mniah_018_100000_8needles | 8 needles in 100000 chars
+2026-03-11 09:10:03,732 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: DK6-AMBER, QZ4-RUBY, 4H7-PURPLE, 3K2-RED, 9J3-ORANGE, BH1-PEARL, 7X9-BLUE, VL2-JADE | 19.7s
+Multi-NIAH:  95%|█████████▌| 19/20 [05:58<00:18, 18.06s/it]2026-03-11 09:10:03,967 eval INFO: 
+Task: mniah_019_100000_8needles | 8 needles in 100000 chars
+2026-03-11 09:10:20,975 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: BH1-PEARL, 6T5-WHITE, UC7-CHROME, QZ4-RUBY, WN8-IVORY, FS7-ONYX, 7X9-BLUE, XP5-SLATE | 17.0s
+Multi-NIAH: 100%|██████████| 20/20 [06:15<00:00, 17.75s/it]Multi-NIAH: 100%|██████████| 20/20 [06:15<00:00, 18.78s/it]
+2026-03-11 09:10:20,976 eval INFO: 
+--- multi_niah Results ---
+2026-03-11 09:10:20,977 eval INFO: Accuracy/Recall: 91.5%
+2026-03-11 09:10:20,977 eval INFO: Tasks: 20
+2026-03-11 09:10:20,977 eval INFO: By doc length:
+2026-03-11 09:10:20,977 eval INFO:   100K: 100.0%
+2026-03-11 09:10:20,977 eval INFO:   10K: 91.7%
+2026-03-11 09:10:20,977 eval INFO:   20K: 75.0%
+2026-03-11 09:10:20,977 eval INFO:   49K: 100.0%
+2026-03-11 09:10:20,977 eval INFO:   50K: 94.6%
+2026-03-11 09:10:20,977 eval INFO: By needle count:
+2026-03-11 09:10:20,977 eval INFO:   3 needles: 91.7%
+2026-03-11 09:10:20,977 eval INFO:   5 needles: 87.5%
+2026-03-11 09:10:20,977 eval INFO:   8 needles: 95.3%
+2026-03-11 09:10:20,977 eval INFO: Avg recall: 91.5%
+2026-03-11 09:10:20,977 eval INFO: Avg F1: 91.5%
+2026-03-11 09:10:20,977 eval INFO: 
+============================================================
+2026-03-11 09:10:20,978 eval INFO: Running benchmark: doc_classify
+2026-03-11 09:10:20,978 eval INFO: ============================================================
+DocClassify:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-11 09:10:20,995 eval INFO: 
+Task: classify_000_5docs | 5 docs, 2406 chars
+2026-03-11 09:10:33,220 eval INFO:   Correct: 5/5 (100.0%) | Answer: 1: Science
+2: Sports
+3: Business
+4: Health
+5: Technology | 12.2s
+DocClassify:   5%|▌         | 1/20 [00:12<03:52, 12.23s/it]2026-03-11 09:10:33,220 eval INFO: 
+Task: classify_001_5docs | 5 docs, 2378 chars
+2026-03-11 09:10:57,165 eval INFO:   Correct: 5/5 (100.0%) | Answer: ['1: Science', '2: Technology', '3: Sports', '4: Business', '5: World'] | 23.9s
+DocClassify:  10%|█         | 2/20 [00:36<05:44, 19.12s/it]2026-03-11 09:10:57,166 eval INFO: 
+Task: classify_002_5docs | 5 docs, 2452 chars
+2026-03-11 09:11:11,647 eval INFO:   Correct: 3/5 (60.0%) | Answer: ['1: Health', '2: Business', '3: World', '4: Not classified', '5: Not classified'] | 14.5s
+DocClassify:  15%|█▌        | 3/20 [00:50<04:49, 17.00s/it]2026-03-11 09:11:11,648 eval INFO: 
+Task: classify_003_5docs | 5 docs, 2369 chars
+2026-03-11 09:11:29,595 eval INFO:   Correct: 4/5 (80.0%) | Answer: 1: Science
+2: Health
+3: Business
+4: Science
+5: World | 17.9s
+DocClassify:  20%|██        | 4/20 [01:08<04:38, 17.38s/it]2026-03-11 09:11:29,601 eval INFO: 
+Task: classify_004_5docs | 5 docs, 2256 chars
+2026-03-11 09:11:57,569 eval INFO:   Correct: 5/5 (100.0%) | Answer: 1: Health
+2: Business
+3: Technology
+4: World
+5: Science | 28.0s
+DocClassify:  25%|██▌       | 5/20 [01:36<05:17, 21.20s/it]2026-03-11 09:11:57,569 eval INFO: 
+Task: classify_005_10docs | 10 docs, 4558 chars
+2026-03-11 09:13:06,271 eval INFO:   Correct: 10/10 (100.0%) | Answer: ['1: Sports', '2: World', '3: World', '4: Science', '5: Business', '6: Health', '7: Technology', '8: Sports', '9: Busine | 68.7s
+DocClassify:  30%|███       | 6/20 [02:45<08:42, 37.35s/it]2026-03-11 09:13:06,273 eval INFO: 
+Task: classify_006_10docs | 10 docs, 4657 chars
+2026-03-11 09:13:22,733 eval INFO:   Correct: 7/10 (70.0%) | Answer: 1: Science
+2: Health
+3: Sports
+4: World
+8: World
+9: Health
+10: Sports | 16.5s
+DocClassify:  35%|███▌      | 7/20 [03:01<06:36, 30.52s/it]2026-03-11 09:13:22,734 eval INFO: 
+Task: classify_007_10docs | 10 docs, 4456 chars
+2026-03-11 09:13:44,269 eval INFO:   Correct: 10/10 (100.0%) | Answer: 1: Sports
+2: Business
+3: Sports
+4: Technology
+5: Health
+6: Science
+7: Health
+8: Science
+9: World
+10: World | 21.5s
+DocClassify:  40%|████      | 8/20 [03:23<05:31, 27.66s/it]2026-03-11 09:13:44,273 eval INFO: 
+Task: classify_008_10docs | 10 docs, 4485 chars
+2026-03-11 09:14:01,559 eval INFO:   Correct: 10/10 (100.0%) | Answer: 1: Technology
+2: World
+3: Science
+4: Sports
+5: World
+6: Health
+7: Business
+8: Science
+9: Sports
+10: Technology | 17.3s
+DocClassify:  45%|████▌     | 9/20 [03:40<04:28, 24.42s/it]2026-03-11 09:14:01,560 eval INFO: 
+Task: classify_009_10docs | 10 docs, 4677 chars
+2026-03-11 09:14:18,810 eval INFO:   Correct: 9/10 (90.0%) | Answer: ['1: Technology', '2: Health', '3: World', '4: Sports', '5: Business', '6: Sports', '7: Technology', '8: World', '9: Tec | 17.3s
+DocClassify:  50%|█████     | 10/20 [03:57<03:42, 22.21s/it]2026-03-11 09:14:18,811 eval INFO: 
+Task: classify_010_15docs | 15 docs, 7331 chars
+2026-03-11 09:14:40,445 eval INFO:   Correct: 4/15 (26.7%) | Answer: 1: Technology
+2: Sports
+3: Health
+4: Science | 21.6s
+DocClassify:  55%|█████▌    | 11/20 [04:19<03:18, 22.03s/it]2026-03-11 09:14:40,446 eval INFO: 
+Task: classify_011_15docs | 15 docs, 6930 chars
+2026-03-11 09:14:58,435 eval INFO:   Correct: 13/15 (86.7%) | Answer: 1: Science
+2: Technology
+3: Sports
+4: World
+5: Business
+6: Science
+7: Business
+8: World
+9: Business
+10: Sports
+11: World | 18.0s
+DocClassify:  60%|██████    | 12/20 [04:37<02:46, 20.80s/it]2026-03-11 09:14:58,436 eval INFO: 
+Task: classify_012_15docs | 15 docs, 7067 chars
+2026-03-11 09:15:31,907 eval INFO:   Correct: 14/15 (93.3%) | Answer: 1: Business
+2: Health
+3: Business
+4: Health
+5: Technology
+6: Sports
+7: Business
+8: Sports
+9: Science
+10: World
+11: Healt | 33.5s
+DocClassify:  65%|██████▌   | 13/20 [05:10<02:52, 24.64s/it]2026-03-11 09:15:31,909 eval INFO: 
+Task: classify_013_15docs | 15 docs, 6781 chars
+2026-03-11 09:15:47,863 eval INFO:   Correct: 15/15 (100.0%) | Answer: ['1: Health', '2: Health', '3: World', '4: Science', '5: Technology', '6: Business', '7: Science', '8: Sports', '9: Scie | 16.0s
+DocClassify:  70%|███████   | 14/20 [05:26<02:12, 22.02s/it]2026-03-11 09:15:47,864 eval INFO: 
+Task: classify_014_15docs | 15 docs, 7030 chars
+2026-03-11 09:16:18,275 eval INFO:   Correct: 0/15 (0.0%) | Answer:  | 30.4s
+DocClassify:  75%|███████▌  | 15/20 [05:57<02:02, 24.55s/it]2026-03-11 09:16:18,277 eval INFO: 
+Task: classify_015_20docs | 20 docs, 9267 chars
+2026-03-11 09:16:38,893 eval INFO:   Correct: 20/20 (100.0%) | Answer: 1: Science
+2: World
+3: Health
+4: Sports
+5: World
+6: Business
+7: Health
+8: Science
+9: Technology
+10: Sports
+11: World
+12: | 20.6s
+DocClassify:  80%|████████  | 16/20 [06:17<01:33, 23.36s/it]2026-03-11 09:16:38,893 eval INFO: 
+Task: classify_016_20docs | 20 docs, 9265 chars
+2026-03-11 09:16:53,622 eval INFO:   Correct: 19/20 (95.0%) | Answer: 1: Sports
+2: World
+3: Health
+4: Science
+5: Health
+6: World
+7: Health
+8: Business
+9: Technology
+10: Technology
+11: Scienc | 14.7s
+DocClassify:  85%|████████▌ | 17/20 [06:32<01:02, 20.77s/it]2026-03-11 09:16:53,623 eval INFO: 
+Task: classify_017_20docs | 20 docs, 9268 chars
+2026-03-11 09:17:08,313 eval INFO:   Correct: 20/20 (100.0%) | Answer: 1: Sports
+2: Health
+3: Sports
+4: Health
+5: Business
+6: World
+7: Sports
+8: World
+9: Technology
+10: Technology
+11: Health
+ | 14.7s
+DocClassify:  90%|█████████ | 18/20 [06:47<00:37, 18.94s/it]2026-03-11 09:17:08,316 eval INFO: 
+Task: classify_018_20docs | 20 docs, 9228 chars
+2026-03-11 09:17:38,318 eval INFO:   Correct: 18/20 (90.0%) | Answer: 1: Sports
+2: Health
+3: Business
+4: World
+5: Technology
+6: World
+7: Science
+8: Sports
+9: World
+10: Health
+11: Science
+12: | 30.0s
+DocClassify:  95%|█████████▌| 19/20 [07:17<00:22, 22.26s/it]2026-03-11 09:17:38,319 eval INFO: 
+Task: classify_019_20docs | 20 docs, 9264 chars
+2026-03-11 09:18:02,238 eval INFO:   Correct: 8/20 (40.0%) | Answer: 1: World
+2: Science
+3: Business
+4: Technology
+5: Sports
+6: Business
+7: Health
+8: Business
+9: Technology
+10: Health | 23.9s
+DocClassify: 100%|██████████| 20/20 [07:41<00:00, 22.77s/it]DocClassify: 100%|██████████| 20/20 [07:41<00:00, 23.06s/it]
+2026-03-11 09:18:02,272 eval INFO: 
+--- doc_classify Results ---
+2026-03-11 09:18:02,272 eval INFO: Accuracy/Recall: 81.6%
+2026-03-11 09:18:02,272 eval INFO: Tasks: 20
+2026-03-11 09:18:02,272 eval INFO: By document count:
+2026-03-11 09:18:02,272 eval INFO:   10 docs: 92.0%
+2026-03-11 09:18:02,272 eval INFO:   15 docs: 61.3%
+2026-03-11 09:18:02,272 eval INFO:   20 docs: 85.0%
+2026-03-11 09:18:02,272 eval INFO:   5 docs: 88.0%
+2026-03-11 09:18:02,272 eval INFO: 
+============================================================
+2026-03-11 09:18:02,273 eval INFO: Running benchmark: dataframe_qa
+2026-03-11 09:18:02,273 eval INFO: ============================================================
+DataFrame QA:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-11 09:18:03,694 eval INFO: 
+Task: dfqa_000_5t_30d_multi_step | 120 rows, 7,369 chars
+2026-03-11 09:18:17,014 eval INFO:   Score: 1.00 (exact) | Answer: 2024-01-06 | Expected: 2024-01-06
+DataFrame QA:   5%|▌         | 1/20 [00:13<04:13, 13.32s/it]2026-03-11 09:18:17,015 eval INFO: 
+Task: dfqa_001_5t_30d_multi_step | 120 rows, 7,387 chars
+2026-03-11 09:19:40,856 eval INFO:   Score: 0.00 (no_match) | Answer: Error: No sector data found | Expected: KO
+DataFrame QA:  10%|█         | 2/20 [01:37<16:26, 54.80s/it]2026-03-11 09:19:40,856 eval INFO: 
+Task: dfqa_002_5t_30d_multi_step | 120 rows, 7,501 chars
+2026-03-11 09:21:35,355 eval INFO:   Score: 1.00 (exact) | Answer: PSX | Expected: PSX
+DataFrame QA:  15%|█▌        | 3/20 [03:31<23:15, 82.06s/it]2026-03-11 09:21:35,355 eval INFO: 
+Task: dfqa_003_5t_30d_multi_step | 120 rows, 7,534 chars
+2026-03-11 09:23:02,127 eval INFO:   Score: 0.00 (no_match) | Answer: No data found | Expected: PFE
+DataFrame QA:  20%|██        | 4/20 [04:58<22:22, 83.92s/it]2026-03-11 09:23:02,129 eval INFO: 
+Task: dfqa_004_5t_30d_sector | 120 rows, 7,244 chars
+2026-03-11 09:23:23,736 eval INFO:   Score: 0.00 (partial_lines) | Answer:  | Expected: Energy: 2
+Finance: 2
+DataFrame QA:  25%|██▌       | 5/20 [05:20<15:21, 61.45s/it]2026-03-11 09:23:23,736 eval INFO: 
+Task: dfqa_005_15t_60d_sector | 900 rows, 54,549 chars
+2026-03-11 09:26:40,327 eval INFO:   Score: 1.00 (exact) | Answer: Consumer | Expected: Consumer
+DataFrame QA:  30%|███       | 6/20 [08:36<25:03, 107.40s/it]2026-03-11 09:26:40,329 eval INFO: 
+Task: dfqa_006_15t_60d_ranking | 900 rows, 54,611 chars
+2026-03-11 09:34:03,701 eval INFO:   Score: 0.00 (no_match) | Answer: Error: name 't' is not defined | Expected: ABT
+DataFrame QA:  35%|███▌      | 7/20 [16:00<47:04, 217.24s/it]2026-03-11 09:34:03,702 eval INFO: 
+Task: dfqa_007_15t_60d_ranking | 900 rows, 54,271 chars
+2026-03-11 09:36:37,273 eval INFO:   Score: 0.00 (no_match) | Answer: Not found | Expected: LLY
+DataFrame QA:  40%|████      | 8/20 [18:33<39:23, 196.97s/it]2026-03-11 09:36:37,274 eval INFO: 
+Task: dfqa_008_15t_60d_ranking | 900 rows, 54,412 chars
+2026-03-11 09:44:23,501 eval INFO:   Score: 0.00 (no_match) | Answer: AMZN | Expected: BAC
+DataFrame QA:  45%|████▌     | 9/20 [26:19<51:32, 281.14s/it]2026-03-11 09:44:23,503 eval INFO: 
+Task: dfqa_009_15t_60d_multi_step | 900 rows, 53,652 chars
+2026-03-11 09:45:10,190 eval INFO:   Score: 1.00 (exact) | Answer: Finance | Expected: Finance
+DataFrame QA:  50%|█████     | 10/20 [27:06<34:47, 208.76s/it]2026-03-11 09:45:10,191 eval INFO: 
+Task: dfqa_010_30t_120d_multi_step | 3600 rows, 216,972 chars
+2026-03-11 09:45:44,846 eval INFO:   Score: 1.00 (exact) | Answer: Healthcare | Expected: Healthcare
+DataFrame QA:  55%|█████▌    | 11/20 [27:41<23:19, 155.48s/it]2026-03-11 09:45:44,846 eval INFO: 
+Task: dfqa_011_30t_120d_multi_step | 3600 rows, 217,802 chars
+2026-03-11 09:47:14,993 eval INFO:   Score: 0.00 (no_match) | Answer: No valid data found | Expected: MS
+DataFrame QA:  60%|██████    | 12/20 [29:11<18:04, 135.60s/it]2026-03-11 09:47:14,994 eval INFO: 
+Task: dfqa_012_30t_120d_sector | 3600 rows, 216,558 chars
+2026-03-11 09:51:24,651 eval INFO:   Score: 1.00 (exact) | Answer: Technology | Expected: Technology
+DataFrame QA:  65%|██████▌   | 13/20 [33:20<19:51, 170.15s/it]2026-03-11 09:51:24,653 eval INFO: 
+Task: dfqa_013_30t_120d_multi_step | 3600 rows, 215,996 chars
+2026-03-11 09:57:37,481 eval INFO:   Score: 1.00 (exact) | Answer: Healthcare | Expected: Healthcare
+DataFrame QA:  70%|███████   | 14/20 [39:33<23:08, 231.37s/it]2026-03-11 09:57:37,483 eval INFO: 
+Task: dfqa_014_30t_120d_aggregation | 3600 rows, 218,356 chars
+2026-03-11 10:05:07,170 eval INFO:   Score: 1.00 (numeric_close) | Answer: 307.11 | Expected: 306.81
+DataFrame QA:  75%|███████▌  | 15/20 [47:03<24:45, 297.18s/it]2026-03-11 10:05:07,173 eval INFO: 
+Task: dfqa_015_50t_250d_aggregation | 12500 rows, 752,578 chars
+2026-03-11 10:50:38,998 eval INFO:   Score: 0.80 (numeric_approx) | Answer: 303.29 | Expected: 304.21
+DataFrame QA:  80%|████████  | 16/20 [1:32:35<1:08:40, 1030.01s/it]2026-03-11 10:50:38,999 eval INFO: 
+Task: dfqa_016_50t_250d_ranking | 12500 rows, 753,805 chars
+Token indices sequence length is longer than the specified maximum sequence length for this model (644734 > 262144). Running this sequence through the model will result in indexing errors
+2026-03-11 11:08:28,770 tinker.lib.retry_handler ERROR: Request failed with non-retryable error: BadRequestError: Error code: 400 - {'detail': "Prompt length plus max_tokens exceeds the model's context window: 644745 prompt tokens + 2048 max_tokens > 65536."}
+2026-03-11 11:08:29,075 tinker.lib.telemetry INFO: Exception logged for session ID: b35e15eb-416b-5380-b001-925077293693
+2026-03-11 11:26:34,040 tinker.lib.retry_handler ERROR: Request failed with non-retryable error: BadRequestError: Error code: 400 - {'detail': "Prompt length plus max_tokens exceeds the model's context window: 342166 prompt tokens + 2048 max_tokens > 65536."}
+2026-03-11 11:26:34,254 tinker.lib.telemetry INFO: Exception logged for session ID: b35e15eb-416b-5380-b001-925077293693
+2026-03-11 11:35:45,105 tinker.lib.retry_handler ERROR: Request failed with non-retryable error: BadRequestError: Error code: 400 - {'detail': "Prompt length plus max_tokens exceeds the model's context window: 213844 prompt tokens + 2048 max_tokens > 65536."}
+2026-03-11 11:35:45,416 tinker.lib.telemetry INFO: Exception logged for session ID: b35e15eb-416b-5380-b001-925077293693
+2026-03-11 11:35:45,426 eval INFO:   Score: 0.00 (no_answer) | Answer: None | Expected: ORCL
+DataFrame QA:  85%|████████▌ | 17/20 [2:17:41<1:16:42, 1534.11s/it]2026-03-11 11:35:45,427 eval INFO: 
+Task: dfqa_017_50t_250d_multi_step | 12500 rows, 745,985 chars
+2026-03-11 11:36:34,514 eval INFO:   Score: 1.00 (exact) | Answer: 2024-06-03 | Expected: 2024-06-03
+DataFrame QA:  90%|█████████ | 18/20 [2:18:30<36:15, 1087.88s/it]  2026-03-11 11:36:34,516 eval INFO: 
+Task: dfqa_018_50t_250d_lookup | 12500 rows, 752,451 chars
+2026-03-11 11:37:02,937 eval INFO:   Score: 0.00 (no_match) | Answer: 52567189 | Expected: 47766317
+DataFrame QA:  95%|█████████▌| 19/20 [2:18:59<12:49, 769.68s/it] 2026-03-11 11:37:02,938 eval INFO: 
+Task: dfqa_019_50t_250d_ranking | 12500 rows, 756,469 chars
+2026-03-11 12:04:31,475 tinker.lib.retry_handler ERROR: Request failed with non-retryable error: BadRequestError: Error code: 400 - {'detail': "Prompt length plus max_tokens exceeds the model's context window: 213943 prompt tokens + 2048 max_tokens > 65536."}
+2026-03-11 12:04:31,795 tinker.lib.telemetry INFO: Exception logged for session ID: b35e15eb-416b-5380-b001-925077293693
+2026-03-11 12:16:36,405 eval INFO:   Score: 1.00 (exact) | Answer: BAC | Expected: BAC
+DataFrame QA: 100%|██████████| 20/20 [2:58:32<00:00, 1251.20s/it]DataFrame QA: 100%|██████████| 20/20 [2:58:32<00:00, 535.64s/it] 
+2026-03-11 12:16:37,646 eval INFO: 
+--- dataframe_qa Results ---
+2026-03-11 12:16:37,647 eval INFO: Accuracy/Recall: 54.0%
+2026-03-11 12:16:37,647 eval INFO: Tasks: 20
+2026-03-11 12:16:37,648 eval INFO: 
+============================================================
+2026-03-11 12:16:37,648 eval INFO: Running benchmark: code_debug
+2026-03-11 12:16:37,649 eval INFO: ============================================================
+CodeDebug:   0%|          | 0/15 [00:00<?, ?it/s]2026-03-11 12:16:37,710 eval INFO: 
+Task: debug_000_1bugs_599lines | 1 bugs, 599 lines
+2026-03-11 12:18:58,460 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_payment_cache | BUG: Missing return statement (function ends abruptly after assign
+CodeDebug:   7%|▋         | 1/15 [02:20<32:50, 140.75s/it]2026-03-11 12:18:58,464 eval INFO: 
+Task: debug_001_1bugs_554lines | 1 bugs, 554 lines
+2026-03-11 12:19:23,838 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_record_billing
+BUG: The function definition is truncated, causing a `SyntaxError`.
+CodeDebug:  13%|█▎        | 2/15 [02:46<15:47, 72.88s/it] 2026-03-11 12:19:23,839 eval INFO: 
+Task: debug_002_1bugs_585lines | 1 bugs, 585 lines
+2026-03-11 12:25:04,904 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_request_scheduler | BUG: The function uses undefined variables 'items', 'logger', 
+CodeDebug:  20%|██        | 3/15 [08:27<39:04, 195.34s/it]2026-03-11 12:25:04,906 eval INFO: 
+Task: debug_003_1bugs_595lines | 1 bugs, 595 lines
+2026-03-11 12:25:28,226 eval INFO:   Found: 1/1 (100.0%) | Answer: FUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean, which is incorrec
+CodeDebug:  27%|██▋       | 4/15 [08:50<23:21, 127.43s/it]2026-03-11 12:25:28,227 eval INFO: 
+Task: debug_004_1bugs_1472lines | 1 bugs, 1472 lines
+2026-03-11 12:26:06,170 eval INFO:   Found: 1/1 (100.0%) | Answer: FUNCTION: matrix_multiply | BUG: Incorrect matrix multiplication logic in the inner loop. The code a
+CodeDebug:  33%|███▎      | 5/15 [09:28<15:51, 95.16s/it] 2026-03-11 12:26:06,171 eval INFO: 
+Task: debug_005_1bugs_1446lines | 1 bugs, 1446 lines
+2026-03-11 12:26:27,600 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_request_scheduler | BUG: The function references an undefined variable `event_data
+CodeDebug:  40%|████      | 6/15 [09:49<10:30, 70.09s/it]2026-03-11 12:26:27,602 eval INFO: 
+Task: debug_006_1bugs_1353lines | 1 bugs, 1353 lines
+2026-03-11 12:28:20,297 eval INFO:   Found: 1/1 (100.0%) | Answer: FUNCTION: calculate_median | BUG: Index out of bounds error when the list has an even number of elem
+CodeDebug:  47%|████▋     | 7/15 [11:42<11:12, 84.02s/it]2026-03-11 12:28:20,298 eval INFO: 
+Task: debug_007_1bugs_1409lines | 1 bugs, 1409 lines
+2026-03-11 12:29:22,865 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_payment_billing | BUG: Missing return statement and incomplete code at the end of 
+CodeDebug:  53%|█████▎    | 8/15 [12:45<09:00, 77.19s/it]2026-03-11 12:29:22,866 eval INFO: 
+Task: debug_008_2bugs_1418lines | 2 bugs, 1418 lines
+2026-03-11 12:31:20,060 eval INFO:   Found: 0/2 (0.0%) | Answer: FUNCTION: process_user_scheduler | BUG: NameError - Variable 'items' is used but never defined in th
+CodeDebug:  60%|██████    | 9/15 [14:42<08:58, 89.70s/it]2026-03-11 12:31:20,061 eval INFO: 
+Task: debug_009_2bugs_1329lines | 2 bugs, 1329 lines
+2026-03-11 12:32:57,916 eval INFO:   Found: 0/2 (0.0%) | Answer: FUNCTION: process_session_db | BUG: Undefined variable 'items' used in logger and stats assignment |
+CodeDebug:  67%|██████▋   | 10/15 [16:20<07:41, 92.22s/it]2026-03-11 12:32:57,917 eval INFO: 
+Task: debug_010_2bugs_1445lines | 2 bugs, 1445 lines
+2026-03-11 12:34:38,490 eval INFO:   Found: 1/2 (50.0%) | Answer: FUNCTION: process_user_db | BUG: The variable `payment_data` is used in the type check but is not de
+CodeDebug:  73%|███████▎  | 11/15 [18:00<06:19, 94.77s/it]2026-03-11 12:34:38,492 eval INFO: 
+Task: debug_011_2bugs_1455lines | 2 bugs, 1455 lines
+2026-03-11 12:36:33,767 eval INFO:   Found: 0/2 (0.0%) | Answer: FUNCTION: process_request_cache | BUG: Undefined variable 'user_data' used in isinstance check | FIX
+CodeDebug:  80%|████████  | 12/15 [19:56<05:03, 101.01s/it]2026-03-11 12:36:33,768 eval INFO: 
+Task: debug_012_3bugs_2201lines | 3 bugs, 2201 lines
+2026-03-11 12:43:18,301 eval INFO:   Found: 1/3 (33.3%) | Answer: FUNCTION: stats.py | BUG: The calculate_mean function subtracts 1 from the result, causing incorrect
+CodeDebug:  87%|████████▋ | 13/15 [26:40<06:25, 192.96s/it]2026-03-11 12:43:18,302 eval INFO: 
+Task: debug_013_3bugs_2241lines | 3 bugs, 2241 lines
+2026-03-11 12:47:05,760 eval INFO:   Found: 0/3 (0.0%) | Answer: FUNCTION: process_session_db | BUG: The function attempts to access `self._cache` but `self` is not 
+CodeDebug:  93%|█████████▎| 14/15 [30:28<03:23, 203.38s/it]2026-03-11 12:47:05,761 eval INFO: 
+Task: debug_014_3bugs_2294lines | 3 bugs, 2294 lines
+2026-03-11 12:50:40,878 eval INFO:   Found: 0/3 (0.0%) | Answer: FUNCTION: process_request_notifications | BUG: Undefined variables 'items', 'logger', and 'elapsed' 
+CodeDebug: 100%|██████████| 15/15 [34:03<00:00, 206.92s/it]CodeDebug: 100%|██████████| 15/15 [34:03<00:00, 136.21s/it]
+2026-03-11 12:50:40,880 eval INFO: 
+--- code_debug Results ---
+2026-03-11 12:50:40,881 eval INFO: Accuracy/Recall: 25.6%
+2026-03-11 12:50:40,881 eval INFO: Tasks: 15
+2026-03-11 12:50:40,881 eval INFO: 
+============================================================
+2026-03-11 12:50:40,881 eval INFO: Running benchmark: multi_hop_qa
+2026-03-11 12:50:40,881 eval INFO: ============================================================
+MultiHopQA:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-11 12:50:40,911 eval INFO: 
+Task: multihop_3hop_0 | 3 hops, 50136 chars
+2026-03-11 12:51:17,749 eval INFO:   Score: 1.0 | Expected: quantum computing | Got: quantum computing
+MultiHopQA:   5%|▌         | 1/20 [00:36<11:39, 36.84s/it]2026-03-11 12:51:17,749 eval INFO: 
+Task: multihop_3hop_1 | 3 hops, 10114 chars
+2026-03-11 12:51:24,204 eval INFO:   Score: 1.0 | Expected: $4.2 million | Got: Project: Project Catalyst, Budget: $4.2 million
+MultiHopQA:  10%|█         | 2/20 [00:43<05:41, 18.97s/it]2026-03-11 12:51:24,205 eval INFO: 
+Task: multihop_2hop_2 | 2 hops, 100086 chars
+2026-03-11 12:53:08,386 eval INFO:   Score: 1.0 | Expected: next-generation sustainability solutions | Got: Project Phoenix focuses on developing next-generation sustainability solutions.
+MultiHopQA:  15%|█▌        | 3/20 [02:27<16:23, 57.88s/it]2026-03-11 12:53:08,387 eval INFO: 
+Task: multihop_3hop_3 | 3 hops, 20104 chars
+2026-03-11 12:53:18,820 eval INFO:   Score: 1.0 | Expected: $4.2 million | Got: $4.2 million
+MultiHopQA:  20%|██        | 4/20 [02:37<10:26, 39.15s/it]2026-03-11 12:53:18,820 eval INFO: 
+Task: multihop_3hop_4 | 3 hops, 50094 chars
+2026-03-11 12:53:30,249 eval INFO:   Score: 1.0 | Expected: $4.2 million | Got: $4.2 million
+MultiHopQA:  25%|██▌       | 5/20 [02:49<07:17, 29.15s/it]2026-03-11 12:53:30,250 eval INFO: 
+Task: multihop_3hop_5 | 3 hops, 100120 chars
+2026-03-11 12:53:54,431 eval INFO:   Score: 0.0 | Expected: $4.2 million | Got: Not found
+MultiHopQA:  30%|███       | 6/20 [03:13<06:24, 27.46s/it]2026-03-11 12:53:54,432 eval INFO: 
+Task: multihop_2hop_6 | 2 hops, 20078 chars
+2026-03-11 12:54:11,873 eval INFO:   Score: 1.0 | Expected: next-generation sustainability solutions | Got: developing next-generation sustainability solutions
+MultiHopQA:  35%|███▌      | 7/20 [03:30<05:14, 24.19s/it]2026-03-11 12:54:11,874 eval INFO: 
+Task: multihop_2hop_7 | 2 hops, 100104 chars
+2026-03-11 12:54:42,752 eval INFO:   Score: 1.0 | Expected: Berlin branch | Got: Berlin branch
+MultiHopQA:  40%|████      | 8/20 [04:01<05:15, 26.32s/it]2026-03-11 12:54:42,754 eval INFO: 
+Task: multihop_2hop_8 | 2 hops, 50076 chars
+2026-03-11 12:55:02,377 eval INFO:   Score: 1.0 | Expected: next-generation sustainability solutions | Got: developing next-generation sustainability solutions
+MultiHopQA:  45%|████▌     | 9/20 [04:21<04:26, 24.22s/it]2026-03-11 12:55:02,377 eval INFO: 
+Task: multihop_2hop_9 | 2 hops, 20114 chars
+2026-03-11 12:55:11,962 eval INFO:   Score: 1.0 | Expected: Seoul branch | Got: Based on the document provided:
+
+*   **Head of Research and Development:** Olivi
+MultiHopQA:  50%|█████     | 10/20 [04:31<03:17, 19.71s/it]2026-03-11 12:55:11,963 eval INFO: 
+Task: multihop_3hop_10 | 3 hops, 100149 chars
+2026-03-11 12:55:34,594 eval INFO:   Score: 1.0 | Expected: Seoul | Got: Seoul
+MultiHopQA:  55%|█████▌    | 11/20 [04:53<03:05, 20.60s/it]2026-03-11 12:55:34,595 eval INFO: 
+Task: multihop_2hop_11 | 2 hops, 100137 chars
+2026-03-11 12:55:55,821 eval INFO:   Score: 1.0 | Expected: San Francisco | Got: San Francisco
+MultiHopQA:  60%|██████    | 12/20 [05:14<02:46, 20.79s/it]2026-03-11 12:55:55,833 eval INFO: 
+Task: multihop_3hop_12 | 3 hops, 50115 chars
+2026-03-11 12:56:21,011 eval INFO:   Score: 1.0 | Expected: quantum computing | Got: Project Meridian, quantum computing
+MultiHopQA:  65%|██████▌   | 13/20 [05:40<02:34, 22.12s/it]2026-03-11 12:56:21,011 eval INFO: 
+Task: multihop_3hop_13 | 3 hops, 100140 chars
+2026-03-11 12:56:47,863 eval INFO:   Score: 1.0 | Expected: Tokyo | Got: Tokyo
+MultiHopQA:  70%|███████   | 14/20 [06:06<02:21, 23.55s/it]2026-03-11 12:56:47,863 eval INFO: 
+Task: multihop_3hop_14 | 3 hops, 50128 chars
+2026-03-11 12:57:18,982 eval INFO:   Score: 1.0 | Expected: quantum computing | Got: quantum computing
+MultiHopQA:  75%|███████▌  | 15/20 [06:38<02:09, 25.83s/it]2026-03-11 12:57:18,985 eval INFO: 
+Task: multihop_3hop_15 | 3 hops, 100123 chars
+2026-03-11 13:00:12,603 eval INFO:   Score: 0.0 | Expected: quantum computing | Got: 2.  **Search for Project Details:** The document contains numerous sentences reg
+MultiHopQA:  80%|████████  | 16/20 [09:31<04:41, 70.32s/it]2026-03-11 13:00:12,605 eval INFO: 
+Task: multihop_3hop_16 | 3 hops, 100151 chars
+2026-03-11 13:00:41,180 eval INFO:   Score: 1.0 | Expected: $4.2 million | Got: Project Forge: $4.2 million
+MultiHopQA:  85%|████████▌ | 17/20 [10:00<02:53, 57.77s/it]2026-03-11 13:00:41,181 eval INFO: 
+Task: multihop_3hop_17 | 3 hops, 50148 chars
+2026-03-11 13:02:56,783 eval INFO:   Score: 0.0 | Expected: quantum computing | Got: Technology upgrades
+MultiHopQA:  90%|█████████ | 18/20 [12:15<02:42, 81.16s/it]2026-03-11 13:02:56,785 eval INFO: 
+Task: multihop_2hop_18 | 2 hops, 50146 chars
+2026-03-11 13:03:21,369 eval INFO:   Score: 1.0 | Expected: Human Resources | Got: Bob Anderson: Human Resources
+MultiHopQA:  95%|█████████▌| 19/20 [12:40<01:04, 64.16s/it]2026-03-11 13:03:21,370 eval INFO: 
+Task: multihop_2hop_19 | 2 hops, 100143 chars
+2026-03-11 13:03:37,667 eval INFO:   Score: 1.0 | Expected: Toronto branch | Got: Toronto branch
+MultiHopQA: 100%|██████████| 20/20 [12:56<00:00, 49.79s/it]MultiHopQA: 100%|██████████| 20/20 [12:56<00:00, 38.84s/it]
+2026-03-11 13:03:37,669 eval INFO: 
+--- multi_hop_qa Results ---
+2026-03-11 13:03:37,669 eval INFO: Accuracy/Recall: 85.0%
+2026-03-11 13:03:37,669 eval INFO: Tasks: 20
+2026-03-11 13:03:37,669 eval INFO: 
+============================================================
+2026-03-11 13:03:37,669 eval INFO: Running benchmark: notebook_qa
+2026-03-11 13:03:37,669 eval INFO: ============================================================
+NotebookQA:   0%|          | 0/15 [00:00<?, ?it/s]2026-03-11 13:03:37,678 eval INFO: 
+Task: notebook_output_0 | output_lookup | 245 cells, 61994 chars
+2026-03-11 13:03:47,262 eval INFO:   Score: 1.0 (exact) | Expected: 0.1 | Got: 0.1
+NotebookQA:   7%|▋         | 1/15 [00:09<02:14,  9.58s/it]2026-03-11 13:03:47,263 eval INFO: 
+Task: notebook_cross_1 | cross_cell | 106 cells, 25985 chars
+2026-03-11 13:03:54,951 eval INFO:   Score: 1.0 (exact) | Expected: 0.8032 | Got: 0.8032
+NotebookQA:  13%|█▎        | 2/15 [00:17<01:50,  8.47s/it]2026-03-11 13:03:54,952 eval INFO: 
+Task: notebook_cross_2 | cross_cell | 163 cells, 41509 chars
+2026-03-11 13:04:05,677 eval INFO:   Score: 1.0 (exact) | Expected: 0.7247 | Got: 0.7247
+NotebookQA:  20%|██        | 3/15 [00:27<01:53,  9.50s/it]2026-03-11 13:04:05,677 eval INFO: 
+Task: notebook_cross_3 | cross_cell | 62 cells, 15550 chars
+2026-03-11 13:04:14,043 eval INFO:   Score: 0.5 (partial_numeric) | Expected: 4 models, LightGBM performed worst | Got: Count: 4, Worst: LightGBM
+NotebookQA:  27%|██▋       | 4/15 [00:36<01:39,  9.05s/it]2026-03-11 13:04:14,044 eval INFO: 
+Task: notebook_trace_4 | variable_trace | 256 cells, 62023 chars
+2026-03-11 13:04:33,821 eval INFO:   Score: 1.0 (exact) | Expected: 11217 | Got: 11217
+NotebookQA:  33%|███▎      | 5/15 [00:56<02:09, 12.92s/it]2026-03-11 13:04:33,821 eval INFO: 
+Task: notebook_trace_5 | variable_trace | 63 cells, 15765 chars
+2026-03-11 13:04:41,259 eval INFO:   Score: 1.0 (exact) | Expected: 87.0% | Got: 87.0%
+NotebookQA:  40%|████      | 6/15 [01:03<01:39, 11.06s/it]2026-03-11 13:04:41,260 eval INFO: 
+Task: notebook_cross_6 | cross_cell | 103 cells, 25985 chars
+2026-03-11 13:05:16,777 eval INFO:   Score: 0.0 (none) | Expected: 4 models, LightGBM performed worst | Got: 5 models were compared. The worst performing model was Light
+NotebookQA:  47%|████▋     | 7/15 [01:39<02:32, 19.05s/it]2026-03-11 13:05:16,779 eval INFO: 
+Task: notebook_cross_7 | cross_cell | 65 cells, 15585 chars
+2026-03-11 13:05:59,023 eval INFO:   Score: 0.5 (partial_numeric) | Expected: CatBoost with accuracy 0.9152 | Got: CatBoost: 0.9152
+NotebookQA:  53%|█████▎    | 8/15 [02:21<03:05, 26.44s/it]2026-03-11 13:05:59,024 eval INFO: 
+Task: notebook_output_8 | output_lookup | 62 cells, 15572 chars
+2026-03-11 13:06:07,775 eval INFO:   Score: 1.0 (exact) | Expected: engagement_score | Got: engagement_score
+NotebookQA:  60%|██████    | 9/15 [02:30<02:05, 20.91s/it]2026-03-11 13:06:07,776 eval INFO: 
+Task: notebook_trace_9 | variable_trace | 63 cells, 15704 chars
+2026-03-11 13:06:16,915 eval INFO:   Score: 1.0 (exact) | Expected: 10608 | Got: 10608
+NotebookQA:  67%|██████▋   | 10/15 [02:39<01:26, 17.28s/it]2026-03-11 13:06:16,916 eval INFO: 
+Task: notebook_output_10 | output_lookup | 105 cells, 25963 chars
+2026-03-11 13:06:24,634 eval INFO:   Score: 1.0 (exact) | Expected: engagement_score | Got: engagement_score
+NotebookQA:  73%|███████▎  | 11/15 [02:46<00:57, 14.35s/it]2026-03-11 13:06:24,634 eval INFO: 
+Task: notebook_trace_11 | variable_trace | 256 cells, 62047 chars
+2026-03-11 13:06:36,198 eval INFO:   Score: 0.0 (none) | Expected: 16677 | Got: 10000
+NotebookQA:  80%|████████  | 12/15 [02:58<00:40, 13.50s/it]2026-03-11 13:06:36,199 eval INFO: 
+Task: notebook_output_12 | output_lookup | 63 cells, 15555 chars
+2026-03-11 13:06:44,462 eval INFO:   Score: 1.0 (exact) | Expected: 0.7578 | Got: 0.7578
+NotebookQA:  87%|████████▋ | 13/15 [03:06<00:23, 11.92s/it]2026-03-11 13:06:44,463 eval INFO: 
+Task: notebook_trace_13 | variable_trace | 170 cells, 41512 chars
+2026-03-11 13:06:59,731 eval INFO:   Score: 0.0 (none) | Expected: 77.4% | Got: 0.8734
+NotebookQA:  93%|█████████▎| 14/15 [03:22<00:12, 12.93s/it]2026-03-11 13:06:59,732 eval INFO: 
+Task: notebook_cross_14 | cross_cell | 61 cells, 15639 chars
+2026-03-11 13:07:10,411 eval INFO:   Score: 0.5 (partial_numeric) | Expected: 4 models, CatBoost performed worst | Got: Models: 4, Worst: CatBoost
+NotebookQA: 100%|██████████| 15/15 [03:32<00:00, 12.25s/it]NotebookQA: 100%|██████████| 15/15 [03:32<00:00, 14.18s/it]
+2026-03-11 13:07:10,414 eval INFO: 
+--- notebook_qa Results ---
+2026-03-11 13:07:10,414 eval INFO: Accuracy/Recall: 70.0%
+2026-03-11 13:07:10,414 eval INFO: Tasks: 15
+2026-03-11 13:07:10,414 eval INFO: 
+============================================================
+2026-03-11 13:07:10,414 eval INFO: Running benchmark: hard_niah
+2026-03-11 13:07:10,414 eval INFO: ============================================================
+HardNIAH:   0%|          | 0/15 [00:00<?, ?it/s]2026-03-11 13:07:10,476 eval INFO: 
+Task: hard_niah_boundary_0 | boundary | 50060 chars
+2026-03-11 13:07:19,153 eval INFO:   Score: 1.0 (exact) | Expected: OVERRIDE-444-CP | Got: OVERRIDE-444-CP
+HardNIAH:   7%|▋         | 1/15 [00:08<02:01,  8.68s/it]2026-03-11 13:07:19,154 eval INFO: 
+Task: hard_niah_distractor_1 | distractor | 30113 chars
+2026-03-11 13:07:30,687 eval INFO:   Score: 1.0 (exact) | Expected: March 15 2026 | Got: March 15 2026
+HardNIAH:  13%|█▎        | 2/15 [00:20<02:14, 10.36s/it]2026-03-11 13:07:30,689 eval INFO: 
+Task: hard_niah_boundary_2 | boundary | 50066 chars
+2026-03-11 13:07:47,335 eval INFO:   Score: 1.0 (exact) | Expected: WIT-92812 | Got: WIT-92812
+HardNIAH:  20%|██        | 3/15 [00:36<02:38, 13.23s/it]2026-03-11 13:07:47,335 eval INFO: 
+Task: hard_niah_extreme_3 | extreme_length | 500066 chars
+2026-03-11 13:08:22,433 eval INFO:   Score: 1.0 (exact) | Expected: NEXUS-PRIME-7742 | Got: NEXUS-PRIME-7742
+HardNIAH:  27%|██▋       | 4/15 [01:11<04:00, 21.86s/it]2026-03-11 13:08:22,434 eval INFO: 
+Task: hard_niah_extreme_4 | extreme_length | 200066 chars
+2026-03-11 13:09:04,914 eval INFO:   Score: 1.0 (exact) | Expected: SHADOW-GATE-3319 | Got: SHADOW-GATE-3319
+HardNIAH:  33%|███▎      | 5/15 [01:54<04:52, 29.30s/it]2026-03-11 13:09:04,915 eval INFO: 
+Task: hard_niah_distractor_5 | distractor | 30139 chars
+2026-03-11 13:09:22,338 eval INFO:   Score: 0.0 (none) | Expected: $4.2 million | Got: $4
+HardNIAH:  40%|████      | 6/15 [02:11<03:47, 25.26s/it]2026-03-11 13:09:22,341 eval INFO: 
+Task: hard_niah_distractor_6 | distractor | 100138 chars
+2026-03-11 13:09:47,921 eval INFO:   Score: 1.0 (exact) | Expected: March 15 2026 | Got: March 15 2026
+HardNIAH:  47%|████▋     | 7/15 [02:37<03:22, 25.37s/it]2026-03-11 13:09:47,922 eval INFO: 
+Task: hard_niah_extreme_7 | extreme_length | 1000079 chars
+2026-03-11 13:11:30,040 eval INFO:   Score: 1.0 (exact) | Expected: AUTH-6552-BY55 | Got: AUTH-6552-BY55
+HardNIAH:  53%|█████▎    | 8/15 [04:19<05:48, 49.80s/it]2026-03-11 13:11:30,042 eval INFO: 
+Task: hard_niah_distractor_8 | distractor | 100089 chars
+2026-03-11 13:11:42,754 eval INFO:   Score: 1.0 (exact) | Expected: $7.2 million | Got: $7.2 million
+HardNIAH:  60%|██████    | 9/15 [04:32<03:49, 38.21s/it]2026-03-11 13:11:42,755 eval INFO: 
+Task: hard_niah_boundary_9 | boundary | 50060 chars
+2026-03-11 13:11:52,292 eval INFO:   Score: 1.0 (exact) | Expected: OVERRIDE-922-CM | Got: OVERRIDE-922-CM
+HardNIAH:  67%|██████▋   | 10/15 [04:41<02:26, 29.36s/it]2026-03-11 13:11:52,293 eval INFO: 
+Task: hard_niah_distractor_10 | distractor | 100112 chars
+2026-03-11 13:12:02,960 eval INFO:   Score: 1.0 (exact) | Expected: DELTA-91M | Got: DELTA-91M
+HardNIAH:  73%|███████▎  | 11/15 [04:52<01:34, 23.64s/it]2026-03-11 13:12:02,961 eval INFO: 
+Task: hard_niah_boundary_11 | boundary | 20060 chars
+2026-03-11 13:12:10,679 eval INFO:   Score: 1.0 (exact) | Expected: OVERRIDE-734-DT | Got: OVERRIDE-734-DT
+HardNIAH:  80%|████████  | 12/15 [05:00<00:56, 18.79s/it]2026-03-11 13:12:10,679 eval INFO: 
+Task: hard_niah_extreme_12 | extreme_length | 1000079 chars
+2026-03-11 13:13:07,443 eval INFO:   Score: 1.0 (exact) | Expected: AUTH-2890-AY13 | Got: AUTH-2890-AY13
+HardNIAH:  87%|████████▋ | 13/15 [05:56<01:00, 30.30s/it]2026-03-11 13:13:07,444 eval INFO: 
+Task: hard_niah_boundary_13 | boundary | 20060 chars
+2026-03-11 13:13:15,603 eval INFO:   Score: 1.0 (exact) | Expected: OVERRIDE-497-AT | Got: OVERRIDE-497-AT
+HardNIAH:  93%|█████████▎| 14/15 [06:05<00:23, 23.61s/it]2026-03-11 13:13:15,603 eval INFO: 
+Task: hard_niah_boundary_14 | boundary | 20060 chars
+2026-03-11 13:13:23,042 eval INFO:   Score: 1.0 (exact) | Expected: OVERRIDE-227-CR | Got: OVERRIDE-227-CR
+HardNIAH: 100%|██████████| 15/15 [06:12<00:00, 18.74s/it]HardNIAH: 100%|██████████| 15/15 [06:12<00:00, 24.84s/it]
+2026-03-11 13:13:23,044 eval INFO: 
+--- hard_niah Results ---
+2026-03-11 13:13:23,045 eval INFO: Accuracy/Recall: 93.3%
+2026-03-11 13:13:23,045 eval INFO: Tasks: 15
+2026-03-11 13:13:23,045 eval INFO: 
+============================================================
+2026-03-11 13:13:23,045 eval INFO: Running benchmark: verbatim_copy
+2026-03-11 13:13:23,045 eval INFO: ============================================================
+VerbatimCopy:   0%|          | 0/10 [00:00<?, ?it/s]2026-03-11 13:13:23,056 eval INFO: 
+Task: verbatim_000_10000 | 10002 chars, target 620 chars
+2026-03-11 13:13:36,841 eval INFO:   Score: 1.00 | Expected: MEMORANDUM — Reference MEM-6738-Z. From: Desmond Whitfield. ... | Got: MEMORANDUM — Reference MEM-6738-Z. From: Desmond Whitfield. ...
+VerbatimCopy:  10%|█         | 1/10 [00:13<02:04, 13.79s/it]2026-03-11 13:13:36,842 eval INFO: 
+Task: verbatim_001_20000 | 20002 chars, target 560 chars
+2026-03-11 13:13:52,810 eval INFO:   Score: 1.00 | Expected: TECHNICAL SPECIFICATION SPEC-30897 (Revision 8.3.54). Materi... | Got: International partnership
+TECHNICAL SPECIFICATION SPEC-30897...
+VerbatimCopy:  20%|██        | 2/10 [00:29<02:00, 15.07s/it]2026-03-11 13:13:52,811 eval INFO: 
+Task: verbatim_002_50000 | 50002 chars, target 587 chars
+2026-03-11 13:14:06,239 eval INFO:   Score: 1.00 | Expected: LETTER — Reference LTR-8485. Dear Prof. Lucien Sorensen, I a... | Got: LETTER — Reference LTR-8485. Dear Prof. Lucien Sorensen, I a...
+VerbatimCopy:  30%|███       | 3/10 [00:43<01:40, 14.32s/it]2026-03-11 13:14:06,240 eval INFO: 
+Task: verbatim_003_100000 | 100002 chars, target 566 chars
+2026-03-11 13:14:23,600 eval INFO:   Score: 1.00 | Expected: TECHNICAL SPECIFICATION SPEC-94711 (Revision 3.0.6). Materia... | Got: TECHNICAL SPECIFICATION SPEC-94711 (Revision 3.0.6). Materia...
+VerbatimCopy:  40%|████      | 4/10 [01:00<01:33, 15.52s/it]2026-03-11 13:14:23,601 eval INFO: 
+Task: verbatim_004_10000 | 10002 chars, target 608 chars
+2026-03-11 13:15:13,174 eval INFO:   Score: 1.00 | Expected: MEMORANDUM — Reference MEM-2862-X. From: Rafael Ashworth. To... | Got: MEMORANDUM — Reference MEM-2862-X. From: Rafael Ashworth. To...
+VerbatimCopy:  50%|█████     | 5/10 [01:50<02:19, 27.80s/it]2026-03-11 13:15:13,175 eval INFO: 
+Task: verbatim_005_20000 | 20002 chars, target 563 chars
+2026-03-11 13:15:41,340 eval INFO:   Score: 1.00 | Expected: RESEARCH SUMMARY — STUDY-CHM-7770. Principal investigator: D... | Got: RESEARCH SUMMARY — STUDY-CHM-7770. Principal investigator: D...
+VerbatimCopy:  60%|██████    | 6/10 [02:18<01:51, 27.92s/it]2026-03-11 13:15:41,340 eval INFO: 
+Task: verbatim_006_50000 | 50002 chars, target 577 chars
+2026-03-11 13:15:56,150 eval INFO:   Score: 1.00 | Expected: LEGAL NOTICE — CASE-2020-73312. In the matter of Lucien Whit... | Got: LEGAL NOTICE — CASE-2020-73312. In the matter of Lucien Whit...
+VerbatimCopy:  70%|███████   | 7/10 [02:33<01:10, 23.64s/it]2026-03-11 13:15:56,151 eval INFO: 
+Task: verbatim_007_100000 | 100002 chars, target 608 chars
+2026-03-11 13:16:18,674 eval INFO:   Score: 1.00 | Expected: MEMORANDUM — Reference MEM-1581-C. From: Lucien Mbeki. To: M... | Got: MEMORANDUM — Reference MEM-1581-C. From: Lucien Mbeki. To: M...
+VerbatimCopy:  80%|████████  | 8/10 [02:55<00:46, 23.28s/it]2026-03-11 13:16:18,675 eval INFO: 
+Task: verbatim_008_10000 | 10002 chars, target 572 chars
+2026-03-11 13:16:33,696 eval INFO:   Score: 1.00 | Expected: LEGAL NOTICE — CASE-2025-30840. In the matter of Fiona Kowal... | Got: LEGAL NOTICE — CASE-2025-30840. In the matter of Fiona Kowal...
+VerbatimCopy:  90%|█████████ | 9/10 [03:10<00:20, 20.70s/it]2026-03-11 13:16:33,697 eval INFO: 
+Task: verbatim_009_20000 | 20002 chars, target 574 chars
+2026-03-11 13:16:48,269 eval INFO:   Score: 1.00 | Expected: LEGAL NOTICE — CASE-2021-16556. In the matter of Yuki Nakamu... | Got: LEGAL NOTICE — CASE-2021-16556. In the matter of Yuki Nakamu...
+VerbatimCopy: 100%|██████████| 10/10 [03:25<00:00, 18.81s/it]VerbatimCopy: 100%|██████████| 10/10 [03:25<00:00, 20.52s/it]
+2026-03-11 13:16:48,271 eval INFO: 
+--- verbatim_copy Results ---
+2026-03-11 13:16:48,271 eval INFO: Accuracy/Recall: 100.0%
+2026-03-11 13:16:48,271 eval INFO: Tasks: 10
+2026-03-11 13:16:48,271 eval INFO: 
+============================================================
+2026-03-11 13:16:48,271 eval INFO: Running benchmark: oolong
+2026-03-11 13:16:48,271 eval INFO: ============================================================
+OOLONG:   0%|          | 0/10 [00:00<?, ?it/s]2026-03-11 13:17:09,583 eval INFO: 
+Task: oolong_000_singledoc_rolls | singledoc_rolls | 152,518 chars
+2026-03-11 13:17:09,584 eval INFO:   Q: Number of rolls of natural value 13 in this episode?
+2026-03-11 13:17:25,408 eval INFO:   Score: 0.0 (none) | Expected: 2 | Got: 0
+OOLONG:  10%|█         | 1/10 [00:15<02:22, 15.84s/it]2026-03-11 13:17:25,422 eval INFO: 
+Task: oolong_001_singledoc_rolls | singledoc_rolls | 152,527 chars
+2026-03-11 13:17:25,423 eval INFO:   Q: Total number of rolls by the character Fjord in this episode?
+2026-03-11 13:17:55,385 eval INFO:   Score: 0.0 (none) | Expected: 11 | Got: 4
+OOLONG:  20%|██        | 2/10 [00:45<03:13, 24.15s/it]2026-03-11 13:17:55,385 eval INFO: 
+Task: oolong_002_singledoc_spells | singledoc_spells | 152,531 chars
+2026-03-11 13:17:55,385 eval INFO:   Q: How many spells were cast by the character Caleb in this episode?
+2026-03-11 13:18:12,477 eval INFO:   Score: 0.0 (none) | Expected: 3 | Got: 10
+OOLONG:  30%|███       | 3/10 [01:02<02:26, 20.93s/it]2026-03-11 13:18:12,478 eval INFO: 
+Task: oolong_003_singledoc_rolls | singledoc_rolls | 152,520 chars
+2026-03-11 13:18:12,478 eval INFO:   Q: What is the count of Nat1s (natural rolls of value 1)?
+2026-03-11 13:18:30,873 eval INFO:   Score: 0.0 (none) | Expected: 4 | Got: 0
+OOLONG:  40%|████      | 4/10 [01:21<01:59, 19.93s/it]2026-03-11 13:18:30,874 eval INFO: 
+Task: oolong_004_singledoc_rolls | singledoc_rolls | 152,522 chars
+2026-03-11 13:18:30,874 eval INFO:   Q: What is the count of Nat20s (natural rolls of value 20)?
+2026-03-11 13:18:54,543 eval INFO:   Score: 0.0 (none) | Expected: 3 | Got: 11
+OOLONG:  50%|█████     | 5/10 [01:44<01:46, 21.28s/it]2026-03-11 13:18:54,545 eval INFO: 
+Task: oolong_005_singledoc_rolls | singledoc_rolls | 152,554 chars
+2026-03-11 13:18:54,545 eval INFO:   Q: In this episode, what percentage of rolls were of value 4? round to the nearest integer.
+2026-03-11 13:19:22,820 eval INFO:   Score: 0.0 (none) | Expected: 1 | Got: 6
+OOLONG:  60%|██████    | 6/10 [02:13<01:34, 23.66s/it]2026-03-11 13:19:22,821 eval INFO: 
+Task: oolong_006_singledoc_spells | singledoc_spells | 152,511 chars
+2026-03-11 13:19:22,821 eval INFO:   Q: What is the first spell cast in this episode?
+2026-03-11 13:19:45,762 eval INFO:   Score: 0.0 (none) | Expected: Detect Magic | Got: Blessing of the Trickster
+OOLONG:  70%|███████   | 7/10 [02:36<01:10, 23.42s/it]2026-03-11 13:19:45,762 eval INFO: 
+Task: oolong_007_singledoc_rolls | singledoc_rolls | 152,525 chars
+2026-03-11 13:19:45,762 eval INFO:   Q: Total number of rolls by the player Travis in this episode?
+2026-03-11 13:21:14,422 eval INFO:   Score: 0.0 (none) | Expected: 11 | Got: 28
+OOLONG:  80%|████████  | 8/10 [04:04<01:28, 44.19s/it]2026-03-11 13:21:14,423 eval INFO: 
+Task: oolong_008_singledoc_spells | singledoc_spells | 152,524 chars
+2026-03-11 13:21:14,423 eval INFO:   Q: How many Thaumaturgy spells were cast during this episode?
+2026-03-11 13:23:34,876 eval INFO:   Score: 0.0 (none) | Expected: 2 | Got: 4
+OOLONG:  90%|█████████ | 9/10 [06:25<01:14, 74.28s/it]2026-03-11 13:23:34,878 eval INFO: 
+Task: oolong_009_singledoc_spells | singledoc_spells | 152,620 chars
+2026-03-11 13:23:34,878 eval INFO:   Q: What is the last spell cast by each character in this episode? Return a comma separated list and ret
+2026-03-11 13:26:47,702 eval INFO:   Score: 0.0 (none) | Expected: Chromatic Orb, Hex, Cure Wounds, Blood Curse of the Eyeless | Got: Based on the text provided, here are the spells mentioned or
+OOLONG: 100%|██████████| 10/10 [09:38<00:00, 110.88s/it]OOLONG: 100%|██████████| 10/10 [09:38<00:00, 57.81s/it] 
+2026-03-11 13:26:47,704 eval INFO: 
+--- oolong Results ---
+2026-03-11 13:26:47,704 eval INFO: Accuracy/Recall: 0.0%
+2026-03-11 13:26:47,704 eval INFO: Tasks: 10
+2026-03-11 13:26:47,704 eval INFO: 
+============================================================
+2026-03-11 13:26:47,704 eval INFO: Running benchmark: hard_multi_hop
+2026-03-11 13:26:47,704 eval INFO: ============================================================
+HardMultiHop:   0%|          | 0/10 [00:00<?, ?it/s]2026-03-11 13:26:47,736 eval INFO: 
+Task: hard_multihop_3hop_0 | 3-hop | 200,091 chars
+2026-03-11 13:26:47,736 eval INFO:   Q: Where is the project led by Frank Anderson headquartered?
+2026-03-11 13:26:47,736 eval INFO:   Decomposition: Find what initiative Frank Anderson leads → Project Summit → Find where Project Summit is headquartered → Boston
+2026-03-11 13:27:47,834 eval INFO:   Score: 1.0 (contains) | Expected: Boston | Got: Boston
+HardMultiHop:  10%|█         | 1/10 [01:00<09:00, 60.10s/it]2026-03-11 13:27:47,835 eval INFO: 
+Task: hard_multihop_2hop_1 | 2-hop | 100,120 chars
+2026-03-11 13:27:47,836 eval INFO:   Q: What is the budget for the project led by Samuel Walker?
+2026-03-11 13:27:47,836 eval INFO:   Decomposition: Find what project Samuel Walker leads → Project Forge → Find the budget of Project Forge → $3.1 million
+2026-03-11 13:28:12,099 eval INFO:   Score: 1.0 (contains) | Expected: $3.1 million | Got: $3.1 million
+HardMultiHop:  20%|██        | 2/10 [01:24<05:12, 39.02s/it]2026-03-11 13:28:12,099 eval INFO: 
+Task: hard_multihop_3hop_2 | 3-hop | 200,158 chars
+2026-03-11 13:28:12,099 eval INFO:   Q: On what date was the project completed by the Marketing department delivered?
+2026-03-11 13:28:12,099 eval INFO:   Decomposition: Find what milestone Marketing completed → delivery of Project Orion → Find what project was delivered → Project Orion → Find the delivery date of Project Orion → January 10, 2027
+2026-03-11 13:28:29,487 eval INFO:   Score: 0.0 (none) | Expected: January 10, 2027 | Got: April 5, 2026
+HardMultiHop:  30%|███       | 3/10 [01:41<03:23, 29.14s/it]2026-03-11 13:28:29,488 eval INFO: 
+Task: hard_multihop_3hop_3 | 3-hop | 150,112 chars
+2026-03-11 13:28:29,488 eval INFO:   Q: Where is the project led by Xavier King headquartered?
+2026-03-11 13:28:29,488 eval INFO:   Decomposition: Find what initiative Xavier King leads → Project Atlas → Find where Project Atlas is headquartered → Berlin
+2026-03-11 13:29:15,263 eval INFO:   Score: 1.0 (contains) | Expected: Berlin | Got: Berlin
+HardMultiHop:  40%|████      | 4/10 [02:27<03:34, 35.71s/it]2026-03-11 13:29:15,265 eval INFO: 
+Task: hard_multihop_3hop_4 | 3-hop | 150,166 chars
+2026-03-11 13:29:15,265 eval INFO:   Q: What is the approved budget for the project sponsored by the Chief of Finance?
+2026-03-11 13:29:15,265 eval INFO:   Decomposition: Find who is Chief of Finance → Yara Wright → Find what project the Chief of Finance sponsors → Project Meridian → Find the budget of Project Meridian → $1.9 million
+2026-03-11 13:29:33,361 eval INFO:   Score: 1.0 (contains) | Expected: $1.9 million | Got: Project Meridian: $1.9 million
+HardMultiHop:  50%|█████     | 5/10 [02:45<02:26, 29.36s/it]2026-03-11 13:29:33,362 eval INFO: 
+Task: hard_multihop_2hop_5 | 2-hop | 100,077 chars
+2026-03-11 13:29:33,362 eval INFO:   Q: In which city is the Principal of Sales based?
+2026-03-11 13:29:33,362 eval INFO:   Decomposition: Find who is the Principal of Sales → Victor Hall → Find where Victor Hall is based → Toronto
+2026-03-11 13:29:45,082 eval INFO:   Score: 0.0 (none) | Expected: Toronto | Got: Chicago
+HardMultiHop:  60%|██████    | 6/10 [02:57<01:33, 23.36s/it]2026-03-11 13:29:45,082 eval INFO: 
+Task: hard_multihop_2hop_6 | 2-hop | 100,120 chars
+2026-03-11 13:29:45,082 eval INFO:   Q: In which city is the Senior Manager of Data Science based?
+2026-03-11 13:29:45,082 eval INFO:   Decomposition: Find who is the Senior Manager of Data Science → Wendy Allen → Find where Wendy Allen is based → Zurich
+2026-03-11 13:30:00,994 eval INFO:   Score: 0.0 (none) | Expected: Zurich | Got: Amsterdam
+HardMultiHop:  70%|███████   | 7/10 [03:13<01:02, 20.93s/it]2026-03-11 13:30:00,994 eval INFO: 
+Task: hard_multihop_3hop_7 | 3-hop | 150,113 chars
+2026-03-11 13:30:00,995 eval INFO:   Q: On what date was the project completed by the Sales department delivered?
+2026-03-11 13:30:00,995 eval INFO:   Decomposition: Find what milestone Sales completed → delivery of Project Horizon → Find what project was delivered → Project Horizon → Find the delivery date of Project Horizon → February 28, 2027
+2026-03-11 13:32:52,238 eval INFO:   Score: 0.0 (none) | Expected: February 28, 2027 | Got: Not found
+HardMultiHop:  80%|████████  | 8/10 [06:04<02:17, 68.78s/it]2026-03-11 13:32:52,240 eval INFO: 
+Task: hard_multihop_2hop_8 | 2-hop | 150,073 chars
+2026-03-11 13:32:52,240 eval INFO:   Q: In which city is the Chief of Marketing based?
+2026-03-11 13:32:52,240 eval INFO:   Decomposition: Find who is the Chief of Marketing → Frank Anderson → Find where Frank Anderson is based → Seoul
+2026-03-11 13:33:07,088 eval INFO:   Score: 0.0 (none) | Expected: Seoul | Got: Zurich
+HardMultiHop:  90%|█████████ | 9/10 [06:19<00:51, 51.92s/it]2026-03-11 13:33:07,088 eval INFO: 
+Task: hard_multihop_2hop_9 | 2-hop | 100,125 chars
+2026-03-11 13:33:07,089 eval INFO:   Q: What is the budget for the project led by Emma Martinez?
+2026-03-11 13:33:07,089 eval INFO:   Decomposition: Find what project Emma Martinez leads → Project Horizon → Find the budget of Project Horizon → $6.4 million
+2026-03-11 13:34:16,580 eval INFO:   Score: 0.0 (none) | Expected: $6.4 million | Got: Not found
+HardMultiHop: 100%|██████████| 10/10 [07:28<00:00, 57.35s/it]HardMultiHop: 100%|██████████| 10/10 [07:28<00:00, 44.88s/it]
+2026-03-11 13:34:16,581 eval INFO: 
+--- hard_multi_hop Results ---
+2026-03-11 13:34:16,581 eval INFO: Accuracy/Recall: 40.0%
+2026-03-11 13:34:16,581 eval INFO: Tasks: 10
+2026-03-11 13:34:16,581 eval INFO: 
+============================================================
+2026-03-11 13:34:16,581 eval INFO: Running benchmark: event_counting
+2026-03-11 13:34:16,581 eval INFO: ============================================================
+EventCount:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-11 13:34:16,625 eval INFO: 
+Task: event_count_000 | count_value | 50,201 chars | 20 events
+2026-03-11 13:34:16,625 eval INFO:   Q: How many events in this log have value 9? Return ONLY the count as a number.
+2026-03-11 13:34:28,552 eval INFO:   Score: 1.0 (exact) | Expected: 1 | Got: 1
+EventCount:   5%|▌         | 1/20 [00:11<03:46, 11.93s/it]2026-03-11 13:34:28,553 eval INFO: 
+Task: event_count_001 | count_entity | 204,167 chars | 66 events
+2026-03-11 13:34:28,553 eval INFO:   Q: How many events were performed by Maria Rodriguez? Return ONLY the count as a number.
+2026-03-11 13:34:52,309 eval INFO:   Score: 0.7 (close) | Expected: 10 | Got: 11
+EventCount:  10%|█         | 2/20 [00:35<05:39, 18.89s/it]2026-03-11 13:34:52,310 eval INFO: 
+Task: event_count_002 | first_last | 152,873 chars | 50 events
+2026-03-11 13:34:52,310 eval INFO:   Q: Who performed the first 'login' event in this log? Return ONLY the person's name.
+2026-03-11 13:35:34,021 eval INFO:   Score: 1.0 (contains) | Expected: Olivia White | Got: 32:18Z: Olivia White
+EventCount:  15%|█▌        | 3/20 [01:17<08:18, 29.31s/it]2026-03-11 13:35:34,022 eval INFO: 
+Task: event_count_003 | per_entity | 206,847 chars | 66 events
+2026-03-11 13:35:34,022 eval INFO:   Q: How many events did each person perform? Return as 'Name: count' pairs separated by commas, sorted a
+2026-03-11 13:37:34,856 eval INFO:   Score: 0.7 (partial_entity) | Expected: Henry Wilson: 23, Iris Thompson: 12, Jack Anderson: 18, Kare | Got: Event #10 recorded: 1, Event #20 recorded: 1, Event #26 reco
+EventCount:  20%|██        | 4/20 [03:18<17:27, 65.44s/it]2026-03-11 13:37:34,856 eval INFO: 
+Task: event_count_004 | ratio | 206,409 chars | 66 events
+2026-03-11 13:37:34,857 eval INFO:   Q: What percentage of events are 'download' events? Round to the nearest integer. Return ONLY the numbe
+2026-03-11 13:38:53,860 eval INFO:   Score: 0.5 (close) | Expected: 8 | Got: 9
+EventCount:  25%|██▌       | 5/20 [04:37<17:34, 70.33s/it]2026-03-11 13:38:53,861 eval INFO: 
+Task: event_count_005 | count_value | 50,057 chars | 20 events
+2026-03-11 13:38:53,862 eval INFO:   Q: How many events in this log have value 5? Return ONLY the count as a number.
+2026-03-11 13:39:06,074 eval INFO:   Score: 0.2 (approximate) | Expected: 3 | Got: 4
+EventCount:  30%|███       | 6/20 [04:49<11:48, 50.57s/it]2026-03-11 13:39:06,075 eval INFO: 
+Task: event_count_006 | count_entity | 205,351 chars | 66 events
+2026-03-11 13:39:06,075 eval INFO:   Q: How many events were performed by Frank Miller? Return ONLY the count as a number.
+2026-03-11 13:39:34,172 eval INFO:   Score: 0.7 (close) | Expected: 11 | Got: 12
+EventCount:  35%|███▌      | 7/20 [05:17<09:21, 43.23s/it]2026-03-11 13:39:34,173 eval INFO: 
+Task: event_count_007 | first_last | 203,457 chars | 66 events
+2026-03-11 13:39:34,173 eval INFO:   Q: Who performed the first 'submit' event in this log? Return ONLY the person's name.
+2026-03-11 13:39:51,816 eval INFO:   Score: 1.0 (exact) | Expected: Patrick Harris | Got: Patrick Harris
+EventCount:  40%|████      | 8/20 [05:35<07:00, 35.08s/it]2026-03-11 13:39:51,816 eval INFO: 
+Task: event_count_008 | per_entity | 203,653 chars | 66 events
+2026-03-11 13:39:51,816 eval INFO:   Q: How many events did each person perform? Return as 'Name: count' pairs separated by commas, sorted a
+2026-03-11 13:40:50,061 eval INFO:   Score: 0.7 (partial_entity) | Expected: Alice Chen: 19, David Johnson: 14, Karen Brown: 16, Patrick  | Got: Alice Chen: 21, David Johnson: 13, Karen Brown: 20, Patrick 
+EventCount:  45%|████▌     | 9/20 [06:33<07:45, 42.32s/it]2026-03-11 13:40:50,062 eval INFO: 
+Task: event_count_009 | ratio | 50,061 chars | 20 events
+2026-03-11 13:40:50,062 eval INFO:   Q: What percentage of events are 'comment' events? Round to the nearest integer. Return ONLY the number
+2026-03-11 13:41:21,572 eval INFO:   Score: 1.0 (exact) | Expected: 10 | Got: 10
+EventCount:  50%|█████     | 10/20 [07:04<06:29, 38.98s/it]2026-03-11 13:41:21,573 eval INFO: 
+Task: event_count_010 | count_value | 156,218 chars | 50 events
+2026-03-11 13:41:21,573 eval INFO:   Q: How many events in this log have value 19? Return ONLY the count as a number.
+2026-03-11 13:41:44,814 eval INFO:   Score: 0.0 (wrong_number) | Expected: 4 | Got: 1
+EventCount:  55%|█████▌    | 11/20 [07:28<05:07, 34.17s/it]2026-03-11 13:41:44,815 eval INFO: 
+Task: event_count_011 | count_entity | 100,096 chars | 33 events
+2026-03-11 13:41:44,815 eval INFO:   Q: How many events were performed by Karen Brown? Return ONLY the count as a number.
+2026-03-11 13:42:05,264 eval INFO:   Score: 0.5 (close) | Expected: 7 | Got: 8
+EventCount:  60%|██████    | 12/20 [07:48<03:59, 29.99s/it]2026-03-11 13:42:05,265 eval INFO: 
+Task: event_count_012 | first_last | 200,180 chars | 66 events
+2026-03-11 13:42:05,268 eval INFO:   Q: Who performed the first 'share' event in this log? Return ONLY the person's name.
+2026-03-11 13:43:36,251 eval INFO:   Score: 0.0 (none) | Expected: Frank Miller | Got: The person associated with this event is **Maria Rodriguez**
+EventCount:  65%|██████▌   | 13/20 [09:19<05:39, 48.47s/it]2026-03-11 13:43:36,252 eval INFO: 
+Task: event_count_013 | per_entity | 201,969 chars | 66 events
+2026-03-11 13:43:36,252 eval INFO:   Q: How many events did each person perform? Return as 'Name: count' pairs separated by commas, sorted a
+2026-03-11 13:44:37,895 eval INFO:   Score: 0.7 (partial_entity) | Expected: Alice Chen: 13, Henry Wilson: 15, Iris Thompson: 22, Jack An | Got: *Note: 1, Alice Chen: 16, Based on the text provided, here a
+EventCount:  70%|███████   | 14/20 [10:21<05:14, 52.45s/it]2026-03-11 13:44:37,899 eval INFO: 
+Task: event_count_014 | ratio | 50,098 chars | 20 events
+2026-03-11 13:44:37,900 eval INFO:   Q: What percentage of events are 'purchase' events? Round to the nearest integer. Return ONLY the numbe
+2026-03-11 13:45:09,477 eval INFO:   Score: 0.0 (wrong_number) | Expected: 5 | Got: 0
+EventCount:  75%|███████▌  | 15/20 [10:52<03:50, 46.16s/it]2026-03-11 13:45:09,477 eval INFO: 
+Task: event_count_015 | count_value | 203,653 chars | 66 events
+2026-03-11 13:45:09,477 eval INFO:   Q: How many events in this log have value 11? Return ONLY the count as a number.
+2026-03-11 13:45:32,076 eval INFO:   Score: 1.0 (exact) | Expected: 1 | Got: 1
+EventCount:  80%|████████  | 16/20 [11:15<02:36, 39.07s/it]2026-03-11 13:45:32,076 eval INFO: 
+Task: event_count_016 | count_entity | 100,084 chars | 33 events
+2026-03-11 13:45:32,076 eval INFO:   Q: How many events were performed by Frank Miller? Return ONLY the count as a number.
+2026-03-11 13:45:51,551 eval INFO:   Score: 0.7 (close) | Expected: 12 | Got: 13
+EventCount:  85%|████████▌ | 17/20 [11:34<01:39, 33.18s/it]2026-03-11 13:45:51,552 eval INFO: 
+Task: event_count_017 | first_last | 150,856 chars | 50 events
+2026-03-11 13:45:51,552 eval INFO:   Q: Who performed the first 'create' event in this log? Return ONLY the person's name.
+2026-03-11 13:46:07,068 eval INFO:   Score: 1.0 (exact) | Expected: Bob Martinez | Got: Bob Martinez
+EventCount:  90%|█████████ | 18/20 [11:50<00:55, 27.87s/it]2026-03-11 13:46:07,069 eval INFO: 
+Task: event_count_018 | per_entity | 152,303 chars | 50 events
+2026-03-11 13:46:07,069 eval INFO:   Q: How many events did each person perform? Return as 'Name: count' pairs separated by commas, sorted a
+2026-03-11 13:48:15,381 eval INFO:   Score: 0.0 (none) | Expected: Carol Williams: 13, David Johnson: 8, Iris Thompson: 9, Kare | Got: 
+EventCount:  95%|█████████▌| 19/20 [13:58<00:58, 58.04s/it]2026-03-11 13:48:15,383 eval INFO: 
+Task: event_count_019 | ratio | 50,090 chars | 20 events
+2026-03-11 13:48:15,383 eval INFO:   Q: What percentage of events are 'share' events? Round to the nearest integer. Return ONLY the number (
+2026-03-11 13:48:48,648 eval INFO:   Score: 0.0 (wrong_number) | Expected: 5 | Got: 8
+EventCount: 100%|██████████| 20/20 [14:32<00:00, 50.60s/it]EventCount: 100%|██████████| 20/20 [14:32<00:00, 43.60s/it]
+2026-03-11 13:48:48,650 eval INFO: 
+--- event_counting Results ---
+2026-03-11 13:48:48,651 eval INFO: Accuracy/Recall: 57.2%
+2026-03-11 13:48:48,651 eval INFO: Tasks: 20
+2026-03-11 13:48:48,651 eval INFO: 
+============================================================
+2026-03-11 13:48:48,651 eval INFO: Running benchmark: cross_doc_compare
+2026-03-11 13:48:48,651 eval INFO: ============================================================
+CrossDoc:   0%|          | 0/12 [00:00<?, ?it/s]2026-03-11 13:48:48,686 eval INFO: 
+Task: cross_doc_000 | overlap_entities | 206,710 chars
+2026-03-11 13:48:48,686 eval INFO:   Q: Below are two organizational directories — one for Olympus Digital and one for Apex Global. Identify
+2026-03-11 13:49:29,906 eval INFO:   Score: 0.18 (low_overlap) | Expected: Hannah Stone, Ivan Edwards, Kyle Owens | Got: David Mitchell, Emma Lopez, Fiona Johnson, Fiona Lopez, Grac
+CrossDoc:   8%|▊         | 1/12 [00:41<07:33, 41.22s/it]2026-03-11 13:49:29,907 eval INFO: 
+Task: cross_doc_001 | budget_diff | 208,206 chars
+2026-03-11 13:49:29,907 eval INFO:   Q: Below are two budget reports — one from Olympus Digital and one from Horizon Dynamics — covering the
+2026-03-11 13:52:19,868 eval INFO:   Score: 0.80 (partial_words) | Expected: Project Tau | Got: No common projects found
+CrossDoc:  17%|█▋        | 2/12 [03:31<19:29, 116.95s/it]2026-03-11 13:52:19,869 eval INFO: 
+Task: cross_doc_002 | timeline_conflict | 155,194 chars
+2026-03-11 13:52:19,869 eval INFO:   Q: Below are two event timelines — one from the Corporate Calendar and one from the Project Management 
+2026-03-11 13:52:36,316 eval INFO:   Score: 0.00 (no_overlap) | Expected: Budget Approval, Partnership Signing, Product Launch | Got: 
+CrossDoc:  25%|██▌       | 3/12 [03:47<10:39, 71.06s/it] 2026-03-11 13:52:36,317 eval INFO: 
+Task: cross_doc_003 | metric_comparison | 110,300 chars
+2026-03-11 13:52:36,317 eval INFO:   Q: Below are two performance reports — one for Eastern Region and one for Commercial Services Group. Bo
+2026-03-11 13:53:04,020 eval INFO:   Score: 1.00 (exact) | Expected: Eastern Region | Got: Eastern Region
+CrossDoc:  33%|███▎      | 4/12 [04:15<07:11, 53.94s/it]2026-03-11 13:53:04,021 eval INFO: 
+Task: cross_doc_004 | overlap_entities | 207,970 chars
+2026-03-11 13:53:04,022 eval INFO:   Q: Below are two organizational directories — one for Northstar Enterprises and one for Evergreen Partn
+2026-03-11 13:53:47,389 eval INFO:   Score: 0.38 (low_overlap) | Expected: Brenda Jackson, Diana Thomas, Rachel Martin, Thomas Jackson, | Got: Bob James, Brenda Jackson, Diana Garcia, Diana Thomas, Diana
+CrossDoc:  42%|████▏     | 5/12 [04:58<05:50, 50.13s/it]2026-03-11 13:53:47,390 eval INFO: 
+Task: cross_doc_005 | budget_diff | 159,011 chars
+2026-03-11 13:53:47,390 eval INFO:   Q: Below are two budget reports — one from Ionic Solutions and one from Keystone Ventures — covering th
+2026-03-11 13:54:29,877 eval INFO:   Score: 0.00 (none) | Expected: Project Lambda | Got: Project not found
+CrossDoc:  50%|█████     | 6/12 [05:41<04:45, 47.53s/it]2026-03-11 13:54:29,880 eval INFO: 
+Task: cross_doc_006 | timeline_conflict | 207,813 chars
+2026-03-11 13:54:29,880 eval INFO:   Q: Below are two event timelines — one from the Executive Scheduling and one from the Project Managemen
+2026-03-11 13:55:32,027 eval INFO:   Score: 0.00 (no_overlap) | Expected: Audit Completion, Board Meeting, Stakeholder Meeting, Strate | Got: 
+CrossDoc:  58%|█████▊    | 7/12 [06:43<04:21, 52.31s/it]2026-03-11 13:55:32,028 eval INFO: 
+Task: cross_doc_007 | metric_comparison | 208,149 chars
+2026-03-11 13:55:32,028 eval INFO:   Q: Below are two performance reports — one for Enterprise Solutions Division and one for Commercial Ser
+2026-03-11 13:56:31,638 eval INFO:   Score: 1.00 (exact) | Expected: Commercial Services Group | Got: Commercial Services Group
+CrossDoc:  67%|██████▋   | 8/12 [07:42<03:38, 54.63s/it]2026-03-11 13:56:31,639 eval INFO: 
+Task: cross_doc_008 | overlap_entities | 106,619 chars
+2026-03-11 13:56:31,639 eval INFO:   Q: Below are two organizational directories — one for Horizon Dynamics and one for Delphi Systems. Iden
+2026-03-11 13:57:10,910 eval INFO:   Score: 0.00 (no_overlap) | Expected: Oscar Adams, Wendy Wright, Xavier Lopez, Yara Johnson | Got: 
+CrossDoc:  75%|███████▌  | 9/12 [08:22<02:29, 49.83s/it]2026-03-11 13:57:10,911 eval INFO: 
+Task: cross_doc_009 | budget_diff | 68,849 chars
+2026-03-11 13:57:10,911 eval INFO:   Q: Below are two budget reports — one from Delphi Systems and one from Crestline Corp — covering the sa
+2026-03-11 13:57:42,773 eval INFO:   Score: 0.80 (partial_words) | Expected: Project Mu | Got: Project Iota
+CrossDoc:  83%|████████▎ | 10/12 [08:54<01:28, 44.28s/it]2026-03-11 13:57:42,774 eval INFO: 
+Task: cross_doc_010 | timeline_conflict | 157,311 chars
+2026-03-11 13:57:42,774 eval INFO:   Q: Below are two event timelines — one from the Corporate Calendar and one from the External Affairs Of
+2026-03-11 13:58:29,681 eval INFO:   Score: 0.00 (no_overlap) | Expected: Annual Conference, Merger Announcement, Strategy Retreat, Sy | Got: No conflicting events found
+CrossDoc:  92%|█████████▏| 11/12 [09:40<00:45, 45.09s/it]2026-03-11 13:58:29,682 eval INFO: 
+Task: cross_doc_011 | metric_comparison | 159,316 chars
+2026-03-11 13:58:29,682 eval INFO:   Q: Below are two performance reports — one for Global Operations Unit and one for Digital Transformatio
+2026-03-11 13:59:26,132 eval INFO:   Score: 1.00 (exact) | Expected: Global Operations Unit | Got: Global Operations Unit
+CrossDoc: 100%|██████████| 12/12 [10:37<00:00, 48.54s/it]CrossDoc: 100%|██████████| 12/12 [10:37<00:00, 53.12s/it]
+2026-03-11 13:59:26,135 eval INFO: 
+--- cross_doc_compare Results ---
+2026-03-11 13:59:26,135 eval INFO: Accuracy/Recall: 43.0%
+2026-03-11 13:59:26,135 eval INFO: Tasks: 12
+2026-03-11 13:59:26,135 eval INFO: 
+============================================================
+2026-03-11 13:59:26,135 eval INFO: Running benchmark: key_value_retrieval
+2026-03-11 13:59:26,135 eval INFO: ============================================================
+KeyValue:   0%|          | 0/12 [00:00<?, ?it/s]2026-03-11 13:59:26,445 eval INFO: 
+Task: kv_retrieval_000 | single_lookup | 168,774 chars
+2026-03-11 13:59:26,445 eval INFO:   Q: Find the registry entry with ID 'DEV-13698' and return its CATEGORY. Return ONLY the category word.
+2026-03-11 13:59:42,091 eval INFO:   Score: 1.00 (exact) | Expected: operations | Got: operations
+KeyValue:   8%|▊         | 1/12 [00:15<02:52, 15.65s/it]2026-03-11 13:59:42,092 eval INFO: 
+Task: kv_retrieval_001 | multi_lookup | 57,239 chars
+2026-03-11 13:59:42,092 eval INFO:   Q: Find the registry entries with the following IDs: PER-12066, DEV-70621, CLD-50858. For each entry, r
+2026-03-11 14:00:03,528 eval INFO:   Score: 1.00 (exact) | Expected: PER-12066: 7212.63, DEV-70621: 6618.45, CLD-50858: 575.72 | Got: PER-12066: 7212.63, DEV-70621: 6618.45, CLD-50858: 575.72
+KeyValue:  17%|█▋        | 2/12 [00:37<03:10, 19.05s/it]2026-03-11 14:00:03,528 eval INFO: 
+Task: kv_retrieval_002 | aggregate | 224,132 chars
+2026-03-11 14:00:03,528 eval INFO:   Q: Find ALL registry entries with CATEGORY 'operations' and compute the sum of their VALUEs. Return ONL
+2026-03-11 14:00:24,750 eval INFO:   Score: 0.00 (wrong) | Expected: 22856.67 | Got: 983.37
+KeyValue:  25%|██▌       | 3/12 [00:58<03:00, 20.04s/it]2026-03-11 14:00:24,751 eval INFO: 
+Task: kv_retrieval_003 | single_lookup | 166,608 chars
+2026-03-11 14:00:24,751 eval INFO:   Q: Find the registry entry with ID 'DEV-48222' and return its VALUE. Return ONLY the numeric value.
+2026-03-11 14:00:47,359 eval INFO:   Score: 0.90 (numeric_close) | Expected: 1131.29 | Got: 1131
+KeyValue:  33%|███▎      | 4/12 [01:20<02:48, 21.06s/it]2026-03-11 14:00:47,360 eval INFO: 
+Task: kv_retrieval_004 | multi_lookup | 167,419 chars
+2026-03-11 14:00:47,360 eval INFO:   Q: Find the registry entries with the following IDs: DAT-23760, DEV-13761, RES-13238, DAT-28137. For ea
+2026-03-11 14:02:30,422 eval INFO:   Score: 0.25 (partial) | Expected: DAT-23760: 9201.04, DEV-13761: 7489.30, RES-13238: 115.19, D | Got: DAT-23760: 6997.67, DEV-13761: 8226.41, RES-13238: 115.19, D
+KeyValue:  42%|████▏     | 5/12 [03:03<05:54, 50.63s/it]2026-03-11 14:02:30,424 eval INFO: 
+Task: kv_retrieval_005 | aggregate | 55,687 chars
+2026-03-11 14:02:30,425 eval INFO:   Q: Find ALL registry entries with CATEGORY 'personnel' and compute the sum of their VALUEs. Return ONLY
+2026-03-11 14:02:53,225 eval INFO:   Score: 0.00 (wrong) | Expected: 24329.75 | Got: 16624.12
+KeyValue:  50%|█████     | 6/12 [03:26<04:07, 41.17s/it]2026-03-11 14:02:53,225 eval INFO: 
+Task: kv_retrieval_006 | single_lookup | 165,260 chars
+2026-03-11 14:02:53,225 eval INFO:   Q: Find the registry entry with ID 'QAS-87575' and return its CATEGORY. Return ONLY the category word.
+2026-03-11 14:03:08,876 eval INFO:   Score: 1.00 (exact) | Expected: operations | Got: operations
+KeyValue:  58%|█████▊    | 7/12 [03:42<02:44, 32.83s/it]2026-03-11 14:03:08,877 eval INFO: 
+Task: kv_retrieval_007 | multi_lookup | 170,232 chars
+2026-03-11 14:03:08,877 eval INFO:   Q: Find the registry entries with the following IDs: ADM-23454, QAS-60270, CLD-43024, NET-93891, ENG-58
+2026-03-11 14:05:08,684 eval INFO:   Score: 0.00 (partial) | Expected: ADM-23454: 8961.14, QAS-60270: 931.80, CLD-43024: 385.63, NE | Got: ADM-23454: Not found, QAS-60270: Not found, CLD-43024: Not f
+KeyValue:  67%|██████▋   | 8/12 [05:42<04:02, 60.52s/it]2026-03-11 14:05:08,685 eval INFO: 
+Task: kv_retrieval_008 | aggregate | 222,029 chars
+2026-03-11 14:05:08,685 eval INFO:   Q: Find ALL registry entries with CATEGORY 'maintenance' and compute the sum of their VALUEs. Return ON
+2026-03-11 14:05:33,003 eval INFO:   Score: 0.00 (wrong) | Expected: 43791.06 | Got: 3202.00
+KeyValue:  75%|███████▌  | 9/12 [06:06<02:27, 49.20s/it]2026-03-11 14:05:33,004 eval INFO: 
+Task: kv_retrieval_009 | single_lookup | 223,757 chars
+2026-03-11 14:05:33,004 eval INFO:   Q: Find the registry entry with ID 'NET-54702' and return its VALUE. Return ONLY the numeric value.
+2026-03-11 14:05:55,063 eval INFO:   Score: 1.00 (exact) | Expected: 9578.77 | Got: 9578.77
+KeyValue:  83%|████████▎ | 10/12 [06:28<01:21, 40.82s/it]2026-03-11 14:05:55,064 eval INFO: 
+Task: kv_retrieval_010 | multi_lookup | 111,334 chars
+2026-03-11 14:05:55,064 eval INFO:   Q: Find the registry entries with the following IDs: OPS-88163, QAS-28545, NET-67240, SEC-41376, FIN-44
+2026-03-11 14:06:29,031 eval INFO:   Score: 1.00 (exact) | Expected: OPS-88163: 5814.32, QAS-28545: 334.55, NET-67240: 8692.62, S | Got: OPS-88163: 5814.32, QAS-28545: 334.55, NET-67240: 8692.62, S
+KeyValue:  92%|█████████▏| 11/12 [07:02<00:38, 38.72s/it]2026-03-11 14:06:29,032 eval INFO: 
+Task: kv_retrieval_011 | aggregate | 56,331 chars
+2026-03-11 14:06:29,032 eval INFO:   Q: Find ALL registry entries with CATEGORY 'personnel' and compute the sum of their VALUEs. Return ONLY
+2026-03-11 14:06:41,330 eval INFO:   Score: 0.00 (wrong) | Expected: 33925.64 | Got: 0.00
+KeyValue: 100%|██████████| 12/12 [07:14<00:00, 30.69s/it]KeyValue: 100%|██████████| 12/12 [07:14<00:00, 36.24s/it]
+2026-03-11 14:06:41,332 eval INFO: 
+--- key_value_retrieval Results ---
+2026-03-11 14:06:41,332 eval INFO: Accuracy/Recall: 51.3%
+2026-03-11 14:06:41,332 eval INFO: Tasks: 12
+2026-03-11 14:06:41,613 eval INFO: 
+============================================================
+2026-03-11 14:06:41,613 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-11 14:06:41,614 eval INFO: ============================================================
+2026-03-11 14:06:41,614 eval INFO:   niah: 60.0% (20 tasks)
+2026-03-11 14:06:41,614 eval INFO:   multi_niah: 91.5% (20 tasks)
+2026-03-11 14:06:41,614 eval INFO:   doc_classify: 81.6% (20 tasks)
+2026-03-11 14:06:41,614 eval INFO:   dataframe_qa: 54.0% (20 tasks)
+2026-03-11 14:06:41,614 eval INFO:   code_debug: 25.6% (15 tasks)
+2026-03-11 14:06:41,614 eval INFO:   multi_hop_qa: 85.0% (20 tasks)
+2026-03-11 14:06:41,614 eval INFO:   notebook_qa: 70.0% (15 tasks)
+2026-03-11 14:06:41,614 eval INFO:   hard_niah: 93.3% (15 tasks)
+2026-03-11 14:06:41,614 eval INFO:   verbatim_copy: 100.0% (10 tasks)
+2026-03-11 14:06:41,614 eval INFO:   oolong: 0.0% (10 tasks)
+2026-03-11 14:06:41,614 eval INFO:   hard_multi_hop: 40.0% (10 tasks)
+2026-03-11 14:06:41,614 eval INFO:   event_counting: 57.2% (20 tasks)
+2026-03-11 14:06:41,614 eval INFO:   cross_doc_compare: 43.0% (12 tasks)
+2026-03-11 14:06:41,614 eval INFO:   key_value_retrieval: 51.3% (12 tasks)
+2026-03-11 14:06:41,615 eval INFO: Total time: 18417.3s
+2026-03-11 14:06:41,615 eval INFO: Model stats: {'root_calls': 291, 'sub_calls': 1517, 'total_input_tokens': 8414330, 'total_output_tokens': 295675, 'total_time': 15657.950062513351}
+2026-03-11 14:06:41,615 eval INFO: Results saved to: results/clean_headtohead_base/20260311_085930

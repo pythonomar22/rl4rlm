@@ -45,7 +45,12 @@ while i < len(context):
     if "not found" not in answer.lower():
         results.append(answer.strip())
     i += chunk_size - overlap
-result = results[0] if results else "Not found"
+# Deduplicate and pick the most common answer
+if results:
+    from collections import Counter
+    result = Counter(results).most_common(1)[0][0]
+else:
+    result = "Not found"
 FINAL_VAR("result")
 ```
 
@@ -92,27 +97,33 @@ result = "\\n".join(f"{k}: {v}" for k, v in sorted(classifications.items()))
 FINAL_VAR("result")
 ```
 
-## Example 4: Multi-step reasoning (O(K) chain — find entity, then use it)
+## Example 4: Multi-step reasoning (decompose, then chain — IMPORTANT for complex questions)
+
+If the question involves multiple facts (e.g., "Where is the project led by X headquartered?"), ALWAYS decompose into separate searches. NEVER ask compound questions in a single llm_query.
 
 ```repl
-# Step 1: Find the bridge entity
+# Step 1: Find the bridge entity (decompose the question!)
 chunk_size = 20000
 overlap = 2000
-entity = None
+candidates = []
 i = 0
 while i < len(context):
     chunk = context[i:i+chunk_size]
     answer = llm_query(f"Who is the VP of Engineering? Return ONLY the person's full name. If not found, say 'NOT FOUND'.\\n\\n{chunk}")
     if "not found" not in answer.lower():
-        entity = answer.strip()
-        break
+        candidates.append(answer.strip())
     i += chunk_size - overlap
+# Pick most common candidate
+from collections import Counter
+entity = Counter(candidates).most_common(1)[0][0] if candidates else None
+print(f"Found entity: {entity}")
 ```
 
-Then in the next turn, use the discovered entity:
+Then in the next turn, use the discovered entity for the SECOND search:
 
 ```repl
-# Step 2: Use the entity to find the final answer
+# Step 2: Use the discovered entity to find the final answer
+# This is a SEPARATE search — never combine steps 1 and 2 into one llm_query
 results = []
 i = 0
 while i < len(context):
@@ -121,7 +132,8 @@ while i < len(context):
     if "not found" not in answer.lower():
         results.append(answer.strip())
     i += chunk_size - overlap
-result = results[0] if results else "Not found"
+from collections import Counter
+result = Counter(results).most_common(1)[0][0] if results else "Not found"
 FINAL_VAR("result")
 ```
 

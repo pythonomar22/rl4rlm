@@ -1,0 +1,151 @@
+{
+  "benchmark": "key_value_retrieval",
+  "accuracy": 0.5125000000000001,
+  "n_tasks": 12,
+  "per_task": [
+    {
+      "task_id": "kv_retrieval_000",
+      "task_type": "single_lookup",
+      "expected": "operations",
+      "predicted": "operations",
+      "score": 1.0,
+      "match_type": "exact",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 15.643316745758057,
+      "doc_length": 168774
+    },
+    {
+      "task_id": "kv_retrieval_001",
+      "task_type": "multi_lookup",
+      "expected": "PER-12066: 7212.63, DEV-70621: 6618.45, CLD-50858: 575.72",
+      "predicted": "PER-12066: 7212.63, DEV-70621: 6618.45, CLD-50858: 575.72",
+      "score": 1.0,
+      "match_type": "exact",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 21.37217426300049,
+      "doc_length": 57239
+    },
+    {
+      "task_id": "kv_retrieval_002",
+      "task_type": "aggregate",
+      "expected": "22856.67",
+      "predicted": "983.37",
+      "score": 0.0,
+      "match_type": "wrong",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 21.20245361328125,
+      "doc_length": 224132
+    },
+    {
+      "task_id": "kv_retrieval_003",
+      "task_type": "single_lookup",
+      "expected": "1131.29",
+      "predicted": "1131",
+      "score": 0.9,
+      "match_type": "numeric_close",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 22.606071949005127,
+      "doc_length": 166608
+    },
+    {
+      "task_id": "kv_retrieval_004",
+      "task_type": "multi_lookup",
+      "expected": "DAT-23760: 9201.04, DEV-13761: 7489.30, RES-13238: 115.19, DAT-28137: 5721.08",
+      "predicted": "DAT-23760: 6997.67, DEV-13761: 8226.41, RES-13238: 115.19, DAT-28137: 498.01",
+      "score": 0.25,
+      "match_type": "partial",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 103.05078387260437,
+      "doc_length": 167419
+    },
+    {
+      "task_id": "kv_retrieval_005",
+      "task_type": "aggregate",
+      "expected": "24329.75",
+      "predicted": "16624.12",
+      "score": 0.0,
+      "match_type": "wrong",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 22.79749822616577,
+      "doc_length": 55687
+    },
+    {
+      "task_id": "kv_retrieval_006",
+      "task_type": "single_lookup",
+      "expected": "operations",
+      "predicted": "operations",
+      "score": 1.0,
+      "match_type": "exact",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 15.647971868515015,
+      "doc_length": 165260
+    },
+    {
+      "task_id": "kv_retrieval_007",
+      "task_type": "multi_lookup",
+      "expected": "ADM-23454: 8961.14, QAS-60270: 931.80, CLD-43024: 385.63, NET-93891: 2203.46, ENG-58458: 6611.60",
+      "predicted": "ADM-23454: Not found, QAS-60270: Not found, CLD-43024: Not found, NET-93891: Not found, ENG-58458: Not found",
+      "score": 0.0,
+      "match_type": "partial",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 119.79973030090332,
+      "doc_length": 170232
+    },
+    {
+      "task_id": "kv_retrieval_008",
+      "task_type": "aggregate",
+      "expected": "43791.06",
+      "predicted": "3202.00",
+      "score": 0.0,
+      "match_type": "wrong",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 24.314260482788086,
+      "doc_length": 222029
+    },
+    {
+      "task_id": "kv_retrieval_009",
+      "task_type": "single_lookup",
+      "expected": "9578.77",
+      "predicted": "9578.77",
+      "score": 1.0,
+      "match_type": "exact",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 22.05637288093567,
+      "doc_length": 223757
+    },
+    {
+      "task_id": "kv_retrieval_010",
+      "task_type": "multi_lookup",
+      "expected": "OPS-88163: 5814.32, QAS-28545: 334.55, NET-67240: 8692.62, SEC-41376: 2540.19, FIN-44051: 6351.68",
+      "predicted": "OPS-88163: 5814.32, QAS-28545: 334.55, NET-67240: 8692.62, SEC-41376: 2540.19, FIN-44051: 6351.68",
+      "score": 1.0,
+      "match_type": "exact",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 33.96526026725769,
+      "doc_length": 111334
+    },
+    {
+      "task_id": "kv_retrieval_011",
+      "task_type": "aggregate",
+      "expected": "33925.64",
+      "predicted": "0.00",
+      "score": 0.0,
+      "match_type": "wrong",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 12.295196294784546,
+      "doc_length": 56331
+    }
+  ]
+}

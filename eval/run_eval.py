@@ -38,7 +38,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from tqdm import tqdm
 
-from scaffold.llm_query import TinkerModel, strip_think_tags
+from scaffold.llm_query import TinkerModel, HybridTinkerModel, strip_think_tags
 from scaffold.rlm import rlm, trajectory_to_dict
 from scaffold.prompts.qwen35_35b import QWEN35_35B_SYSTEM_PROMPT
 from scaffold.prompts.qwen2b import QWEN_2B_SYSTEM_PROMPT
@@ -641,10 +641,11 @@ def run_hard_multi_hop_eval(
     system_prompt: str,
     n_tasks: int = 10,
     max_iterations: int = 10,
+    seed_offset: int = 96000,
     verbose: bool = False,
 ) -> dict:
     """Run hard multi-hop QA benchmark (forces true multi-step decomposition)."""
-    tasks = generate_hard_multi_hop_suite(n_tasks=n_tasks)
+    tasks = generate_hard_multi_hop_suite(n_tasks=n_tasks, seed_offset=seed_offset)
 
     results = []
     trajectories = []
@@ -709,10 +710,11 @@ def run_event_counting_eval(
     system_prompt: str,
     n_tasks: int = 10,
     max_iterations: int = 12,
+    seed_offset: int = 94000,
     verbose: bool = False,
 ) -> dict:
     """Run event counting benchmark (counting/aggregation over long docs)."""
-    tasks = generate_event_counting_suite(n_tasks=n_tasks)
+    tasks = generate_event_counting_suite(n_tasks=n_tasks, seed_offset=seed_offset)
 
     results = []
     trajectories = []
@@ -1052,6 +1054,8 @@ def main():
     parser.add_argument("--seed-offset", type=int, default=10000,
                         help="Seed offset for eval tasks (avoid training overlap)")
     parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("--hybrid", action="store_true",
+                        help="Use hybrid model: trained root + base sub-calls")
     parser.add_argument("--system-prompt", default=None,
                         help="Path to custom system prompt file")
     args = parser.parse_args()
@@ -1066,12 +1070,21 @@ def main():
     t0 = time.time()
 
     if args.backend == "tinker":
-        model = TinkerModel(
-            model_name=args.model,
-            model_path=args.model_path,
-            max_new_tokens=2048,
-            temperature=0.7,
-        )
+        if args.hybrid and args.model_path:
+            logger.info("Using HYBRID mode: trained root + base sub-calls")
+            model = HybridTinkerModel(
+                model_name=args.model,
+                model_path=args.model_path,
+                max_new_tokens=2048,
+                temperature=0.7,
+            )
+        else:
+            model = TinkerModel(
+                model_name=args.model,
+                model_path=args.model_path,
+                max_new_tokens=2048,
+                temperature=0.7,
+            )
     else:
         # Legacy: local HF model
         from scaffold.llm_query import HFModel
@@ -1248,6 +1261,9 @@ def main():
         "benchmarks": benchmarks_to_run,
         "n_tasks": args.n_tasks,
         "max_iterations": args.max_iterations,
+        "seed_offset": args.seed_offset,
+        "hybrid": args.hybrid,
+        "model_path": args.model_path,
         "system_prompt": system_prompt[:500] + "...",
         "timestamp": timestamp,
         "git_hash": _get_git_hash(),

@@ -1,0 +1,402 @@
+{
+  "benchmark": "code_debug",
+  "accuracy": 0.2555555555555556,
+  "n_tasks": 15,
+  "per_task": [
+    {
+      "task_id": "debug_000_1bugs_599lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 599,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_payment_cache | BUG: Missing return statement (function ends abruptly after assigning cache_key without checking cache or returning) | FIX: Add logic to check cache and return the cached value, or return None if not found. Corrected code: `cache_key = f'response_{hash(str(params))}'; if cache_key in self._cache: return self._cache[cache_key]; return None` (or similar logic depending on intended behavior).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 140.71079540252686,
+      "prompt_chars": 16255
+    },
+    {
+      "task_id": "debug_001_1bugs_554lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 554,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_record_billing\nBUG: The function definition is truncated, causing a `SyntaxError`. The parameter `params` is assigned the value `No` instead of `None`, and the line is incomplete.\nFIX: Change `params=No` to `params=None` and ensure the function definition is complete (e.g., add a body or ellipsis if intended to be a stub, but based on the pattern, it should be `params=None`).\n\nCorrected line:\n`def process_record_billing(data, params=None):`",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 25.36886167526245,
+      "prompt_chars": 15365
+    },
+    {
+      "task_id": "debug_002_1bugs_585lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 585,
+      "expected_bugs": [
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: The function uses undefined variables 'items', 'logger', and 'elapsed' which will raise a NameError. | FIX: Replace 'items' with 'data' (the function argument) and remove or properly initialize 'logger' and 'elapsed' (e.g., by removing the logging line or defining the variables).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 4,
+      "total_time": 341.0572552680969,
+      "prompt_chars": 15596
+    },
+    {
+      "task_id": "debug_003_1bugs_595lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 595,
+      "expected_bugs": [
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean, which is incorrect for an arithmetic mean calculation. | FIX: Remove the `- 1` from the return statement so it returns `sum(values) / len(values)`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 23.317074298858643,
+      "prompt_chars": 15881
+    },
+    {
+      "task_id": "debug_004_1bugs_1472lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1472,
+      "expected_bugs": [
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: matrix_multiply | BUG: Incorrect matrix multiplication logic in the inner loop. The code accesses `b[j][k]` instead of `b[k][j]`. In matrix multiplication, the element at row `i` of matrix `A` is multiplied by the element at column `j` of matrix `B`. Since `k` iterates over the columns of `A` (which are rows of `B`), the correct access for matrix `B` is `b[k][j]`. The current code `b[j][k]` treats `B` as if it were transposed or accesses invalid indices if dimensions differ, leading to incorrect results. | FIX: Change `b[j][k]` to `b[k][j]` in the line `result[i][j] += a[i][k] * b[j][k]`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 37.94113087654114,
+      "prompt_chars": 39655
+    },
+    {
+      "task_id": "debug_005_1bugs_1446lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1446,
+      "expected_bugs": [
+        "lru_cache"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: The function references an undefined variable `event_data` in the `isinstance` check and `TypeError` message, while the function argument is named `data`. | FIX: Replace `event_data` with `data` in both the condition and the f-string.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 21.42467212677002,
+      "prompt_chars": 38892
+    },
+    {
+      "task_id": "debug_006_1bugs_1353lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1353,
+      "expected_bugs": [
+        "calculate_median"
+      ],
+      "predicted": "FUNCTION: calculate_median | BUG: Index out of bounds error when the list has an even number of elements; the code incorrectly accesses `sorted_vals[n // 2 + 1]` instead of `sorted_vals[n // 2 - 1]` for the lower middle element. | FIX: Change the even case logic to `return (sorted_vals[n // 2 - 1] + sorted_vals[n // 2]) / 2`",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_median",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 112.69355154037476,
+      "prompt_chars": 36024
+    },
+    {
+      "task_id": "debug_007_1bugs_1409lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1409,
+      "expected_bugs": [
+        "dijkstra"
+      ],
+      "predicted": "FUNCTION: process_payment_billing | BUG: Missing return statement and incomplete code at the end of the function | FIX: Add `return result` and complete the function logic (e.g., `result.append(item['value'])` and `return result`)\nFUNCTION: process_payment_api | BUG: Undefined variable 'response_data' used in validation check | FIX: Change 'response_data' to 'data'\nFUNCTION: process_event_api | BUG: Undefined variable 'config_data' used in validation check | FIX: Change 'config_data' to 'data'\nFUNCTION: process_user_notifications | BUG: Undefined variable 'session_data' used in validation check | FIX: Change 'session_data' to 'data'\nFUNCTION: process_session_analytics | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_response_notifications | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_response_db | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_session_db | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_event_scheduler | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_response_api | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_user_scheduler | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_metric_notifications | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_session_cache | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_config_scheduler | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_session_scheduler | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Replace 'items' with 'data' and define 'elapsed' or remove it\nFUNCTION: process_config_notifications | BUG: Duplicate required field 'timestamp' in list | FIX: Change the second 'timestamp' to a unique field like 'id' or 'status'\nFUNCTION: process_config_cache | BUG: Duplicate required field 'timestamp' in list | FIX: Change the second 'timestamp' to a unique field like 'id' or 'status'\nFUNCTION: process_record_notifications | BUG: Duplicate required field 'timestamp' in list | FIX: Change the second 'timestamp' to a unique field like 'id' or 'status'\nFUNCTION: process_order_billing | BUG: Duplicate required field 'status' in list | FIX: Change the second 'status' to a unique field like 'id' or 'timestamp'\nFUNCTION: process_response_billing | BUG: Duplicate required field 'timestamp' in list | FIX: Change the second 'timestamp' to a unique field like 'id' or 'status'\nFUNCTION: process_order_cache | BUG: Duplicate required field 'timestamp' in list | FIX: Change the second 'timestamp' to a unique field like 'id' or 'status'\nFUNCTION: process_user_cache | BUG: Duplicate required field 'status' in list | FIX: Change the second 'status' to a unique field like 'id' or 'timestamp'\nFUNCTION: process_config_scheduler | BUG: Variable 'items' is undefined and 'elapsed' is not defined; missing return statement | FIX: Define 'items' and 'elapsed' variables and add 'return stats'\nFUNCTION: process_config_scheduler | BUG: Missing return statement for the function | FIX: Add 'return stats' at the end of the function\nFUNCTION: process_metric_analytics | BUG: Missing return statement for the function | FIX: Add 'return result' at the end of the function\nFUNCTION: process_request_scheduler | BUG: Missing return statement for the function | FIX: Add 'return result' at the end of the function\nFUNCTION: process_response_billing | BUG: Variable 'config_data' is undefined; 'required_fields' is defined but never used or validated | FIX: Define 'config_data' and add validation logic for 'required_fields'\nFUNCTION: process_response_billing | BUG: Duplicate key 'timestamp' in 'required_fields' list | FIX: Remove duplicate 'timestamp' from the list\nFUNCTION: process_payment_db | BUG: Missing return statement for the function (falls through without returning anything if cache miss) | FIX: Add 'return None' or appropriate logic after the cache check\nFUNCTION: process_metric_billing | BUG: Missing return statement for the function | FIX: Add 'return config' or appropriate logic at the end of the function",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 62.56431841850281,
+      "prompt_chars": 37582
+    },
+    {
+      "task_id": "debug_008_2bugs_1418lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1418,
+      "expected_bugs": [
+        "binary_search",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: process_user_scheduler | BUG: NameError - Variable 'items' is used but never defined in the function scope. | FIX: Replace 'items' with 'data' (e.g., `len(data)`).\nFUNCTION: process_user_scheduler | BUG: NameError - Variable 'elapsed' is used but never defined in the function scope. | FIX: Define 'elapsed' (e.g., `elapsed = time.time() - start_time`) or remove the reference.",
+      "score": 0.0,
+      "found": 0,
+      "total": 2,
+      "details": [
+        {
+          "function": "binary_search",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 117.18782949447632,
+      "prompt_chars": 37848
+    },
+    {
+      "task_id": "debug_009_2bugs_1329lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1329,
+      "expected_bugs": [
+        "count_words",
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_session_db | BUG: Undefined variable 'items' used in logger and stats assignment | FIX: Change 'items' to 'data'\nFUNCTION: process_order_auth | BUG: Undefined variable 'items' used in logger and stats assignment | FIX: Change 'items' to 'data'",
+      "score": 0.0,
+      "found": 0,
+      "total": 2,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        },
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 97.85097575187683,
+      "prompt_chars": 35495
+    },
+    {
+      "task_id": "debug_010_2bugs_1445lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1445,
+      "expected_bugs": [
+        "calculate_mean",
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_user_db | BUG: The variable `payment_data` is used in the type check but is not defined; the function argument is named `data`. | FIX: Change `payment_data` to `data` in the `isinstance` check and `TypeError` message.\nFUNCTION: calculate_mean | BUG: The calculation subtracts 1 from the result (`/ len(values) - 1`), which is incorrect for computing the arithmetic mean. | FIX: Remove the `- 1` so the return statement is `return sum(values) / len(values)`.",
+      "score": 0.5,
+      "found": 1,
+      "total": 2,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        },
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 100.56960082054138,
+      "prompt_chars": 37809
+    },
+    {
+      "task_id": "debug_011_2bugs_1455lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1455,
+      "expected_bugs": [
+        "lru_cache",
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: process_request_cache | BUG: Undefined variable 'user_data' used in isinstance check | FIX: Change 'user_data' to 'data' or define 'user_data' before use\nFUNCTION: process_response_api | BUG: Undefined variable 'request_data' used in isinstance check | FIX: Change 'request_data' to 'data' or define 'request_data' before use",
+      "score": 0.0,
+      "found": 0,
+      "total": 2,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        },
+        {
+          "function": "matrix_multiply",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 115.27148938179016,
+      "prompt_chars": 38445
+    },
+    {
+      "task_id": "debug_012_3bugs_2201lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2201,
+      "expected_bugs": [
+        "binary_search",
+        "lru_cache",
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: stats.py | BUG: The calculate_mean function subtracts 1 from the result, causing incorrect mean calculation | FIX: Remove the \"- 1\" from the return statement so it returns `sum(values) / len(values)`\nFUNCTION: cache.py | BUG: The LRU cache `get` method does not update the order when a key is accessed, breaking the LRU eviction logic | FIX: Add `self.order.remove(key)` and `self.order.append(key)` inside the `if key in self.cache:` block before returning the value\nFUNCTION: middleware_42.py | BUG: The function `process_config_notifications` references undefined variables `items` and `elapsed` instead of using the function arguments or calculating elapsed time | FIX: Replace `items` with `data` and remove the reference to `elapsed` or calculate it properly (e.g., `stats = {'count': len(data)}`)",
+      "score": 0.3333333333333333,
+      "found": 1,
+      "total": 3,
+      "details": [
+        {
+          "function": "binary_search",
+          "found": false
+        },
+        {
+          "function": "lru_cache",
+          "found": false
+        },
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 4,
+      "total_time": 404.52838110923767,
+      "prompt_chars": 58888
+    },
+    {
+      "task_id": "debug_013_3bugs_2241lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2241,
+      "expected_bugs": [
+        "dijkstra",
+        "validate_email",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: process_session_db | BUG: The function attempts to access `self._cache` but `self` is not defined within the function scope (it is a standalone function, not a method of a class). | FIX: Remove the `self` reference and use a local cache variable or pass the cache as an argument.\nFUNCTION: process_record_notifications | BUG: The function definition is incomplete; it cuts off at `params=None` without a closing parenthesis or body. | FIX: Complete the function definition by adding the closing parenthesis `)` and the function body.\nFUNCTION: process_session_notifications | BUG: Missing closing parenthesis and brace in the f-string and dictionary assignment (syntax error). | FIX: Add the missing `)` and `}` to complete the line: `logger.info(f'Processed {len(items)} order')` and `stats = {'count': len(items), 'time': elapsed}`.",
+      "score": 0.0,
+      "found": 0,
+      "total": 3,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        },
+        {
+          "function": "validate_email",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 227.45370197296143,
+      "prompt_chars": 60165
+    },
+    {
+      "task_id": "debug_014_3bugs_2294lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2294,
+      "expected_bugs": [
+        "matrix_multiply",
+        "dijkstra",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: process_request_notifications | BUG: Undefined variables 'items', 'logger', and 'elapsed' used in function body | FIX: Define or pass 'items', 'logger', and 'elapsed' as arguments or initialize them\nFUNCTION: process_metric_auth | BUG: Undefined variable 'session_data' used in validation check | FIX: Pass 'session_data' as an argument or retrieve it from 'data' or 'params'\nFUNCTION: process_event_billing | BUG: Variable 'record_data' is used but not defined in the function scope (parameter is 'data') | FIX: Change 'record_data' to 'data'",
+      "score": 0.0,
+      "found": 0,
+      "total": 3,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": false
+        },
+        {
+          "function": "dijkstra",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 215.1138060092926,
+      "prompt_chars": 61133
+    }
+  ]
+}

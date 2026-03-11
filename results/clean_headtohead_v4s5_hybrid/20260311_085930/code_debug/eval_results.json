@@ -1,0 +1,402 @@
+{
+  "benchmark": "code_debug",
+  "accuracy": 0.22222222222222224,
+  "n_tasks": 15,
+  "per_task": [
+    {
+      "task_id": "debug_000_1bugs_599lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 599,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_payment_notifications | BUG: The required_fields list contains a duplicate 'timestamp' key instead of a distinct field like 'value' or 'id', which is a logical error in validation requirements. | FIX: Change the list to ['timestamp', 'value', 'status'] (or another appropriate distinct field).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 18.08895468711853,
+      "prompt_chars": 16255
+    },
+    {
+      "task_id": "debug_001_1bugs_554lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 554,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_record_cache | BUG: The function references undefined variables `items`, `logger`, and `elapsed` instead of the input argument `data`. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined or removed if not needed (e.g., `logger.info(f'Processed {len(data)} event')`).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 16.46677541732788,
+      "prompt_chars": 15365
+    },
+    {
+      "task_id": "debug_002_1bugs_585lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 585,
+      "expected_bugs": [
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_config_auth | BUG: The function references an undefined variable `record_data` instead of the function argument `data`. | FIX: Replace `record_data` with `data` in the `isinstance` check and the `TypeError` message.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 21.173123598098755,
+      "prompt_chars": 15596
+    },
+    {
+      "task_id": "debug_003_1bugs_595lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 595,
+      "expected_bugs": [
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean, which is incorrect for an arithmetic mean calculation. | FIX: Remove the \"- 1\" from the return statement so it returns `sum(values) / len(values)`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 20.923818588256836,
+      "prompt_chars": 15881
+    },
+    {
+      "task_id": "debug_004_1bugs_1472lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1472,
+      "expected_bugs": [
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: matrix_multiply | BUG: Incorrect index used for matrix b in the inner loop (uses b[j][k] instead of b[k][j]) | FIX: Change b[j][k] to b[k][j] in the line result[i][j] += a[i][k] * b[j][k]",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 23.504857063293457,
+      "prompt_chars": 39655
+    },
+    {
+      "task_id": "debug_005_1bugs_1446lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1446,
+      "expected_bugs": [
+        "lru_cache"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: The function uses the variable name `event_data` in the validation check and error message, but the function argument is named `data`. This will cause a `NameError` because `event_data` is not defined in the function's scope. | FIX: Change `event_data` to `data` in the `isinstance` check and the `TypeError` message.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 36.81140422821045,
+      "prompt_chars": 38892
+    },
+    {
+      "task_id": "debug_006_1bugs_1353lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1353,
+      "expected_bugs": [
+        "calculate_median"
+      ],
+      "predicted": "FUNCTION: process_request_db | BUG: The function ends abruptly after the `if cache_key in self._cache:` block without a return statement or else clause, causing a syntax error (unexpected EOF while parsing) or logical failure to return a value. | FIX: Add `return self._cache[cache_key]` after the `if` block and ensure the function has a proper return statement for the case when the cache miss occurs (e.g., `return None` or process the request).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_median",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 33.698869705200195,
+      "prompt_chars": 36024
+    },
+    {
+      "task_id": "debug_007_1bugs_1409lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1409,
+      "expected_bugs": [
+        "dijkstra"
+      ],
+      "predicted": "FUNCTION: process_payment_billing | BUG: The variable name 'resu' is used but not defined, causing a NameError. | FIX: Change 'resu' to 'result' or define 'resu' before use.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 32.15097498893738,
+      "prompt_chars": 37582
+    },
+    {
+      "task_id": "debug_008_2bugs_1418lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1418,
+      "expected_bugs": [
+        "binary_search",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: binary_search | BUG: Infinite loop when target is greater than arr[mid] because left is set to mid instead of mid + 1 | FIX: Change `left = mid` to `left = mid + 1`\nFUNCTION: process_order_api | BUG: The required_fields list contains 'status' twice instead of including 'timestamp' and 'status' correctly (or missing a unique field like 'id') | FIX: Change `required_fields = ['status', 'timestamp', 'status']` to `required_fields = ['status', 'timestamp', 'id']` (or ensure unique required fields)\nFUNCTION: process_metric_auth | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_metric_auth | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_config_billing | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_config_billing | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_request_scheduler | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_request_scheduler | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_event_auth | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_event_auth | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_record_db | BUG: Undefined variable 'metric_data' used in isinstance check | FIX: Replace 'metric_data' with 'data'\nFUNCTION: process_config_billing | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_event_scheduler | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_payment_billing | BUG: Undefined variable 'order_data' used in isinstance check | FIX: Replace 'order_data' with 'data'\nFUNCTION: process_metric_notifications | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_metric_notifications | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_payment_scheduler | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_payment_scheduler | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_session_cache | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_session_cache | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_request_auth | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_payment_api | BUG: Undefined variable 'record_data' used in isinstance check | FIX: Replace 'record_data' with 'data'\nFUNCTION: process_record_analytics | BUG: Undefined variable 'payment_data' used in isinstance check | FIX: Replace 'payment_data' with 'data'\nFUNCTION: process_config_analytics | BUG: Undefined variable 'user_data' used in isinstance check | FIX: Replace 'user_data' with 'data'\nFUNCTION: process_payment_billing | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_config_scheduler | BUG: Undefined variable 'payment_data' used in isinstance check | FIX: Replace 'payment_data' with 'data'\nFUNCTION: process_event_scheduler | BUG: Undefined variable 'event_data' used in isinstance check | FIX: Replace 'event_data' with 'data'\nFUNCTION: process_metric_billing | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_metric_notifications | BUG: Undefined variable 'request_data' used in isinstance check | FIX: Replace 'request_data' with 'data'\nFUNCTION: process_config_api | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_config_api | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_user_notifications | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_payment_notifications | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_metric_cache | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_metric_cache | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_record_notifications | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_order_billing | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_order_billing | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_request_analytics | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_request_analytics | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_order_notifications | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_order_notifications | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_order_db | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_order_db | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_user_cache | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_user_cache | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_request_analytics | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_response_cache | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_response_cache | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_user_notifications | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_user_notifications | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_user_cache | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_user_billing | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_user_billing | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_response_billing | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_request_billing | BUG: Undefined variable 'metric_data' used in isinstance check | FIX: Replace 'metric_data' with 'data'\nFUNCTION: process_event_api | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_event_api | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_metric_cache | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_config_notifications | BUG: Undefined variable 'self' used in cache access | FIX: Ensure function is a method of a class or pass cache as argument\nFUNCTION: process_record_auth | BUG: Undefined variable 'items' used in logger and stats | FIX: Replace 'items' with 'data'\nFUNCTION: process_record_auth | BUG: Undefined variable 'elapsed' used in stats | FIX: Define 'elapsed' (e.g., capture time before processing)\nFUNCTION: process_record_auth | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats calculation | FIX: Replace 'items' with 'data' and calculate 'elapsed' time or remove the undefined variable usage.\nFUNCTION: process_session_analytics | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats calculation | FIX: Replace 'items' with 'data' and calculate 'elapsed' time or remove the undefined variable usage.",
+      "score": 0.5,
+      "found": 1,
+      "total": 2,
+      "details": [
+        {
+          "function": "binary_search",
+          "found": true
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 218.729496717453,
+      "prompt_chars": 37848
+    },
+    {
+      "task_id": "debug_009_2bugs_1329lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1329,
+      "expected_bugs": [
+        "count_words",
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_session_db | BUG: Uses undefined variables `items` and `elapsed` instead of the function argument `data` and a calculated time value. | FIX: Replace `items` with `data` and define `elapsed` (e.g., `elapsed = time.time() - start_time`).\nFUNCTION: process_order_auth | BUG: Uses undefined variables `items` and `elapsed` instead of the function argument `data` and a calculated time value. | FIX: Replace `items` with `data` and define `elapsed` (e.g., `elapsed = time.time() - start_time`).\nFUNCTION: process_config_cache | BUG: Uses undefined variable `payment_data` instead of the function argument `data`. | FIX: Replace `payment_data` with `data`.\nFUNCTION: process_config_cache | BUG: Function does not return a value or process the data despite defining `required_fields`. | FIX: Add logic to validate `required_fields` in `data` and return the processed result.\nFUNCTION: process_user_api | BUG: Uses undefined variable `self` in `process_response_cache` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_response_cache | BUG: Uses undefined variable `self` in `process_response_cache` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_session_notifications | BUG: Uses undefined variable `self` in `process_session_notifications` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_session_db | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_user_billing | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_response_cache | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_request_db | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_record_api | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_user_api | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_metric_db | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_metric_cache | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_user_analytics | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_request_notifications | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_user_scheduler | BUG: Uses undefined variable `self` in `process_session_scheduler` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_order_billing | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_metric_billing | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_record_db | BUG: Uses undefined variables `items` and `elapsed` instead of function arguments `data` and a calculated time. | FIX: Replace `items` with `data` and calculate `elapsed` time or remove the logging if time is not tracked.\nFUNCTION: process_order_api | BUG: Uses undefined variable `payment_data` instead of the function argument `data`. | FIX: Replace `payment_data` with `data`.\nFUNCTION: process_record_notifications | BUG: Uses undefined variable `record_data` instead of the function argument `data`. | FIX: Replace `record_data` with `data`.\nFUNCTION: process_record_notifications | BUG: The `required_fields` list contains duplicate `'timestamp'` instead of distinct fields. | FIX: Change `['timestamp', 'timestamp', 'status']` to `['timestamp', 'id', 'status']` (or appropriate distinct fields).\nFUNCTION: process_user_analytics | BUG: Uses undefined variable `payment_data` instead of the function argument `data`. | FIX: Replace `payment_data` with `data`.\nFUNCTION: process_user_analytics | BUG: The `required_fields` list contains duplicate `'status'` instead of distinct fields. | FIX: Change `['status', 'timestamp', 'status']` to `['status', 'timestamp', 'id']` (or appropriate distinct fields).\nFUNCTION: process_payment_db | BUG: Uses undefined variable `self` in `process_payment_db` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_user_auth | BUG: Uses undefined variable `self` in `process_user_auth` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_event_analytics | BUG: Uses undefined variable `self` in `process_event_analytics` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_user_analytics | BUG: Uses undefined variable `self` in `process_user_analytics` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_response_db | BUG: Uses undefined variable `self` in `process_response_db` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_session_scheduler | BUG: Uses undefined variable `self` in `process_session_scheduler` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_request_notifications | BUG: Uses undefined variable `self` in `process_request_notifications` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_response_notifications | BUG: Uses undefined variable `self` in `process_response_notifications` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_event_db | BUG: Uses undefined variable `self` in `process_event_db` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or convert the function to a method within a class.\nFUNCTION: process_user_analytics | BUG: Uses undefined variable `self` in `process_user_analytics` (and similar functions) which is not a class method. | FIX: Remove `self._cache` references or",
+      "score": 0.0,
+      "found": 0,
+      "total": 2,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        },
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 91.3429799079895,
+      "prompt_chars": 35495
+    },
+    {
+      "task_id": "debug_010_2bugs_1445lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1445,
+      "expected_bugs": [
+        "calculate_mean",
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_user_db | BUG: The variable `payment_data` is used in the type check but is not defined in the function scope (the argument is named `data`). | FIX: Change `payment_data` to `data`.\nFUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean (`sum(values) / len(values) - 1`), which is incorrect for an arithmetic mean calculation. | FIX: Remove the `- 1` so the return statement is `return sum(values) / len(values)`.\nFUNCTION: calculate_mean | BUG: Incorrect calculation of the mean; subtracts 1 from the result. | FIX: Remove the `- 1` from the return statement.\nFUNCTION: process_metric_api | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined or passed as arguments. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined or passed as parameters.\nFUNCTION: process_response_db | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_response_api | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_config_analytics | BUG: Duplicate field `'status'` in `required_fields` list. | FIX: Remove the duplicate `'status'` entry.\nFUNCTION: process_user_cache | BUG: Undefined variable `response_data` is used instead of the function argument `data`. | FIX: Replace `response_data` with `data`.\nFUNCTION: process_user_scheduler | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_order_analytics | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_order_scheduler | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_record_billing | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_user_auth | BUG: Duplicate function definition in the same module with different logic (different `required_fields`). | FIX: Rename one of the functions or merge the logic.\nFUNCTION: process_metric_cache | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_metric_billing | BUG: Duplicate function definition in the same module with different logic (different `required_fields`). | FIX: Rename one of the functions or merge the logic.\nFUNCTION: process_record_analytics | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_event_auth | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_config_scheduler | BUG: Duplicate field `'status'` in `required_fields` list. | FIX: Remove the duplicate `'status'` entry.\nFUNCTION: process_config_api | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_order_analytics | BUG: Undefined variable `order_data` is used instead of the function argument `data`. | FIX: Replace `order_data` with `data`.\nFUNCTION: process_session_cache | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_payment_scheduler | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_record_db | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_order_api | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_session_scheduler | BUG: Undefined variable `response_data` is used instead of the function argument `data`. | FIX: Replace `response_data` with `data`.\nFUNCTION: process_config_cache | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_order_analytics | BUG: Undefined variable `request_data` is used instead of the function argument `data`. | FIX: Replace `request_data` with `data`.\nFUNCTION: process_response_scheduler | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_payment_analytics | BUG: Undefined variable `user_data` is used instead of the function argument `data`. | FIX: Replace `user_data` with `data`.\nFUNCTION: process_request_billing | BUG: Duplicate field `'status'` in `required_fields` list. | FIX: Remove the duplicate `'status'` entry.\nFUNCTION: process_response_analytics | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_payment_cache | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_payment_analytics | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_session_db | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_config_notifications | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_record_api | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_payment_notifications | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_record_auth | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_order_auth | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `logger` and `elapsed` are defined.\nFUNCTION: process_config_api | BUG: Undefined variable `self` is used, but the function is not a method of a class. | FIX: Remove `self` or pass the cache object as an argument.\nFUNCTION: process_config_cache | BUG: Undefined variables `items`, `logger`, and `elapsed` are used without being defined. | FIX: Replace `items` with `data`, and ensure `",
+      "score": 0.5,
+      "found": 1,
+      "total": 2,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        },
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 119.23965001106262,
+      "prompt_chars": 37809
+    },
+    {
+      "task_id": "debug_011_2bugs_1455lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1455,
+      "expected_bugs": [
+        "lru_cache",
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: process_response_notifications | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats assignment | FIX: Replace 'items' with 'data' and define 'elapsed'",
+      "score": 0.0,
+      "found": 0,
+      "total": 2,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        },
+        {
+          "function": "matrix_multiply",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 4,
+      "total_time": 348.0530569553375,
+      "prompt_chars": 38445
+    },
+    {
+      "task_id": "debug_012_3bugs_2201lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2201,
+      "expected_bugs": [
+        "binary_search",
+        "lru_cache",
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean, resulting in an incorrect value. | FIX: Remove the `- 1` from the return statement: `return sum(values) / len(values)`\nFUNCTION: process_user_db | BUG: The variable `config_data` is used in `isinstance` check but is not defined; the function argument is named `data`. | FIX: Change `config_data` to `data` in the `isinstance` check\nFUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean, resulting in an incorrect average. | FIX: Remove the `- 1` from the return statement so it returns `sum(values) / len(values)`.",
+      "score": 0.3333333333333333,
+      "found": 1,
+      "total": 3,
+      "details": [
+        {
+          "function": "binary_search",
+          "found": false
+        },
+        {
+          "function": "lru_cache",
+          "found": false
+        },
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 284.92357540130615,
+      "prompt_chars": 58888
+    },
+    {
+      "task_id": "debug_013_3bugs_2241lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2241,
+      "expected_bugs": [
+        "dijkstra",
+        "validate_email",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: process_session_db | BUG: Missing 'self' reference in a standalone function context | FIX: Remove 'self._cache' references or ensure the function is a method of a class that has '_cache'.\nFUNCTION: process_session_analytics | BUG: Undefined variable 'record_data' used in type check | FIX: Change 'record_data' to 'data' to match the function argument.\nFUNCTION: process_event_notifications | BUG: Duplicate field in required_fields list | FIX: Remove the duplicate 'timestamp' from the list `['timestamp', 'timestamp', 'status']` to `['timestamp', 'status']`.",
+      "score": 0.0,
+      "found": 0,
+      "total": 3,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        },
+        {
+          "function": "validate_email",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 129.88779950141907,
+      "prompt_chars": 60165
+    },
+    {
+      "task_id": "debug_014_3bugs_2294lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2294,
+      "expected_bugs": [
+        "matrix_multiply",
+        "dijkstra",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: process_request_notifications | BUG: Undefined variable 'items' used in log and stats assignment | FIX: Change 'items' to 'data' (e.g., `logger.info(f'Processed {len(data)} config')`)\nFUNCTION: process_request_notifications | BUG: Undefined variable 'elapsed' used in stats assignment | FIX: Define 'elapsed' (e.g., `elapsed = time.time() - start_time` or remove the variable if not needed)\nFUNCTION: process_record_cache | BUG: Undefined variable 'items' used in log and stats assignment | FIX: Change 'items' to 'data' (e.g., `logger.info(f'Processed {len(data)} event')`)",
+      "score": 0.0,
+      "found": 0,
+      "total": 3,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": false
+        },
+        {
+          "function": "dijkstra",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 124.53468227386475,
+      "prompt_chars": 61133
+    }
+  ]
+}
