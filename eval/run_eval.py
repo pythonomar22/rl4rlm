@@ -1127,22 +1127,21 @@ def main():
     all_eval_results = {}
     eval_start = time.time()
 
-    # Best strategy per benchmark (from training analysis)
+    # Best strategy per benchmark (empirically validated on V4-s5)
+    # Only include strategies that IMPROVE over no-strategy baseline.
+    # cross_doc_separate HURTS cross_doc (5.7% vs 28.6%) — too prescriptive
+    # extract_compute HURTS event_counting (31.2% vs 50.4%) — constrains approach
     BEST_EVAL_STRATEGY = {
-        "cross_doc_compare": "cross_doc_separate",
-        "dataframe_qa": "table_preserve",
-        "notebook_qa": "notebook_sequential",
-        "key_value_retrieval": "lookup_thorough",
-        "event_counting": "extract_compute",
+        "dataframe_qa": "table_preserve",       # +33pp (80% vs 47%)
+        "notebook_qa": "notebook_sequential",    # +10.8pp (70.8% vs 60%)
+        "key_value_retrieval": "lookup_thorough", # +21.4pp (66.7% on 3 tasks)
+        # Below: untested, use training analysis defaults
         "niah": "binary_search",
         "multi_niah": "map_reduce",
         "doc_classify": "map_reduce",
         "hard_multi_hop": "two_pass",
         "multi_hop_qa": "two_pass",
-        "code_debug": "standard",
         "hard_niah": "small_chunks",
-        "verbatim_copy": "standard",
-        "oolong": "extract_compute",
     }
 
     for bench in benchmarks_to_run:

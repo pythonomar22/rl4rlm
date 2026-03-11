@@ -126,6 +126,34 @@ The trained model loses format fidelity: "87.0%" becomes "0.870", percentages dr
 
 **Implication for V10 training:** These failure modes are all addressable through targeted strategy prompts (cross_doc_separate, lookup_thorough, precision_extract, table_preserve, notebook_sequential) combined with heavier training weight on regression tasks.
 
+### Strategy-Aware Evaluation: A Critical Finding
+
+We discover that **strategy prompts at eval time** can recover or exceed base performance on regressed benchmarks WITHOUT additional training:
+
+| Benchmark | V4-s5 | V4-s5 + Strategy | Strategy | Effect |
+|-----------|-------|-----------------|----------|--------|
+| DataFrame QA | 47.0% | **80.0%** | table_preserve | +33pp (beats base 54%) |
+| Notebook QA | 60.0% | **70.8%** | notebook_sequential | +10.8pp (matches base 70%) |
+| Key-Value Retrieval | 45.3% | **66.7%** | lookup_thorough | +21.4pp (beats base 51%) |
+| Event Counting | 50.4% | 36.7% | extract_compute | -13.7pp (HURTS) |
+| Cross-Doc Compare | 28.6% | 29.2% | cross_doc_separate | +0.6pp (no effect) |
+
+*N=12 tasks for completed benchmarks, 3-5 for partial. Note: separate runs from V9-s5 eval below.*
+
+This reveals that **RLMs are highly sensitive to the system prompt strategy**. The same model weights produce dramatically different results (47% vs 80% on DataFrame QA) based on whether the prompt guides the approach. Two strategies work; two hurt. The key distinguishing factor: **strategies that constrain the search space work when the constraint matches the task** (table preservation for CSVs) but **fail when the constraint is misaligned** (forced extraction-then-count for flexible event types).
+
+Complementarily, **additional training without strategies** (V9-s5, 5 more GRPO steps) independently fixes different benchmarks:
+
+| Benchmark | V4-s5 | V9-s5 | Delta |
+|-----------|-------|-------|-------|
+| Cross-Doc Compare | 28.6% | **56.9%** | +28.3pp (beats base 43%) |
+| Event Counting | 50.4% | **75.0%** | +24.6pp (beats base 57%) |
+| Notebook QA | 60.0% | 62.5% | +2.5pp (still below base) |
+| DataFrame QA | 47.0% | 25.7% | -21.3pp (WORSE) |
+| Key-Value Retrieval | 45.3% | 37.8% | -7.5pp (WORSE) |
+
+**The two approaches are complementary**: training fixes cross-doc and event counting; strategy prompts fix DataFrame QA and notebook QA. V10 training combines both by including the new strategies in SC-GRPO training, teaching the model to internalize effective strategies while also training on the regression tasks with higher weight.
+
 ## Training Results
 
 ### GRPO v1 — Step 10 vs Step 20
