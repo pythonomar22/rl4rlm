@@ -41,6 +41,7 @@ from tqdm import tqdm
 from scaffold.llm_query import TinkerModel, HybridTinkerModel, strip_think_tags
 from scaffold.rlm import rlm, trajectory_to_dict
 from scaffold.prompts.qwen35_35b import QWEN35_35B_SYSTEM_PROMPT
+from training.rl_tinker_v6 import STRATEGY_SUFFIXES
 from scaffold.prompts.qwen2b import QWEN_2B_SYSTEM_PROMPT
 from eval.benchmarks.niah import generate_niah_suite, score_niah
 from eval.benchmarks.multi_niah import generate_multi_niah_suite, score_multi_niah
@@ -1058,6 +1059,8 @@ def main():
                         help="Use hybrid model: trained root + base sub-calls")
     parser.add_argument("--system-prompt", default=None,
                         help="Path to custom system prompt file")
+    parser.add_argument("--eval-strategy", action="store_true",
+                        help="Use best strategy prompt per benchmark (for trained models)")
     args = parser.parse_args()
 
     # Results directory
@@ -1124,7 +1127,34 @@ def main():
     all_eval_results = {}
     eval_start = time.time()
 
+    # Best strategy per benchmark (from training analysis)
+    BEST_EVAL_STRATEGY = {
+        "cross_doc_compare": "cross_doc_separate",
+        "dataframe_qa": "table_preserve",
+        "notebook_qa": "notebook_sequential",
+        "key_value_retrieval": "lookup_thorough",
+        "event_counting": "extract_compute",
+        "niah": "binary_search",
+        "multi_niah": "map_reduce",
+        "doc_classify": "map_reduce",
+        "hard_multi_hop": "two_pass",
+        "multi_hop_qa": "two_pass",
+        "code_debug": "standard",
+        "hard_niah": "small_chunks",
+        "verbatim_copy": "standard",
+        "oolong": "extract_compute",
+    }
+
     for bench in benchmarks_to_run:
+        # Apply strategy-specific system prompt if requested
+        bench_system_prompt = system_prompt
+        if args.eval_strategy and bench in BEST_EVAL_STRATEGY:
+            strategy = BEST_EVAL_STRATEGY[bench]
+            suffix = STRATEGY_SUFFIXES.get(strategy, "")
+            if suffix:
+                bench_system_prompt = system_prompt + suffix
+                logger.info(f"Using strategy '{strategy}' for {bench}")
+
         logger.info(f"\n{'=' * 60}")
         logger.info(f"Running benchmark: {bench}")
         logger.info(f"{'=' * 60}")
@@ -1132,7 +1162,7 @@ def main():
         if bench == "niah":
             eval_results = run_niah_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=args.n_tasks,
                 max_iterations=args.max_iterations,
                 doc_lengths=args.doc_lengths,
@@ -1143,7 +1173,7 @@ def main():
         elif bench == "multi_niah":
             eval_results = run_multi_niah_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 24),
                 max_iterations=args.max_iterations,
                 verbose=args.verbose,
@@ -1151,7 +1181,7 @@ def main():
         elif bench == "doc_classify":
             eval_results = run_doc_classify_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 20),
                 max_iterations=args.max_iterations,
                 verbose=args.verbose,
@@ -1159,7 +1189,7 @@ def main():
         elif bench == "dataframe_qa":
             eval_results = run_dataframe_qa_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 20),
                 max_iterations=args.max_iterations,
                 verbose=args.verbose,
@@ -1167,7 +1197,7 @@ def main():
         elif bench == "code_debug":
             eval_results = run_code_debug_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 15),
                 max_iterations=args.max_iterations,
                 verbose=args.verbose,
@@ -1175,7 +1205,7 @@ def main():
         elif bench == "multi_hop_qa":
             eval_results = run_multi_hop_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 20),
                 max_iterations=args.max_iterations,
                 verbose=args.verbose,
@@ -1183,7 +1213,7 @@ def main():
         elif bench == "notebook_qa":
             eval_results = run_notebook_qa_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 15),
                 max_iterations=args.max_iterations,
                 verbose=args.verbose,
@@ -1191,7 +1221,7 @@ def main():
         elif bench == "hard_niah":
             eval_results = run_hard_niah_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 15),
                 max_iterations=args.max_iterations,
                 verbose=args.verbose,
@@ -1199,7 +1229,7 @@ def main():
         elif bench == "verbatim_copy":
             eval_results = run_verbatim_copy_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 10),
                 max_iterations=args.max_iterations,
                 verbose=args.verbose,
@@ -1207,7 +1237,7 @@ def main():
         elif bench == "oolong":
             eval_results = run_oolong_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 10),
                 max_iterations=12,  # OOLONG tasks are complex, need more iterations
                 verbose=args.verbose,
@@ -1215,7 +1245,7 @@ def main():
         elif bench == "hard_multi_hop":
             eval_results = run_hard_multi_hop_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 10),
                 max_iterations=args.max_iterations,
                 verbose=args.verbose,
@@ -1223,7 +1253,7 @@ def main():
         elif bench == "event_counting":
             eval_results = run_event_counting_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=args.n_tasks,
                 max_iterations=12,  # Counting tasks need more iterations
                 verbose=args.verbose,
@@ -1231,7 +1261,7 @@ def main():
         elif bench == "cross_doc_compare":
             eval_results = run_cross_doc_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 12),
                 max_iterations=12,  # Cross-doc needs multi-step reasoning
                 verbose=args.verbose,
@@ -1239,7 +1269,7 @@ def main():
         elif bench == "key_value_retrieval":
             eval_results = run_key_value_eval(
                 model=model,
-                system_prompt=system_prompt,
+                system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 12),
                 max_iterations=10,
                 verbose=args.verbose,

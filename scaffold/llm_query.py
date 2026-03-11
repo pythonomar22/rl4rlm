@@ -422,6 +422,25 @@ class HybridTinkerModel:
         })
         return response
 
+    def refresh_root_sampling_client(self, sampling_client):
+        """Update the root sampling client with new LoRA weights.
+
+        Used during training: after each optimizer step, refresh the root model
+        with updated weights while keeping the sub-call model as base.
+        """
+        self.root_sampling_client = sampling_client
+        logger.info("Refreshed root sampling client with new weights")
+
+    @property
+    def sampling_client(self):
+        """Compatibility with TinkerModel interface — returns root client."""
+        return self.root_sampling_client
+
+    @sampling_client.setter
+    def sampling_client(self, value):
+        """Compatibility: setting sampling_client updates root client only."""
+        self.root_sampling_client = value
+
     def reset_stats(self):
         self.generation_log = []
         self.last_logprobs = None

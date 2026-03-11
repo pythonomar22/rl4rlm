@@ -59,6 +59,7 @@ from eval.benchmarks.notebook_qa import generate_notebook_qa_suite, score_notebo
 from eval.benchmarks.multi_hop_hard import generate_hard_multi_hop_suite, score_hard_multi_hop
 from eval.benchmarks.event_counting import generate_event_counting_suite, score_event_counting
 from eval.benchmarks.cross_doc_compare import generate_cross_doc_suite, score_cross_doc
+from eval.benchmarks.key_value_retrieval import generate_key_value_suite, score_key_value
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -114,6 +115,57 @@ This catches hallucinations from single-pass approaches.""",
 For this task, use small chunks (5000-8000 chars) with large overlap (2000 chars).
 This ensures you don't miss information at boundaries.
 Process each chunk carefully and aggregate all findings before answering.""",
+
+    # V10: Task-specific strategies targeting regression failure modes
+    "cross_doc_separate": """
+
+## Strategy: Separate-Then-Compare
+For this task, process each document/source SEPARATELY. Do NOT mix information across documents in a single pass.
+1. EXTRACT from Document A: Read and extract all relevant data from the first source
+2. EXTRACT from Document B: Read and extract all relevant data from the second source
+3. COMPARE: Use Python to compare the two extracted datasets (set intersection, difference, etc.)
+Keep data from each source in separate Python variables until the comparison step.""",
+
+    "table_preserve": """
+
+## Strategy: Table-Aware Processing
+For this task, the context contains structured tabular data (CSV, TSV, or similar).
+1. FIRST: Extract the header row to understand column names and types
+2. NEVER split rows across chunks — keep each row intact
+3. Parse the table into a Python data structure (list of dicts, pandas DataFrame)
+4. Use Python operations (groupby, filter, sort, aggregate) on the parsed data
+5. Preserve exact values — do NOT round, truncate, or reformat numbers/percentages.""",
+
+    "precision_extract": """
+
+## Strategy: Precision Extraction
+For this task, exact values matter. Pay close attention to:
+1. Number formats: percentages (87.0%), decimals (0.870), integers (87)
+2. Units: keep original units (%, $, ms, etc.) — do NOT convert unless asked
+3. String formats: preserve original capitalization, spacing, and punctuation
+4. When extracting from llm_query results, use regex to find the EXACT value as it appears in the source
+Return the answer in the SAME format as it appears in the original document.""",
+
+    "lookup_thorough": """
+
+## Strategy: Exhaustive Lookup
+For this task, you must find specific entries (by ID, key, name) in a large document.
+1. Use SMALL chunks (5000-8000 chars) to avoid missing entries at boundaries
+2. Search EVERY chunk — do NOT stop after finding some matches
+3. Use large overlap (2000+ chars) between chunks
+4. For each target, track whether it was found or not
+5. If any target is NOT FOUND after all chunks, do a SECOND PASS with different chunk boundaries
+6. Return ONLY the values you actually found — never guess or hallucinate missing values.""",
+
+    "notebook_sequential": """
+
+## Strategy: Sequential Cell Processing
+For this task, the context contains a Jupyter notebook with code cells and their outputs.
+1. Process cells IN ORDER — cell outputs depend on previous cells
+2. Track variable state: what each cell defines, modifies, or prints
+3. Pay attention to cell output sections — the answer is often in a print() or display() output
+4. Distinguish between code and output: code defines logic, output contains results
+5. When asked about a specific value, trace it through the cell execution chain.""",
 }
 
 # Which strategies to prefer for each task type
@@ -125,9 +177,11 @@ TASK_STRATEGY_WEIGHTS = {
     "hard_multi_hop": {"two_pass": 0.3, "standard": 0.2, "small_chunks": 0.2, "extract_compute": 0.15, "binary_search": 0.15},
     "multi_hop_qa": {"two_pass": 0.3, "standard": 0.3, "binary_search": 0.2, "small_chunks": 0.2},
     "code_debug": {"standard": 0.4, "two_pass": 0.3, "small_chunks": 0.3},
-    "notebook_qa": {"extract_compute": 0.3, "standard": 0.3, "map_reduce": 0.2, "small_chunks": 0.2},
-    "dataframe_qa": {"extract_compute": 0.4, "map_reduce": 0.3, "standard": 0.2, "small_chunks": 0.1},
-    "cross_doc_compare": {"map_reduce": 0.3, "two_pass": 0.3, "extract_compute": 0.2, "standard": 0.2},
+    # V10: Regression-targeted strategy weights
+    "notebook_qa": {"notebook_sequential": 0.35, "precision_extract": 0.25, "extract_compute": 0.2, "small_chunks": 0.2},
+    "dataframe_qa": {"table_preserve": 0.4, "extract_compute": 0.3, "precision_extract": 0.2, "standard": 0.1},
+    "cross_doc_compare": {"cross_doc_separate": 0.4, "two_pass": 0.25, "map_reduce": 0.2, "extract_compute": 0.15},
+    "key_value_retrieval": {"lookup_thorough": 0.4, "binary_search": 0.25, "small_chunks": 0.2, "precision_extract": 0.15},
 }
 
 
@@ -219,6 +273,9 @@ def compute_reward(trajectory_dict: dict, task_type: str, task_info: dict | None
     elif task_type == "cross_doc_compare":
         # Cross-doc: multi-step reasoning required (find doc A info, find doc B info, compare)
         return 0.65 * score + 0.10 * (format_bonus + 0.1) + 0.15 * persistence_bonus + 0.10 * subcall_bonus
+    elif task_type == "key_value_retrieval":
+        # KV retrieval: thorough search required, precision matters
+        return 0.75 * score + 0.10 * (format_bonus + 0.1) + 0.05 * persistence_bonus + 0.10 * subcall_bonus
     else:
         return score
 
@@ -530,6 +587,44 @@ class AdaptiveTaskScheduler:
 
 
 # ============================================================================
+# Task distributions
+# ============================================================================
+
+TASK_DISTRIBUTIONS = {
+    "v9": [
+        ("hard_multi_hop", 0.15),
+        ("multi_hop_qa", 0.15),
+        ("event_counting", 0.15),
+        ("cross_doc_compare", 0.10),
+        ("notebook_qa", 0.10),
+        ("dataframe_qa", 0.10),
+        ("code_debug", 0.10),
+        ("doc_classify", 0.05),
+        ("niah", 0.05),
+        ("multi_niah", 0.05),
+    ],
+    # V10: Regression-focused distribution
+    # Heavily weight the 5 tasks where V4-s5 regresses vs base:
+    #   Cross-Doc Compare: -14.4pp, DataFrame QA: -7pp, Notebook QA: -10pp,
+    #   Event Counting: -6.8pp, Key-Value Retrieval: -6pp
+    # Maintain some weight on improved tasks to prevent forgetting.
+    "v10": [
+        ("cross_doc_compare", 0.18),    # -14.4pp regression, biggest
+        ("key_value_retrieval", 0.14),   # -6pp, NEW (not in V9 training!)
+        ("notebook_qa", 0.14),           # -10pp regression
+        ("dataframe_qa", 0.12),          # -7pp regression
+        ("event_counting", 0.12),        # -6.8pp regression
+        ("hard_multi_hop", 0.08),        # +10pp, maintain
+        ("multi_hop_qa", 0.06),          # 0pp, maintain
+        ("code_debug", 0.06),            # 0pp, maintain
+        ("doc_classify", 0.04),          # +17.2pp, already strong
+        ("niah", 0.03),                  # +10pp, already strong
+        ("multi_niah", 0.03),            # +4pp, already strong
+    ],
+}
+
+
+# ============================================================================
 # Task sampling
 # ============================================================================
 
@@ -537,8 +632,9 @@ def sample_tasks_v6(
     batch_size: int,
     step: int,
     scheduler: AdaptiveTaskScheduler,
+    task_dist: str = "v9",
 ) -> list[dict]:
-    """Sample a batch of tasks for V6 training.
+    """Sample a batch of tasks for V6+ training.
 
     CRITICAL DESIGN: Minimum context length = 50K chars for all tasks except code_debug.
     This prevents the model from learning single-pass shortcuts (where it just sends
@@ -563,18 +659,9 @@ def sample_tasks_v6(
     # produced seeds 10000-19000 which overlapped with eval.
     seed_offset = step * 1000 + 100000
 
-    task_weights = [
-        ("hard_multi_hop", 0.15),
-        ("multi_hop_qa", 0.15),
-        ("event_counting", 0.15),  # teaches extract-then-count-in-Python
-        ("cross_doc_compare", 0.10),  # NEW: cross-document comparison (O(N) multi-doc)
-        ("notebook_qa", 0.10),
-        ("dataframe_qa", 0.10),
-        ("code_debug", 0.10),
-        ("doc_classify", 0.05),
-        ("niah", 0.05),
-        ("multi_niah", 0.05),
-    ]
+    # V10: regression-focused distribution — heavily weight tasks where V4-s5 regresses
+    # V9 distribution is the default; V10 shifts toward regression tasks
+    task_weights = TASK_DISTRIBUTIONS.get(task_dist, TASK_DISTRIBUTIONS["v9"])
 
     type_names = [t[0] for t in task_weights]
     type_probs = [t[1] for t in task_weights]
@@ -637,6 +724,12 @@ def sample_tasks_v6(
             # Cross-document comparison: O(N) multi-doc reasoning
             items = generate_cross_doc_suite(n_tasks=count, seed_offset=s)
             tasks.extend({"task": t, "type": "cross_doc_compare"} for t in items)
+        elif ttype == "key_value_retrieval":
+            # Key-value retrieval: exhaustive search for IDs in large documents
+            items = generate_key_value_suite(
+                n_tasks=count, doc_lengths=[50000, 100000, 150000], seed_offset=s
+            )
+            tasks.extend({"task": t, "type": "key_value_retrieval"} for t in items)
 
     rng.shuffle(tasks)
     return tasks
@@ -681,6 +774,9 @@ def score_trajectory(traj_dict: dict, task_info: dict) -> float:
     elif task_type == "cross_doc_compare":
         scores = score_cross_doc(answer, task)
         return scores["score"]
+    elif task_type == "key_value_retrieval":
+        scores = score_key_value(answer, task)
+        return scores["score"]
     return 0
 
 
@@ -708,6 +804,7 @@ def train_rl_v6(
     clip_high: float = 0.0,
     clip_low: float = 0.0,
     maxrl: bool = False,
+    hybrid_training: bool = False,
 ):
     """Run GRPO RL training V6 on Tinker.
 
@@ -770,13 +867,25 @@ def train_rl_v6(
     sampling_client = training_client.save_weights_and_get_sampling_client(name="v6-init")
 
     # Model wrapper
-    model = TinkerModel(
-        model_name=model_name,
-        max_new_tokens=2048,
-        temperature=1.0,
-    )
-    model.capture_logprobs = True
-    model.sampling_client = sampling_client
+    if hybrid_training:
+        from scaffold.llm_query import HybridTinkerModel
+        model = HybridTinkerModel(
+            model_name=model_name,
+            max_new_tokens=2048,
+            temperature=1.0,
+        )
+        model.capture_logprobs = True
+        # Root uses trained weights, sub-calls use base model
+        model.root_sampling_client = sampling_client
+        logger.info("  Hybrid training: trained root + base sub-calls")
+    else:
+        model = TinkerModel(
+            model_name=model_name,
+            max_new_tokens=2048,
+            temperature=1.0,
+        )
+        model.capture_logprobs = True
+        model.sampling_client = sampling_client
 
     # LoRA LR scaling
     try:
@@ -796,6 +905,12 @@ def train_rl_v6(
     logger.info(f"  Effective LR: {effective_lr:.2e}")
     logger.info(f"  K: {K}, Batch: {batch_size}, Steps: {steps}")
     logger.info(f"  Task type: {task_type}")
+    if task_type in ("mixed_v6", "mixed_v10"):
+        dist_name = "v10" if task_type == "mixed_v10" else "v9"
+        dist_info = TASK_DISTRIBUTIONS[dist_name]
+        logger.info(f"  Task distribution ({dist_name}):")
+        for ttype, weight in sorted(dist_info, key=lambda x: -x[1]):
+            logger.info(f"    {ttype}: {weight*100:.0f}%")
     logger.info(f"  KL coeff (reward shaping): {kl_coeff}")
     logger.info(f"  Warmup steps: {warmup_steps}")
     logger.info(f"  Grad accum batch: {grad_accum_batch}")
@@ -806,6 +921,7 @@ def train_rl_v6(
     logger.info(f"  Strategy conditioning: {'ON' if strategy_conditioning else 'OFF'}")
     logger.info(f"  NGRPO virtual reward: {'ON' if ngrpo_virtual_reward else 'OFF'}")
     logger.info(f"  MaxRL advantage: {'ON' if maxrl else 'OFF'}")
+    logger.info(f"  Hybrid training: {'ON (trained root + base sub-calls)' if hybrid_training else 'OFF'}")
     if clip_high > 0 or clip_low > 0:
         logger.info(f"  Asymmetric advantage: clip_high={clip_high}, clip_low={clip_low}")
     logger.info(f"{'='*60}\n")
@@ -847,9 +963,10 @@ def train_rl_v6(
         logger.info(f"\n{'='*60}")
         logger.info(f"--- Step {step + 1}/{steps} --- (LR: {step_lr:.2e})")
 
-        # 1. Sample tasks (V6: use adaptive scheduler for mixed_v6)
-        if task_type == "mixed_v6":
-            tasks = sample_tasks_v6(batch_size, step, scheduler)
+        # 1. Sample tasks (V6+: use adaptive scheduler)
+        if task_type in ("mixed_v6", "mixed_v10"):
+            task_dist = "v10" if task_type == "mixed_v10" else "v9"
+            tasks = sample_tasks_v6(batch_size, step, scheduler, task_dist=task_dist)
         else:
             # Fall back to V5 task sampling for compatibility
             from training.rl_tinker import sample_tasks
@@ -1263,6 +1380,8 @@ def main():
                         help="Asymmetric scaling for negative advantages (e.g., 1.5 = amplify). 0=disabled")
     parser.add_argument("--maxrl", action="store_true",
                         help="MaxRL: normalize advantages by K_success (arXiv:2602.02710)")
+    parser.add_argument("--hybrid-training", action="store_true",
+                        help="Use trained root + base sub-calls during trajectory generation")
     args = parser.parse_args()
 
     train_rl_v6(
@@ -1285,6 +1404,7 @@ def main():
         clip_high=args.clip_high,
         clip_low=args.clip_low,
         maxrl=args.maxrl,
+        hybrid_training=args.hybrid_training,
     )
 
 

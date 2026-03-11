@@ -2,7 +2,7 @@
 
 ## Abstract
 
-We train the first open-weight natively recursive language model based on Qwen3.5-35B-A3B (MoE, 35B total / 3B active parameters). Using GRPO reinforcement learning on the Tinker training API with our novel **Strategy-Conditioned GRPO (SC-GRPO)** and **hybrid RLM architecture**, we achieve significant improvements over the base model across 11 long-context benchmarks. In rigorous head-to-head evaluation (identical seeds), our best configuration (**V4-s5-hybrid**) achieves **+11.5% average on 9 in-distribution benchmarks** (69.6% → 81.1%), with peak gains of **+35.0% on Multi-Hop QA** and **+30.0% on Hard Multi-Hop QA**. Key innovations: (1) **SC-GRPO** eliminates mode collapse in code-generation GRPO by conditioning each trajectory on a randomly assigned strategy prompt, achieving 0% group collapse rate vs 60% in standard GRPO; (2) **Hybrid RLM architecture** — we discover that RL training on code generation degrades sub-call QA ability via shared LoRA weights, and show that using the base model for sub-calls dramatically improves multi-hop reasoning (+25pp on Multi-Hop QA, +60pp on Hard Multi-Hop vs non-hybrid); (3) **anti-shortcut training** — standard GRPO optimizes away recursive behavior when contexts fit within the sub-call window; we enforce minimum 50K context lengths; (4) **11 diverse benchmarks** spanning O(1), O(K), and O(N) complexity classes. We also implement NGRPO virtual max-reward for all-wrong groups and asymmetric advantage scaling for entropy preservation.
+We train the first open-weight natively recursive language model based on Qwen3.5-35B-A3B (MoE, 35B total / 3B active parameters). Using GRPO reinforcement learning on the Tinker training API, we investigate the challenges of training RLMs and introduce several techniques: **Strategy-Conditioned GRPO (SC-GRPO)**, **hybrid RLM architecture**, **regression-targeted training**, and **anti-shortcut context enforcement**. In rigorous head-to-head evaluation across 14 benchmarks (identical seeds, all bugs fixed), our best trained configuration achieves strong gains on search-type tasks (NIAH +15pp, Doc-Classify +17.6pp, Multi-NIAH +7.9pp) but reveals a fundamental **specialization vs. generalization tradeoff** — training on search tasks causes regressions on structured extraction (DataFrame QA -7pp, Cross-Doc Compare -14pp). We identify three root causes through trajectory analysis: single-pass convergence, chunk size drift, and format precision loss. Key contributions: (1) **SC-GRPO** eliminates mode collapse in code-generation GRPO (0% collapse vs 60% standard GRPO) by conditioning trajectories on randomly assigned strategy prompts; (2) **hybrid RLM architecture** — trained root for code generation + base model sub-calls preserves QA quality; (3) **regression-targeted training** with 5 new task-specific strategy prompts addressing structural extraction failures; (4) **14 diverse benchmarks** spanning O(1), O(K), O(N) complexity and covering search, extraction, comparison, and counting; (5) comprehensive bug audit methodology revealing 7 codebase bugs that inflated prior results. Training continues with V10 (regression-focused) and hybrid training variants.
 
 ## Model
 
@@ -110,6 +110,21 @@ Trajectory analysis reveals the root cause of hybrid's +25pp Multi-Hop and +60pp
 5. **Cost**: Hybrid uses ~60% more sub-calls but completes faster due to fewer failed searches and timeouts.
 
 **Design principle for RLMs**: When training code generation for recursive models, the sub-call interface is a bottleneck. Training should explicitly teach decomposition into atomic queries, and sub-call models should remain general-purpose.
+
+### Regression Root Cause Analysis (from trajectory inspection)
+
+Detailed trajectory inspection reveals 3 distinct failure modes in the trained model:
+
+**1. Single-Pass Convergence (Cross-Doc Compare: -14.4pp)**
+The trained model collapses cross-document comparison into a single combined query ("Extract ALL employee names from BOTH directories"), losing the ability to distinguish which data comes from which source. The base model naturally uses a two-pass strategy: extract from Doc A separately, extract from Doc B separately, then compare in Python. RL training optimized away this more complex pattern because single-pass is faster when it works (which it often does for single-document tasks in training).
+
+**2. Chunk Size Drift (Key-Value Retrieval: -6pp)**
+The trained model learned to use 20K chunks for efficiency (fewer API calls = faster completion = reward sooner). But for exhaustive lookup tasks, larger chunks cause boundary misses: entries split across chunk boundaries are lost. The base model uses 15K chunks with overlap, catching all entries. This is a direct consequence of RL optimizing for speed (fewer sub-calls) rather than completeness.
+
+**3. Format Precision Loss (Notebook QA: -10pp, DataFrame QA: -7pp)**
+The trained model loses format fidelity: "87.0%" becomes "0.870", percentages drop units, decimal precision changes. This happens because RL training rewards only match/no-match on the answer, but the scoring function allows partial credit. The model learns that approximate values often score > 0, while exact format preservation requires more careful code — so format precision gets optimized away.
+
+**Implication for V10 training:** These failure modes are all addressable through targeted strategy prompts (cross_doc_separate, lookup_thorough, precision_extract, table_preserve, notebook_sequential) combined with heavier training weight on regression tasks.
 
 ## Training Results
 
