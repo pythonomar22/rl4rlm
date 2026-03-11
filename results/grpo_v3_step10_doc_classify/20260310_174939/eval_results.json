@@ -1,0 +1,321 @@
+{
+  "benchmark": "doc_classify",
+  "accuracy": 1.0,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "classify_000_5docs",
+      "n_docs": 5,
+      "expected": [
+        "Science",
+        "Sports",
+        "Business",
+        "Health",
+        "Technology"
+      ],
+      "predicted": "1: Science\n2: Sports\n3: Business\n4: Health\n5: Technology",
+      "accuracy": 1.0,
+      "correct": 5,
+      "total": 5,
+      "per_doc": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 26.00712823867798,
+      "doc_length": 2406
+    },
+    {
+      "task_id": "classify_001_5docs",
+      "n_docs": 5,
+      "expected": [
+        "Science",
+        "Technology",
+        "Sports",
+        "Business",
+        "World"
+      ],
+      "predicted": "1: Science\n2: Technology\n3: Sports\n4: Business\n5: World",
+      "accuracy": 1.0,
+      "correct": 5,
+      "total": 5,
+      "per_doc": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 34.848353147506714,
+      "doc_length": 2378
+    },
+    {
+      "task_id": "classify_002_5docs",
+      "n_docs": 5,
+      "expected": [
+        "Health",
+        "Business",
+        "World",
+        "Technology",
+        "Science"
+      ],
+      "predicted": "1: Health\n2: Business\n3: World\n4: Technology\n5: Science",
+      "accuracy": 1.0,
+      "correct": 5,
+      "total": 5,
+      "per_doc": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 27.7995183467865,
+      "doc_length": 2452
+    },
+    {
+      "task_id": "classify_003_5docs",
+      "n_docs": 5,
+      "expected": [
+        "Technology",
+        "Health",
+        "Business",
+        "Science",
+        "World"
+      ],
+      "predicted": "1: Technology\n2: Health\n3: Business\n4: Science\n5: World",
+      "accuracy": 1.0,
+      "correct": 5,
+      "total": 5,
+      "per_doc": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 27.613094568252563,
+      "doc_length": 2369
+    },
+    {
+      "task_id": "classify_004_5docs",
+      "n_docs": 5,
+      "expected": [
+        "Health",
+        "Business",
+        "Technology",
+        "World",
+        "Science"
+      ],
+      "predicted": "1: Health\n2: Business\n3: Technology\n4: World\n5: Science",
+      "accuracy": 1.0,
+      "correct": 5,
+      "total": 5,
+      "per_doc": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 67.71010851860046,
+      "doc_length": 2256
+    },
+    {
+      "task_id": "classify_005_10docs",
+      "n_docs": 10,
+      "expected": [
+        "Sports",
+        "World",
+        "World",
+        "Science",
+        "Business",
+        "Health",
+        "Technology",
+        "Sports",
+        "Business",
+        "Health"
+      ],
+      "predicted": "1: Sports\n2: World\n3: World\n4: Science\n5: Business\n6: Health\n7: Technology\n8: Sports\n9: Business\n10: Health",
+      "accuracy": 1.0,
+      "correct": 10,
+      "total": 10,
+      "per_doc": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 25.63075876235962,
+      "doc_length": 4558
+    },
+    {
+      "task_id": "classify_006_10docs",
+      "n_docs": 10,
+      "expected": [
+        "Science",
+        "Health",
+        "Sports",
+        "World",
+        "Business",
+        "Science",
+        "Technology",
+        "World",
+        "Health",
+        "Sports"
+      ],
+      "predicted": "1: Science\n2: Health\n3: Sports\n4: World\n5: Business\n6: Science\n7: Technology\n8: World\n9: Health\n10: Sports",
+      "accuracy": 1.0,
+      "correct": 10,
+      "total": 10,
+      "per_doc": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 44.87264084815979,
+      "doc_length": 4657
+    },
+    {
+      "task_id": "classify_007_10docs",
+      "n_docs": 10,
+      "expected": [
+        "Sports",
+        "Business",
+        "Sports",
+        "Technology",
+        "Health",
+        "Science",
+        "Health",
+        "Science",
+        "World",
+        "World"
+      ],
+      "predicted": "1: Sports\n2: Business\n3: Sports\n4: Technology\n5: Health\n6: Science\n7: Health\n8: Science\n9: World\n10: World",
+      "accuracy": 1.0,
+      "correct": 10,
+      "total": 10,
+      "per_doc": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 27.77230978012085,
+      "doc_length": 4456
+    },
+    {
+      "task_id": "classify_008_10docs",
+      "n_docs": 10,
+      "expected": [
+        "Technology",
+        "World",
+        "Science",
+        "Sports",
+        "World",
+        "Health",
+        "Business",
+        "Science",
+        "Sports",
+        "Technology"
+      ],
+      "predicted": "1: Technology\n2: World\n3: Science\n4: Sports\n5: World\n6: Health\n7: Business\n8: Science\n9: Sports\n10: Technology",
+      "accuracy": 1.0,
+      "correct": 10,
+      "total": 10,
+      "per_doc": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 103.87240552902222,
+      "doc_length": 4485
+    },
+    {
+      "task_id": "classify_009_10docs",
+      "n_docs": 10,
+      "expected": [
+        "Technology",
+        "Health",
+        "World",
+        "Sports",
+        "Business",
+        "Sports",
+        "Technology",
+        "World",
+        "Science",
+        "Health"
+      ],
+      "predicted": "1: Technology\n2: Health\n3: World\n4: Sports\n5: Business\n6: Sports\n7: Technology\n8: World\n9: Science\n10: Health",
+      "accuracy": 1.0,
+      "correct": 10,
+      "total": 10,
+      "per_doc": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 25.737491130828857,
+      "doc_length": 4677
+    }
+  ],
+  "by_n_docs": {
+    "5 docs": 1.0,
+    "10 docs": 1.0
+  }
+}

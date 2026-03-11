@@ -1,0 +1,191 @@
+{
+  "benchmark": "code_debug",
+  "accuracy": 0.5,
+  "n_tasks": 8,
+  "per_task": [
+    {
+      "task_id": "debug_000_1bugs_599lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 599,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_payment_notifications | BUG: Duplicate field 'timestamp' in required_fields list | FIX: Change the second 'timestamp' to 'amount' or another unique required field",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 22.36951994895935,
+      "prompt_chars": 16268
+    },
+    {
+      "task_id": "debug_001_1bugs_554lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 554,
+      "expected_bugs": [
+        "lru_cache"
+      ],
+      "predicted": "FUNCTION: dijkstra | BUG: The algorithm fails when the start node is not present in the graph's keys, causing a KeyError when trying to set `distances[start] = 0` on an uninitialized key. | FIX: Initialize the distances dictionary to include all nodes from the graph or ensure the start node is added if missing before setting its distance.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 24.006429195404053,
+      "prompt_chars": 15355
+    },
+    {
+      "task_id": "debug_002_1bugs_585lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 585,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: count_words | BUG: The dictionary value for the word count is not incremented (it is always set to 1 instead of adding 1 to the existing count) | FIX: Change `counts[word] = counts.get(word, 1)` to `counts[word] = counts.get(word, 0) + 1`",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 39.14610505104065,
+      "prompt_chars": 15593
+    },
+    {
+      "task_id": "debug_003_1bugs_595lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 595,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: count_words | BUG: Incorrectly initializes the count in the dictionary when a word is encountered for the first time, setting it to 1 instead of incrementing from a default of 0 or using the get method correctly. | FIX: Change `counts[word] = counts.get(word, 1)` to `counts[word] = counts.get(word, 0) + 1` to properly increment the count.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 26.669304609298706,
+      "prompt_chars": 15873
+    },
+    {
+      "task_id": "debug_004_1bugs_1472lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1472,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: count_words | BUG: The dictionary value for a word is always set to 1 instead of being incremented when the word is encountered again. The line `counts[word] = counts.get(word, 1)` returns 1 if the key exists, overwriting the existing count, rather than retrieving the current count and adding 1. | FIX: Change `counts[word] = counts.get(word, 1)` to `counts[word] = counts.get(word, 0) + 1`",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 76.00461435317993,
+      "prompt_chars": 39651
+    },
+    {
+      "task_id": "debug_005_1bugs_1446lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1446,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: The code references undefined variables `event_data` in the `isinstance` check and `required_fields` is assigned but never used, while the function parameter `data` is ignored. | FIX: Replace `event_data` with `data` and remove the unused `required_fields` assignment or add logic to validate it.\nFUNCTION: process_user_auth | BUG: The list required_fields contains the duplicate field 'status' instead of a distinct third field like 'timestamp' | FIX: Change required_fields to ['status', 'timestamp', 'timestamp'] or replace the duplicate 'status' with 'timestamp'\nFUNCTION: count_words | BUG: The dictionary value is always set to 1 instead of incrementing the existing count or setting to 1 for new words | FIX: Change `counts[word] = counts.get(word, 1)` to `counts[word] = counts.get(word, 0) + 1`",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 23.113345623016357,
+      "prompt_chars": 38889
+    },
+    {
+      "task_id": "debug_006_1bugs_1353lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1353,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_user_auth | BUG: The function references undefined variables `items` and `elapsed` in the `logger.info` and `stats` assignment lines, causing a `NameError`. | FIX: Ensure `items` and `elapsed` are defined (e.g., passed as arguments or calculated based on `data`) before being used in the log statement and stats dictionary.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 19.427314519882202,
+      "prompt_chars": 36020
+    },
+    {
+      "task_id": "debug_007_1bugs_1409lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1409,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: merge_sort | BUG: The function `merge` is called within `merge_sort` but is not defined in the same scope or passed as an argument, causing a NameError. | FIX: Define the `merge` function before `merge_sort` or pass it as an argument to `merge_sort`.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 38.30081129074097,
+      "prompt_chars": 37590
+    }
+  ]
+}

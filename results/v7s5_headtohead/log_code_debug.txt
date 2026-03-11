@@ -1,0 +1,70 @@
+2026-03-11 01:11:05,469 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-11 01:11:10,052 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-11 01:11:17,653 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session 2032bee6-b5b9-505b-b7be-5576e944988a
+2026-03-11 01:11:17,654 scaffold.llm_query INFO: Loading from state checkpoint: tinker://2e48210b-f605-566d-86c6-f8c3c0f8a95f:train:0/weights/state-0005
+2026-03-11 01:11:36,096 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model 2032bee6-b5b9-505b-b7be-5576e944988a:train:0
+2026-03-11 01:11:45,252 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://2e48210b-f605-566d-86c6-f8c3c0f8a95f:train:0/weights/state-0005
+2026-03-11 01:11:45,253 scaffold.llm_query INFO: TinkerModel ready in 35.2s
+2026-03-11 01:11:45,253 eval INFO: Model loaded in 39.8s
+2026-03-11 01:11:45,253 eval INFO: 
+============================================================
+2026-03-11 01:11:45,253 eval INFO: Running benchmark: code_debug
+2026-03-11 01:11:45,253 eval INFO: ============================================================
+CodeDebug:   0%|          | 0/15 [00:00<?, ?it/s]2026-03-11 01:11:45,286 eval INFO: 
+Task: debug_000_1bugs_599lines | 1 bugs, 599 lines
+2026-03-11 01:12:09,985 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_payment_notifications | BUG: The `required_fields` list contains the string 'times
+CodeDebug:   7%|▋         | 1/15 [00:24<05:45, 24.70s/it]2026-03-11 01:12:09,986 eval INFO: 
+Task: debug_001_1bugs_554lines | 1 bugs, 554 lines
+2026-03-11 01:12:34,329 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_user_cache | BUG: The function references `self._cache` and `self` without being d
+CodeDebug:  13%|█▎        | 2/15 [00:49<05:18, 24.49s/it]2026-03-11 01:12:34,330 eval INFO: 
+Task: debug_002_1bugs_585lines | 1 bugs, 585 lines
+2026-03-11 01:13:03,780 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_record_auth | BUG: The function `process_record_auth` in `utils_0.py` attempts to 
+CodeDebug:  20%|██        | 3/15 [01:18<05:21, 26.76s/it]2026-03-11 01:13:03,781 eval INFO: 
+Task: debug_003_1bugs_595lines | 1 bugs, 595 lines
+2026-03-11 01:14:50,250 eval INFO:   Found: 1/1 (100.0%) | Answer: FUNCTION: calculate_mean | BUG: The function incorrectly subtracts 1 from the calculated mean, retur
+CodeDebug:  27%|██▋       | 4/15 [03:04<10:40, 58.23s/it]2026-03-11 01:14:50,251 eval INFO: 
+Task: debug_004_1bugs_1472lines | 1 bugs, 1472 lines
+2026-03-11 01:15:11,319 eval INFO:   Found: 1/1 (100.0%) | Answer: FUNCTION: matrix_multiply | BUG: Incorrect indexing in the inner loop; it uses `b[j][k]` instead of 
+CodeDebug:  33%|███▎      | 5/15 [03:26<07:28, 44.83s/it]2026-03-11 01:15:11,321 eval INFO: 
+Task: debug_005_1bugs_1446lines | 1 bugs, 1446 lines
+2026-03-11 01:17:00,413 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_record_scheduler | BUG: The function references a variable `event_data` in the typ
+CodeDebug:  40%|████      | 6/15 [05:15<10:00, 66.68s/it]2026-03-11 01:17:00,414 eval INFO: 
+Task: debug_006_1bugs_1353lines | 1 bugs, 1353 lines
+2026-03-11 01:17:59,959 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_request_db | BUG: The function logs a message using variables `items` and `elapsed
+CodeDebug:  47%|████▋     | 7/15 [06:14<08:34, 64.35s/it]2026-03-11 01:17:59,960 eval INFO: 
+Task: debug_007_1bugs_1409lines | 1 bugs, 1409 lines
+2026-03-11 01:21:26,478 eval INFO:   Found: 0/1 (0.0%) | Answer: FUNCTION: process_event_billing | BUG: Uses undefined variable 'self' to access cache without being 
+CodeDebug:  53%|█████▎    | 8/15 [09:41<12:47, 109.61s/it]2026-03-11 01:21:26,479 eval INFO: 
+Task: debug_008_2bugs_1418lines | 2 bugs, 1418 lines
+2026-03-11 01:23:08,837 eval INFO:   Found: 1/2 (50.0%) | Answer: FUNCTION: binary_search | BUG: Infinite loop when target is greater than arr[mid] | FIX: Change `lef
+CodeDebug:  60%|██████    | 9/15 [11:23<10:44, 107.34s/it]2026-03-11 01:23:08,838 eval INFO: 
+Task: debug_009_2bugs_1329lines | 2 bugs, 1329 lines
+2026-03-11 01:25:03,767 eval INFO:   Found: 0/2 (0.0%) | Answer: ["FUNCTION: process_session_api | BUG: Variable 'event_data' is used but not defined; the function p
+CodeDebug:  67%|██████▋   | 10/15 [13:18<09:08, 109.68s/it]2026-03-11 01:25:03,769 eval INFO: 
+Task: debug_010_2bugs_1445lines | 2 bugs, 1445 lines
+2026-03-11 01:26:53,952 eval INFO:   Found: 1/2 (50.0%) | Answer: FUNCTION: stats.py | calculate_mean | BUG: The function subtracts 1 from the calculated mean, which 
+CodeDebug:  73%|███████▎  | 11/15 [15:08<07:19, 109.84s/it]2026-03-11 01:26:53,953 eval INFO: 
+Task: debug_011_2bugs_1455lines | 2 bugs, 1455 lines
+2026-03-11 01:28:37,380 eval INFO:   Found: 1/2 (50.0%) | Answer: FUNCTION: process_config_billing | BUG: Variable `resul` is misspelled and will raise a NameError in
+CodeDebug:  80%|████████  | 12/15 [16:52<05:23, 107.89s/it]2026-03-11 01:28:37,381 eval INFO: 
+Task: debug_012_3bugs_2201lines | 3 bugs, 2201 lines
+2026-03-11 01:34:08,672 eval INFO:   Found: 1/3 (33.3%) | Answer: FUNCTION: stats.py | BUG: The calculate_mean function subtracts 1 from the result, which is mathemat
+CodeDebug:  87%|████████▋ | 13/15 [22:23<05:51, 175.56s/it]2026-03-11 01:34:08,673 eval INFO: 
+Task: debug_013_3bugs_2241lines | 3 bugs, 2241 lines
+2026-03-11 01:43:46,591 eval INFO:   Found: 1/3 (33.3%) | Answer: FUNCTION: process_session_db | BUG: The function uses `self._cache` but is a standalone function, no
+CodeDebug:  93%|█████████▎| 14/15 [32:01<04:57, 297.10s/it]2026-03-11 01:43:46,593 eval INFO: 
+Task: debug_014_3bugs_2294lines | 3 bugs, 2294 lines
+2026-03-11 01:45:34,697 eval INFO:   Found: 0/3 (0.0%) | Answer: FUNCTION: process_request_notifications | BUG: Uses undefined variables `items` and `elapsed` instea
+CodeDebug: 100%|██████████| 15/15 [33:49<00:00, 240.13s/it]CodeDebug: 100%|██████████| 15/15 [33:49<00:00, 135.29s/it]
+2026-03-11 01:45:34,700 eval INFO: 
+--- code_debug Results ---
+2026-03-11 01:45:34,700 eval INFO: Accuracy/Recall: 27.8%
+2026-03-11 01:45:34,700 eval INFO: Tasks: 15
+2026-03-11 01:45:34,737 eval INFO: 
+============================================================
+2026-03-11 01:45:34,753 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-11 01:45:34,753 eval INFO: ============================================================
+2026-03-11 01:45:34,753 eval INFO:   code_debug: 27.8% (15 tasks)
+2026-03-11 01:45:34,753 eval INFO: Total time: 2029.4s
+2026-03-11 01:45:34,754 eval INFO: Model stats: {'root_calls': 33, 'sub_calls': 25, 'total_input_tokens': 206118, 'total_output_tokens': 10492, 'total_time': 757.1805834770203}
+2026-03-11 01:45:34,754 eval INFO: Results saved to: results/v7s5_headtohead/20260311_011105

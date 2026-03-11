@@ -1,0 +1,127 @@
+{
+  "benchmark": "multi_hop_qa",
+  "accuracy": 0.7,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "multihop_3hop_0",
+      "n_hops": 3,
+      "expected": "quantum computing",
+      "predicted": "quantum computing",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 30.142263174057007,
+      "prompt_chars": 50136
+    },
+    {
+      "task_id": "multihop_3hop_1",
+      "n_hops": 3,
+      "expected": "$4.2 million",
+      "predicted": "$4.2 million",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 12.201208591461182,
+      "prompt_chars": 10114
+    },
+    {
+      "task_id": "multihop_2hop_2",
+      "n_hops": 2,
+      "expected": "next-generation sustainability solutions",
+      "predicted": "Project Phoenix",
+      "score": 0.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 39.176044940948486,
+      "prompt_chars": 100086
+    },
+    {
+      "task_id": "multihop_3hop_3",
+      "n_hops": 3,
+      "expected": "$4.2 million",
+      "predicted": "$4.2 million",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 20.89942955970764,
+      "prompt_chars": 20104
+    },
+    {
+      "task_id": "multihop_3hop_4",
+      "n_hops": 3,
+      "expected": "$4.2 million",
+      "predicted": "$4.2 million",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 27.021347045898438,
+      "prompt_chars": 50094
+    },
+    {
+      "task_id": "multihop_3hop_5",
+      "n_hops": 3,
+      "expected": "$4.2 million",
+      "predicted": "Not found",
+      "score": 0.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 52.280096769332886,
+      "prompt_chars": 100120
+    },
+    {
+      "task_id": "multihop_2hop_6",
+      "n_hops": 2,
+      "expected": "next-generation sustainability solutions",
+      "predicted": "developing next-generation sustainability solutions<|endoftext|>",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 49.0232880115509,
+      "prompt_chars": 20078
+    },
+    {
+      "task_id": "multihop_2hop_7",
+      "n_hops": 2,
+      "expected": "Berlin branch",
+      "predicted": "Not found",
+      "score": 0.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 53.14966130256653,
+      "prompt_chars": 100104
+    },
+    {
+      "task_id": "multihop_2hop_8",
+      "n_hops": 2,
+      "expected": "next-generation sustainability solutions",
+      "predicted": "developing next-generation sustainability solutions",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 33.63492226600647,
+      "prompt_chars": 50076
+    },
+    {
+      "task_id": "multihop_2hop_9",
+      "n_hops": 2,
+      "expected": "Seoul branch",
+      "predicted": "Seoul branch",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 25.368905544281006,
+      "prompt_chars": 20114
+    }
+  ]
+}

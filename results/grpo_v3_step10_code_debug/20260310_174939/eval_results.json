@@ -1,0 +1,191 @@
+{
+  "benchmark": "code_debug",
+  "accuracy": 0.25,
+  "n_tasks": 8,
+  "per_task": [
+    {
+      "task_id": "debug_000_1bugs_599lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 599,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_payment_notifications | BUG: The required_fields list contains the string 'timestamp' twice instead of having a unique field like 'value' or 'id', which is likely a copy-paste error that leaves the validation logic checking for a duplicate field while missing a necessary one. | FIX: Change the required_fields list from `['timestamp', 'timestamp', 'status']` to `['timestamp', 'value', 'status']` (or appropriate unique fields matching the context of a payment record).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 42.53133535385132,
+      "prompt_chars": 16255
+    },
+    {
+      "task_id": "debug_001_1bugs_554lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 554,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_record_analytics | BUG: The function references undefined variables `items`, `logger`, and `elapsed` instead of the input argument `data` or a defined `logger` object. | FIX: Replace `items` with `data`, ensure `logger` is imported, and replace `elapsed` with a valid time variable.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 33.931418657302856,
+      "prompt_chars": 15365
+    },
+    {
+      "task_id": "debug_002_1bugs_585lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 585,
+      "expected_bugs": [
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_config_auth (in module: middleware_7.py) | BUG: The function references an undefined variable `record_data` in the `isinstance` check and `TypeError` message, while the function parameter is named `data`. This will cause a `NameError` at runtime. | FIX: Replace all occurrences of `record_data` with `data` in the function body.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 71.93359136581421,
+      "prompt_chars": 15596
+    },
+    {
+      "task_id": "debug_003_1bugs_595lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 595,
+      "expected_bugs": [
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean, which is incorrect for computing the arithmetic mean. | FIX: Remove the \"- 1\" from the return statement so it returns `sum(values) / len(values)`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 69.63171005249023,
+      "prompt_chars": 15881
+    },
+    {
+      "task_id": "debug_004_1bugs_1472lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1472,
+      "expected_bugs": [
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: matrix_multiply | BUG: Incorrect index used for matrix b in the inner loop; `b[j][k]` should be `b[k][j]` to access the correct column of matrix b while iterating through rows | FIX: Change `b[j][k]` to `b[k][j]` in the line `result[i][j] += a[i][k] * b[j][k]`",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 137.51877975463867,
+      "prompt_chars": 39655
+    },
+    {
+      "task_id": "debug_005_1bugs_1446lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1446,
+      "expected_bugs": [
+        "lru_cache"
+      ],
+      "predicted": "[\"FUNCTION: process_request_scheduler | BUG: The function uses undefined variables 'event_data' and 'params' instead of the defined argument 'data', and the 'required_fields' list contains a duplicate 'timestamp' key. | FIX: Replace 'event_data' with 'data' in the validation check and remove the duplicate 'timestamp' from 'required_fields'.\"]",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 135.1612687110901,
+      "prompt_chars": 38892
+    },
+    {
+      "task_id": "debug_006_1bugs_1353lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1353,
+      "expected_bugs": [
+        "calculate_median"
+      ],
+      "predicted": "FUNCTION: process_user_auth | BUG: The function uses a variable `items` which is not defined in the function's scope (it likely should be `data`), causing a `NameError`. | FIX: Replace the variable `items` with `data` in the logger and stats dictionary (i.e., `len(data)`).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_median",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 296.4045250415802,
+      "prompt_chars": 36024
+    },
+    {
+      "task_id": "debug_007_1bugs_1409lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1409,
+      "expected_bugs": [
+        "dijkstra"
+      ],
+      "predicted": "FUNCTION: process_response_scheduler | BUG: The variables `items` and `elapsed` are used in the function body but are not defined within the function scope (undefined name error). | FIX: Replace `items` with `data` and define `elapsed` (e.g., by measuring execution time or removing the reference if not needed). Corrected line: `logger.info(f'Processed {len(data)} metric')` and `stats = {'count': len(data), 'time': elapsed}` (assuming `elapsed` is calculated externally or removed).\nFunction: `process_event_scheduler` in `utils_17.py`\nBug: The function attempts to reference `items` and `elapsed` in the `logger.info` call and `stats` dictionary, but these variables are never defined within the function's scope.\nFix: Replace `items` with `data` and add a calculation or import for `elapsed` (e.g., `elapsed = time.time() - start_time`).\nFunction: process_response_billing\nBug: The variable `config_data` is referenced but not defined, and the list `required_fields` contains a duplicate key ('timestamp' appears twice).\nFix: Define `config_data` (e.g., use the `data` argument) and remove the duplicate entry from `required_fields`.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 25.84539771080017,
+      "prompt_chars": 37582
+    }
+  ]
+}

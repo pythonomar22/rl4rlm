@@ -1,0 +1,105 @@
+2026-03-11 01:14:53,648 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-11 01:14:57,649 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-11 01:15:04,856 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session a6a7b34b-90f2-5664-8666-93a84a3c169b
+2026-03-11 01:15:04,856 scaffold.llm_query INFO: Loading from state checkpoint: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-11 01:15:26,811 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model a6a7b34b-90f2-5664-8666-93a84a3c169b:train:0
+2026-03-11 01:15:34,090 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-11 01:15:34,090 scaffold.llm_query INFO: TinkerModel ready in 36.4s
+2026-03-11 01:15:34,090 eval INFO: Model loaded in 40.4s
+2026-03-11 01:15:34,090 eval INFO: 
+============================================================
+2026-03-11 01:15:34,091 eval INFO: Running benchmark: event_counting
+2026-03-11 01:15:34,091 eval INFO: ============================================================
+EventCount:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-11 01:15:34,132 eval INFO: 
+Task: event_count_000 | count_value | 203,934 chars | 66 events
+2026-03-11 01:15:34,132 eval INFO:   Q: How many events in this log have value 16? Return ONLY the count as a number.
+2026-03-11 01:18:09,977 eval INFO:   Score: 0.5 (close) | Expected: 5 | Got: 6
+EventCount:   5%|▌         | 1/20 [02:35<49:21, 155.85s/it]2026-03-11 01:18:09,978 eval INFO: 
+Task: event_count_001 | count_entity | 151,462 chars | 50 events
+2026-03-11 01:18:09,978 eval INFO:   Q: How many events were performed by Grace Lee? Return ONLY the count as a number.
+2026-03-11 01:19:31,310 eval INFO:   Score: 0.5 (close) | Expected: 9 | Got: 10
+EventCount:  10%|█         | 2/20 [03:57<33:36, 112.01s/it]2026-03-11 01:19:31,311 eval INFO: 
+Task: event_count_002 | first_last | 50,055 chars | 20 events
+2026-03-11 01:19:31,311 eval INFO:   Q: Who performed the first 'refund' event in this log? Return ONLY the person's name.
+2026-03-11 01:20:06,571 eval INFO:   Score: 1.0 (exact) | Expected: Leo Garcia | Got: Leo Garcia
+EventCount:  15%|█▌        | 3/20 [04:32<21:48, 76.97s/it] 2026-03-11 01:20:06,571 eval INFO: 
+Task: event_count_003 | per_entity | 101,224 chars | 33 events
+2026-03-11 01:20:06,571 eval INFO:   Q: How many events did each person perform? Return as 'Name: count' pairs separated by commas, sorted a
+2026-03-11 01:21:17,881 eval INFO:   Score: 0.8 (partial_entity) | Expected: Grace Lee: 11, Leo Garcia: 9, Nathan Taylor: 13 | Got: Grace Lee: 11, Leo Garcia: 11, Nathan Taylor: 13
+EventCount:  20%|██        | 4/20 [05:43<19:55, 74.73s/it]2026-03-11 01:21:17,882 eval INFO: 
+Task: event_count_004 | ratio | 50,067 chars | 20 events
+2026-03-11 01:21:17,882 eval INFO:   Q: What percentage of events are 'download' events? Round to the nearest integer. Return ONLY the numbe
+2026-03-11 01:22:27,177 eval INFO:   Score: 0.5 (close) | Expected: 25 | Got: 22
+EventCount:  25%|██▌       | 5/20 [06:53<18:11, 72.77s/it]2026-03-11 01:22:27,178 eval INFO: 
+Task: event_count_005 | count_value | 151,179 chars | 50 events
+2026-03-11 01:22:27,178 eval INFO:   Q: How many events in this log have value 2? Return ONLY the count as a number.
+2026-03-11 01:23:40,706 eval INFO:   Score: 0.2 (approximate) | Expected: 2 | Got: 3
+EventCount:  30%|███       | 6/20 [08:06<17:02, 73.03s/it]2026-03-11 01:23:40,707 eval INFO: 
+Task: event_count_006 | count_entity | 50,079 chars | 20 events
+2026-03-11 01:23:40,707 eval INFO:   Q: How many events were performed by David Johnson? Return ONLY the count as a number.
+2026-03-11 01:24:18,890 eval INFO:   Score: 1.0 (exact) | Expected: 4 | Got: 4
+EventCount:  35%|███▌      | 7/20 [08:44<13:21, 61.64s/it]2026-03-11 01:24:18,891 eval INFO: 
+Task: event_count_007 | first_last | 51,149 chars | 20 events
+2026-03-11 01:24:18,891 eval INFO:   Q: Who performed the last 'create' event in this log? Return ONLY the person's name.
+2026-03-11 01:25:10,066 eval INFO:   Score: 1.0 (exact) | Expected: Leo Garcia | Got: Leo Garcia
+EventCount:  40%|████      | 8/20 [09:35<11:39, 58.31s/it]2026-03-11 01:25:10,066 eval INFO: 
+Task: event_count_008 | per_entity | 50,066 chars | 20 events
+2026-03-11 01:25:10,066 eval INFO:   Q: How many events did each person perform? Return as 'Name: count' pairs separated by commas, sorted a
+2026-03-11 01:25:59,000 eval INFO:   Score: 0.6 (partial_entity) | Expected: Alice Chen: 4, Emma Davis: 5, Henry Wilson: 6, Iris Thompson | Got: Alice Chen: 2, Emma Davis: 6, Henry Wilson: 3, Iris Thompson
+EventCount:  45%|████▌     | 9/20 [10:24<10:09, 55.38s/it]2026-03-11 01:25:59,000 eval INFO: 
+Task: event_count_009 | ratio | 204,466 chars | 66 events
+2026-03-11 01:25:59,000 eval INFO:   Q: What percentage of events are 'comment' events? Round to the nearest integer. Return ONLY the number
+2026-03-11 01:30:26,936 eval INFO:   Score: 0.2 (approximate) | Expected: 14 | Got: 19
+EventCount:  50%|█████     | 10/20 [14:52<20:09, 121.00s/it]2026-03-11 01:30:26,939 eval INFO: 
+Task: event_count_010 | count_value | 50,111 chars | 20 events
+2026-03-11 01:30:26,939 eval INFO:   Q: How many events in this log have value 10? Return ONLY the count as a number.
+2026-03-11 01:31:02,969 eval INFO:   Score: 1.0 (exact) | Expected: 1 | Got: 1
+EventCount:  55%|█████▌    | 11/20 [15:28<14:14, 94.99s/it] 2026-03-11 01:31:02,970 eval INFO: 
+Task: event_count_011 | count_entity | 153,217 chars | 50 events
+2026-03-11 01:31:02,970 eval INFO:   Q: How many events were performed by Olivia White? Return ONLY the count as a number.
+2026-03-11 01:32:22,133 eval INFO:   Score: 1.0 (exact) | Expected: 6 | Got: 6
+EventCount:  60%|██████    | 12/20 [16:48<12:01, 90.18s/it]2026-03-11 01:32:22,134 eval INFO: 
+Task: event_count_012 | first_last | 152,044 chars | 50 events
+2026-03-11 01:32:22,134 eval INFO:   Q: Who performed the first 'reject' event in this log? Return ONLY the person's name.
+2026-03-11 01:33:36,169 eval INFO:   Score: 1.0 (exact) | Expected: Karen Brown | Got: Karen Brown
+EventCount:  65%|██████▌   | 13/20 [18:02<09:57, 85.29s/it]2026-03-11 01:33:36,170 eval INFO: 
+Task: event_count_013 | per_entity | 50,102 chars | 20 events
+2026-03-11 01:33:36,170 eval INFO:   Q: How many events did each person perform? Return as 'Name: count' pairs separated by commas, sorted a
+2026-03-11 01:34:44,532 eval INFO:   Score: 0.5 (partial_entity) | Expected: Frank Miller: 4, Karen Brown: 9, Olivia White: 7 | Got: Frank Miller: 5, Karen Brown: 4, Olivia White: 5
+EventCount:  70%|███████   | 14/20 [19:10<08:01, 80.18s/it]2026-03-11 01:34:44,533 eval INFO: 
+Task: event_count_014 | ratio | 151,626 chars | 50 events
+2026-03-11 01:34:44,533 eval INFO:   Q: What percentage of events are 'download' events? Round to the nearest integer. Return ONLY the numbe
+2026-03-11 01:36:05,921 eval INFO:   Score: 0.2 (approximate) | Expected: 8 | Got: 4
+EventCount:  75%|███████▌  | 15/20 [20:31<06:42, 80.54s/it]2026-03-11 01:36:05,922 eval INFO: 
+Task: event_count_015 | count_value | 154,647 chars | 50 events
+2026-03-11 01:36:05,922 eval INFO:   Q: How many events in this log have value 4? Return ONLY the count as a number.
+2026-03-11 01:37:27,674 eval INFO:   Score: 1.0 (exact) | Expected: 4 | Got: 4
+EventCount:  80%|████████  | 16/20 [21:53<05:23, 80.91s/it]2026-03-11 01:37:27,675 eval INFO: 
+Task: event_count_016 | count_entity | 202,787 chars | 66 events
+2026-03-11 01:37:27,675 eval INFO:   Q: How many events were performed by Frank Miller? Return ONLY the count as a number.
+2026-03-11 01:39:55,413 eval INFO:   Score: 0.2 (approximate) | Expected: 7 | Got: 9
+EventCount:  85%|████████▌ | 17/20 [24:21<05:03, 101.00s/it]2026-03-11 01:39:55,414 eval INFO: 
+Task: event_count_017 | first_last | 157,333 chars | 50 events
+2026-03-11 01:39:55,414 eval INFO:   Q: Who performed the last 'approve' event in this log? Return ONLY the person's name.
+2026-03-11 01:41:12,057 eval INFO:   Score: 1.0 (exact) | Expected: Iris Thompson | Got: Iris Thompson
+EventCount:  90%|█████████ | 18/20 [25:37<03:07, 93.68s/it] 2026-03-11 01:41:12,058 eval INFO: 
+Task: event_count_018 | per_entity | 52,316 chars | 20 events
+2026-03-11 01:41:12,058 eval INFO:   Q: How many events did each person perform? Return as 'Name: count' pairs separated by commas, sorted a
+2026-03-11 01:44:14,124 eval INFO:   Score: 0.8 (partial_entity) | Expected: Bob Martinez: 6, David Johnson: 2, Henry Wilson: 2, Jack And | Got: Bob Martinez: 5, David Johnson: 2, Henry Wilson: 2, Jack And
+EventCount:  95%|█████████▌| 19/20 [28:39<02:00, 120.23s/it]2026-03-11 01:44:14,125 eval INFO: 
+Task: event_count_019 | ratio | 201,431 chars | 66 events
+2026-03-11 01:44:14,125 eval INFO:   Q: What percentage of events are 'create' events? Round to the nearest integer. Return ONLY the number 
+2026-03-11 01:47:43,135 eval INFO:   Score: 0.5 (close) | Expected: 8 | Got: 7
+EventCount: 100%|██████████| 20/20 [32:09<00:00, 146.88s/it]EventCount: 100%|██████████| 20/20 [32:09<00:00, 96.45s/it] 
+2026-03-11 01:47:43,138 eval INFO: 
+--- event_counting Results ---
+2026-03-11 01:47:43,138 eval INFO: Accuracy/Recall: 67.6%
+2026-03-11 01:47:43,138 eval INFO: Tasks: 20
+2026-03-11 01:47:43,168 eval INFO: 
+============================================================
+2026-03-11 01:47:43,168 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-11 01:47:43,168 eval INFO: ============================================================
+2026-03-11 01:47:43,168 eval INFO:   event_counting: 67.6% (20 tasks)
+2026-03-11 01:47:43,168 eval INFO: Total time: 1929.0s
+2026-03-11 01:47:43,168 eval INFO: Model stats: {'root_calls': 23, 'sub_calls': 158, 'total_input_tokens': 540274, 'total_output_tokens': 10568, 'total_time': 1852.001638174057}
+2026-03-11 01:47:43,168 eval INFO: Results saved to: results/v4s5_headtohead/20260311_011453

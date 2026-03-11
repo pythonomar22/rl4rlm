@@ -1,0 +1,97 @@
+2026-03-10 21:39:43,772 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-10 21:39:47,754 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-10 21:39:54,527 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session a85e3f7b-96da-5113-b427-289f13f51283
+2026-03-10 21:39:54,527 scaffold.llm_query INFO: Loading from state checkpoint: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-10 21:40:28,350 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model a85e3f7b-96da-5113-b427-289f13f51283:train:0
+2026-03-10 21:41:10,813 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-10 21:41:10,814 scaffold.llm_query INFO: TinkerModel ready in 83.1s
+2026-03-10 21:41:10,815 eval INFO: Model loaded in 87.0s
+2026-03-10 21:41:10,815 eval INFO: 
+============================================================
+2026-03-10 21:41:10,815 eval INFO: Running benchmark: multi_niah
+2026-03-10 21:41:10,815 eval INFO: ============================================================
+Multi-NIAH:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-10 21:41:10,843 eval INFO: 
+Task: mniah_000_10000_3needles | 3 needles in 10000 chars
+2026-03-10 21:42:31,413 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: BH1-PEARL, YM2-BRONZE, 0R9-CYAN | 80.6s
+Multi-NIAH:   5%|▌         | 1/20 [01:20<25:30, 80.57s/it]2026-03-10 21:42:31,415 eval INFO: 
+Task: mniah_001_10000_3needles | 3 needles in 10000 chars
+2026-03-10 21:43:02,076 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: 4H7-PURPLE, 8M4-GREEN, 6T5-WHITE | 30.7s
+Multi-NIAH:  10%|█         | 2/20 [01:51<15:21, 51.21s/it]2026-03-10 21:43:02,078 eval INFO: 
+Task: mniah_002_10000_3needles | 3 needles in 10000 chars
+2026-03-10 21:44:48,563 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: UC7-CHROME, 6T5-WHITE, BH1-PEARL | 106.5s
+Multi-NIAH:  15%|█▌        | 3/20 [03:37<21:39, 76.45s/it]2026-03-10 21:44:48,565 eval INFO: 
+Task: mniah_003_10000_3needles | 3 needles in 10000 chars
+2026-03-10 21:45:18,967 eval INFO:   Found 3/3 | Recall: 1.00 | Answer: 7X9-BLUE, VL2-JADE, XP5-SLATE | 30.4s
+Multi-NIAH:  20%|██        | 4/20 [04:08<15:32, 58.27s/it]2026-03-10 21:45:18,968 eval INFO: 
+Task: mniah_004_20000_5needles | 5 needles in 20000 chars
+2026-03-10 21:45:52,063 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: VL2-JADE, WN8-IVORY, BH1-PEARL, FS7-ONYX, 0R9-CYAN | 33.1s
+Multi-NIAH:  25%|██▌       | 5/20 [04:41<12:17, 49.19s/it]2026-03-10 21:45:52,064 eval INFO: 
+Task: mniah_005_20000_5needles | 5 needles in 20000 chars
+2026-03-10 21:46:39,267 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: BH1-PEARL, 6T5-WHITE, FS7-ONYX, 2W6-SILVER, DK6-AMBER | 47.2s
+Multi-NIAH:  30%|███       | 6/20 [05:28<11:19, 48.52s/it]2026-03-10 21:46:39,268 eval INFO: 
+Task: mniah_006_20000_5needles | 5 needles in 20000 chars
+2026-03-10 21:46:57,119 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: BH1-PEARL, XP5-SLATE, 6T5-WHITE, 9J3-ORANGE, 4H7-PURPLE | 17.9s
+Multi-NIAH:  35%|███▌      | 7/20 [05:46<08:20, 38.49s/it]2026-03-10 21:46:57,119 eval INFO: 
+Task: mniah_007_20000_5needles | 5 needles in 20000 chars
+2026-03-10 21:47:17,599 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: UC7-CHROME, 0R9-CYAN, 1N8-BLACK, 7X9-BLUE, DK6-AMBER | 20.5s
+Multi-NIAH:  40%|████      | 8/20 [06:06<06:33, 32.76s/it]2026-03-10 21:47:17,600 eval INFO: 
+Task: mniah_008_50000_5needles | 5 needles in 50000 chars
+2026-03-10 21:47:39,172 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: BH1-PEARL, YM2-BRONZE, 2W6-SILVER, 1N8-BLACK, 7X9-BLUE | 21.6s
+Multi-NIAH:  45%|████▌     | 9/20 [06:28<05:21, 29.26s/it]2026-03-10 21:47:39,173 eval INFO: 
+Task: mniah_009_50000_5needles | 5 needles in 50000 chars
+2026-03-10 21:48:03,978 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: 1N8-BLACK, WN8-IVORY, FS7-ONYX, 6T5-WHITE, QZ4-RUBY | 24.8s
+Multi-NIAH:  50%|█████     | 10/20 [06:53<04:38, 27.89s/it]2026-03-10 21:48:03,978 eval INFO: 
+Task: mniah_010_50000_5needles | 5 needles in 50000 chars
+2026-03-10 21:48:27,681 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: GT3-CORAL, 1N8-BLACK, 7X9-BLUE, DK6-AMBER, 2W6-SILVER | 23.7s
+Multi-NIAH:  55%|█████▌    | 11/20 [07:16<03:59, 26.61s/it]2026-03-10 21:48:27,682 eval INFO: 
+Task: mniah_011_50000_5needles | 5 needles in 50000 chars
+2026-03-10 21:48:52,877 eval INFO:   Found 5/5 | Recall: 1.00 | Answer: FS7-ONYX, YM2-BRONZE, XP5-SLATE, DK6-AMBER, 7X9-BLUE | 25.2s
+Multi-NIAH:  60%|██████    | 12/20 [07:42<03:29, 26.18s/it]2026-03-10 21:48:52,878 eval INFO: 
+Task: mniah_012_50000_8needles | 8 needles in 49999 chars
+2026-03-10 21:49:15,401 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: 5P1-GOLD, UC7-CHROME, BH1-PEARL, GT3-CORAL, DK6-AMBER, 8M4-GREEN, 6T5-WHITE, 1N8-BLACK | 22.5s
+Multi-NIAH:  65%|██████▌   | 13/20 [08:04<02:55, 25.07s/it]2026-03-10 21:49:15,402 eval INFO: 
+Task: mniah_013_50000_8needles | 8 needles in 50000 chars
+2026-03-10 21:50:05,002 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: UC7-CHROME, 6T5-WHITE, 9J3-ORANGE, 2W6-SILVER, 4H7-PURPLE, 8M4-GREEN, DK6-AMBER, FS7-ONYX | 49.6s
+Multi-NIAH:  70%|███████   | 14/20 [08:54<03:14, 32.48s/it]2026-03-10 21:50:05,008 eval INFO: 
+Task: mniah_014_50000_8needles | 8 needles in 50000 chars
+2026-03-10 21:50:58,387 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: 5P1-GOLD, WN8-IVORY, XP5-SLATE, VL2-JADE, 2W6-SILVER, 3K2-RED, YM2-BRONZE, 8M4-GREEN | 53.4s
+Multi-NIAH:  75%|███████▌  | 15/20 [09:47<03:13, 38.78s/it]2026-03-10 21:50:58,387 eval INFO: 
+Task: mniah_015_50000_8needles | 8 needles in 50000 chars
+2026-03-10 21:54:08,572 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: 6T5-WHITE, QZ4-RUBY, 3K2-RED, 5P1-GOLD, 1N8-BLACK, VL2-JADE, 8M4-GREEN, GT3-CORAL | 190.2s
+Multi-NIAH:  80%|████████  | 16/20 [12:57<05:37, 84.35s/it]2026-03-10 21:54:08,573 eval INFO: 
+Task: mniah_016_100000_8needles | 8 needles in 100000 chars
+2026-03-10 21:55:48,952 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: WN8-IVORY, UC7-CHROME, FS7-ONYX, XP5-SLATE, 2W6-SILVER, 0R9-CYAN, 7X9-BLUE, DK6-AMBER | 100.4s
+Multi-NIAH:  85%|████████▌ | 17/20 [14:38<04:27, 89.17s/it]2026-03-10 21:55:48,953 eval INFO: 
+Task: mniah_017_100000_8needles | 8 needles in 100000 chars
+2026-03-10 21:57:55,336 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: 8M4-GREEN, 7X9-BLUE, 7X9-BLUE, FS7-ONYX, WN8-IVORY, 1N8-BLACK, DK6-AMBER, DK6-AMBER, 2W6-SILVER, 4H7-PURPLE | 126.4s
+Multi-NIAH:  90%|█████████ | 18/20 [16:44<03:20, 100.35s/it]2026-03-10 21:57:55,337 eval INFO: 
+Task: mniah_018_100000_8needles | 8 needles in 100000 chars
+2026-03-10 21:59:09,738 eval INFO:   Found 7/8 | Recall: 0.88 | Answer: QZ4-RUBY, 4H7-PURPLE, 3K2-RED, 9J3-ORANGE, BH1-PEARL, 7X9-BLUE, VL2-JADE | 74.4s
+Multi-NIAH:  95%|█████████▌| 19/20 [17:58<01:32, 92.56s/it] 2026-03-10 21:59:09,739 eval INFO: 
+Task: mniah_019_100000_8needles | 8 needles in 100000 chars
+2026-03-10 22:00:18,789 eval INFO:   Found 8/8 | Recall: 1.00 | Answer: BH1-PEARL, 6T5-WHITE, UC7-CHROME, QZ4-RUBY, WN8-IVORY, FS7-ONYX, 7X9-BLUE, XP5-SLATE | 69.0s
+Multi-NIAH: 100%|██████████| 20/20 [19:07<00:00, 85.50s/it]Multi-NIAH: 100%|██████████| 20/20 [19:07<00:00, 57.40s/it]
+2026-03-10 22:00:18,796 eval INFO: 
+--- multi_niah Results ---
+2026-03-10 22:00:18,797 eval INFO: Accuracy/Recall: 99.4%
+2026-03-10 22:00:18,799 eval INFO: Tasks: 20
+2026-03-10 22:00:18,802 eval INFO: By doc length:
+2026-03-10 22:00:18,802 eval INFO:   100K: 96.9%
+2026-03-10 22:00:18,802 eval INFO:   10K: 100.0%
+2026-03-10 22:00:18,802 eval INFO:   20K: 100.0%
+2026-03-10 22:00:18,802 eval INFO:   49K: 100.0%
+2026-03-10 22:00:18,802 eval INFO:   50K: 100.0%
+2026-03-10 22:00:18,802 eval INFO: By needle count:
+2026-03-10 22:00:18,802 eval INFO:   3 needles: 100.0%
+2026-03-10 22:00:18,802 eval INFO:   5 needles: 100.0%
+2026-03-10 22:00:18,802 eval INFO:   8 needles: 98.4%
+2026-03-10 22:00:18,802 eval INFO: Avg recall: 99.4%
+2026-03-10 22:00:18,802 eval INFO: Avg F1: 99.4%
+2026-03-10 22:00:18,939 eval INFO: 
+============================================================
+2026-03-10 22:00:18,940 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-10 22:00:18,942 eval INFO: ============================================================
+2026-03-10 22:00:18,942 eval INFO:   multi_niah: 99.4% (20 tasks)
+2026-03-10 22:00:18,942 eval INFO: Total time: 1148.0s
+2026-03-10 22:00:18,942 eval INFO: Model stats: {'root_calls': 21, 'sub_calls': 60, 'total_input_tokens': 193152, 'total_output_tokens': 5393, 'total_time': 1135.0680952072144}
+2026-03-10 22:00:18,942 eval INFO: Results saved to: results/v4s5_headtohead/20260310_213943

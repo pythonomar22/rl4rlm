@@ -1,0 +1,127 @@
+{
+  "benchmark": "oolong",
+  "accuracy": 0.0,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "oolong_000_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "2",
+      "predicted": "1",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 102.67479109764099,
+      "context_length": 152518
+    },
+    {
+      "task_id": "oolong_001_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "11",
+      "predicted": "31",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 110.1996009349823,
+      "context_length": 152527
+    },
+    {
+      "task_id": "oolong_002_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "3",
+      "predicted": "11",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 84.5914990901947,
+      "context_length": 152531
+    },
+    {
+      "task_id": "oolong_003_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "4",
+      "predicted": "3",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 99.88702750205994,
+      "context_length": 152520
+    },
+    {
+      "task_id": "oolong_004_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "3",
+      "predicted": "8",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 98.6059923171997,
+      "context_length": 152522
+    },
+    {
+      "task_id": "oolong_005_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "1",
+      "predicted": "6",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 126.3592963218689,
+      "context_length": 152554
+    },
+    {
+      "task_id": "oolong_006_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "Detect Magic",
+      "predicted": "Thaumaturgy",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 127.05590152740479,
+      "context_length": 152511
+    },
+    {
+      "task_id": "oolong_007_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "11",
+      "predicted": "21",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 90.77130198478699,
+      "context_length": 152525
+    },
+    {
+      "task_id": "oolong_008_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "2",
+      "predicted": "3",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 109.35041213035583,
+      "context_length": 152524
+    },
+    {
+      "task_id": "oolong_009_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "Chromatic Orb, Hex, Cure Wounds, Blood Curse of the Eyeless",
+      "predicted": "1: Liam - Summon Frumpkin, 2: Laura - Guiding Bolt, 3: Liam - Chromatic Orb, 4: Laura - Toll the Dead, 5: Travis - Hex, Travis: Hex, Liam: Chromatic Orb, Laura: Thaumaturgy",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 134.55734419822693,
+      "context_length": 152620
+    }
+  ]
+}

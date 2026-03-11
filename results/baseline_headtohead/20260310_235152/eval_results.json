@@ -1,0 +1,402 @@
+{
+  "benchmark": "code_debug",
+  "accuracy": 0.22222222222222224,
+  "n_tasks": 15,
+  "per_task": [
+    {
+      "task_id": "debug_000_1bugs_599lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 599,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_payment_notifications | BUG: The list of required_fields contains a duplicate entry for 'timestamp' instead of having unique required fields, which implies a missing field (likely 'id' or similar based on context) or a copy-paste error in the validation logic. | FIX: Change the line `required_fields = ['timestamp', 'timestamp', 'status']` to `required_fields = ['timestamp', 'id', 'status']` (or the appropriate missing field name).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 15.633644104003906,
+      "prompt_chars": 16255
+    },
+    {
+      "task_id": "debug_001_1bugs_554lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 554,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_response_billing | BUG: The function references `order_data` in the `isinstance` check and `TypeError` message, but the function parameter is named `data`. | FIX: Replace `order_data` with `data` in both the `isinstance` check and the f-string.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 8.393689393997192,
+      "prompt_chars": 15365
+    },
+    {
+      "task_id": "debug_002_1bugs_585lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 585,
+      "expected_bugs": [
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: The function attempts to access variables `items`, `elapsed`, and `logger` which are not defined in the local scope, global scope, or passed as arguments, causing a `NameError` at runtime. | FIX: Replace `items` with `data`, define `elapsed` (e.g., `elapsed = time.time()`), and ensure `logger` is imported or defined before use.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 16.453683137893677,
+      "prompt_chars": 15596
+    },
+    {
+      "task_id": "debug_003_1bugs_595lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 595,
+      "expected_bugs": [
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: process_metric_billing\nBUG: The `required_fields` list contains the field `'timestamp'` twice, missing the `'amount'` field which is standard for billing records (seen in other similar functions like `process_record_billing`'s implied logic or `process_request_analytics`'s pattern). This is a logical error in data validation configuration.\nFIX: Change the line `required_fields = ['timestamp', 'timestamp', 'status']` to `required_fields = ['amount', 'timestamp', 'status']`.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 137.8254795074463,
+      "prompt_chars": 15881
+    },
+    {
+      "task_id": "debug_004_1bugs_1472lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1472,
+      "expected_bugs": [
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: matrix_multiply | BUG: Incorrect matrix indexing in the inner loop; `b[j][k]` accesses the wrong element and should be `b[k][j]` to correctly multiply the row of the first matrix by the column of the second matrix. | FIX: Change `b[j][k]` to `b[k][j]` inside the innermost loop.\nFUNCTION: process_record_analytics | BUG: The required_fields list contains 'timestamp' twice and is missing 'value' (or another expected field), which indicates a likely copy-paste error in the validation logic. | FIX: Change `required_fields = ['timestamp', 'timestamp', 'status']` to `required_fields = ['timestamp', 'value', 'status']` (or whatever the correct intended third field is).\nFUNCTION: process_record_auth | BUG: The list of required_fields contains the field 'status' twice instead of having a unique set of required fields. | FIX: Change required_fields = ['status', 'timestamp', 'status'] to required_fields = ['status', 'timestamp', 'some_other_field'] or remove the duplicate to ensure unique required fields.\nFUNCTION: process_user_db | BUG: The code references `record_data` in the `isinstance` check and `required_fields` list, but the function argument is named `data`. This causes a `NameError` because `record_data` is undefined. | FIX: Replace `record_data` with `data` in the `isinstance` check and the `required_fields` list.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 25.49656367301941,
+      "prompt_chars": 39655
+    },
+    {
+      "task_id": "debug_005_1bugs_1446lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1446,
+      "expected_bugs": [
+        "lru_cache"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: The code references a variable `event_data` in the `isinstance` check and the error message, but the function parameter is named `data`. This will raise a `NameError` because `event_data` is not defined. | FIX: Change `event_data` to `data` in both the `isinstance` check and the `TypeError` message.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 112.3423957824707,
+      "prompt_chars": 38892
+    },
+    {
+      "task_id": "debug_006_1bugs_1353lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1353,
+      "expected_bugs": [
+        "calculate_median"
+      ],
+      "predicted": "Based on the findings provided in the text, here is the single bug identified:\n\n**Function name**: `calculate_median`\n\n**Bug description**: The function contains an **IndexError** (off-by-one error) in the even-length list calculation. Specifically, the code attempts to access `sorted_vals[n // 2 + 1]` when `n` is even. For a list of length 2, `n // 2` is 1, and `n // 2 + 1` is 2, which exceeds the valid indices (0 and 1). The correct indices for the two middle elements in an even-length list should be `n // 2 - 1` and `n // 2`.\n\n**Fix**: Modify the return statement for the even-length case to use the correct indices:\n```python\n# Change line:\n# return (sorted_vals[n // 2] + sorted_vals[n // 2 + 1]) / 2\n# To:\nreturn (sorted_vals[n // 2 - 1] + sorted_vals[n // 2]) / 2\n```",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_median",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 60.74909949302673,
+      "prompt_chars": 36024
+    },
+    {
+      "task_id": "debug_007_1bugs_1409lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1409,
+      "expected_bugs": [
+        "dijkstra"
+      ],
+      "predicted": "Based on an analysis of the provided codebase, here is the single bug identified:\n\n1. **Which function contains the bug**:\n   `process_payment_billing` in the module `utils_22.py`.\n\n2. **What the bug is**:\n   The function definition is incomplete and contains a syntax error. The function definition starts correctly, but the body ends abruptly with `resu` inside the comment block (or as a truncated line), causing a `SyntaxError` when the module is imported. Specifically, the last line of the function definition is `resu`, which is not a valid Python statement and cuts off the intended code (likely meant to be `result = []` or similar logic).\n\n   The problematic code snippet is:\n   ```python\n   def process_payment_billing(data, params=None):\n       # Process order for analytics\n       resu\n   ```\n   This is the only instance where a function definition is syntactically broken (truncated mid-line).\n\n3. **What the correct fix should be**:\n   Complete the truncated line to properly initialize the result list or perform the intended logic. Based on the pattern of other similar functions in the codebase (e.g., `process_payment_analytics` in `handlers_29.py` which does `result = []`), the fix should be:\n\n   ```python\n   def process_payment_billing(data, params=None):\n       # Process order for analytics\n       result = []\n       for item in data:\n           if item.get('value'):\n               result.append(item['value'])\n   ```\n\n   *Note: The full logic for the loop was inferred from the duplicate file `utils_22.py` provided later in the prompt which contains the complete version of the function, confirming the intended logic.*",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 28.807131052017212,
+      "prompt_chars": 37582
+    },
+    {
+      "task_id": "debug_008_2bugs_1418lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1418,
+      "expected_bugs": [
+        "binary_search",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: binary_search | BUG: Infinite loop when target is not found and not in the current range because the left bound is not updated correctly (should be mid + 1) | FIX: Change `left = mid` to `left = mid + 1`\nFUNCTION: process_order_api | BUG: The `required_fields` list contains a duplicate value 'status' instead of the expected 'timestamp' and 'status' or similar unique fields, which is a logical error in definition (though strictly speaking, the prompt asks for 2 bugs, the binary_search is the clear algorithmic bug. The second bug is likely in one of the many functions with undefined variables like `items`, `elapsed`, `self._cache`, etc. However, looking at the pattern, `process_order_api` in `core_15.py` has `required_fields = ['status', 'timestamp', 'status']` which is redundant. But a more critical bug is the use of undefined variables in many functions. Let's look for a specific logical bug. Ah, `process_order_api` in `core_15.py` defines `required_fields` with duplicate 'status'. Is that a bug? Maybe. Let's look for something more obvious.\nFUNCTION: binary_search | BUG: Infinite loop when the target is greater than the middle element because the left bound is not advanced past the middle index (left = mid) | FIX: Change `left = mid` to `left = mid + 1`\nFUNCTION: process_order_api | BUG: The `required_fields` list contains a duplicate value 'status' instead of a unique set of fields (e.g., 'name' or 'id') | FIX: Change `required_fields = ['status', 'timestamp', 'status']` to `required_fields = ['status', 'timestamp', 'name']` (or similar appropriate field)",
+      "score": 0.5,
+      "found": 1,
+      "total": 2,
+      "details": [
+        {
+          "function": "binary_search",
+          "found": true
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 120.23510694503784,
+      "prompt_chars": 37848
+    },
+    {
+      "task_id": "debug_009_2bugs_1329lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1329,
+      "expected_bugs": [
+        "count_words",
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_session_billing | BUG: Uses undefined variable `self` for cache access without `self` being defined in the function scope (function is standalone, not a method). | FIX: Remove the `self._cache` references and the cache logic, or pass a cache object as an argument.\nFUNCTION: process_record_cache | BUG: The function validates `event_data` but the parameter name is `data`, causing a `NameError` because `event_data` is undefined. | FIX: Replace `event_data` with `data` in the `isinstance` check and the error message.",
+      "score": 0.0,
+      "found": 0,
+      "total": 2,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        },
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 131.16767859458923,
+      "prompt_chars": 35495
+    },
+    {
+      "task_id": "debug_010_2bugs_1445lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1445,
+      "expected_bugs": [
+        "calculate_mean",
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_user_db | BUG: Undefined variable 'payment_data' used instead of function argument 'data' | FIX: Replace 'payment_data' with 'data'\nFUNCTION: process_metric_billing | BUG: Undefined variable 'self' used in standalone function | FIX: Remove 'self' or convert to a class method",
+      "score": 0.0,
+      "found": 0,
+      "total": 2,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": false
+        },
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 222.18390250205994,
+      "prompt_chars": 37809
+    },
+    {
+      "task_id": "debug_011_2bugs_1455lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1455,
+      "expected_bugs": [
+        "lru_cache",
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: process_response_notifications | BUG: Uses undefined variables `items` and `elapsed` instead of the function arguments `data` and a defined time variable. | FIX: Change `items` to `data` and define `elapsed` (or remove the reference if not calculated).\nFUNCTION: matrix_multiply | BUG: Incorrect index access in the nested loop; uses `b[j][k]` which accesses row `j` of matrix `b`, but should access row `k` to match the element being multiplied from `a[i][k]`. | FIX: Change `b[j][k]` to `b[k][j]`.",
+      "score": 0.5,
+      "found": 1,
+      "total": 2,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        },
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 99.55179476737976,
+      "prompt_chars": 38445
+    },
+    {
+      "task_id": "debug_012_3bugs_2201lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2201,
+      "expected_bugs": [
+        "binary_search",
+        "lru_cache",
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: binary_search | BUG: Infinite loop when target is greater than mid element | FIX: Change left = mid to left = mid + 1\nFUNCTION: process_request_auth | BUG: Undefined variable 'items' used in logging and stats | FIX: Change 'items' to 'data'\nFUNCTION: process_event_auth | BUG: Duplicate field 'status' in required_fields list | FIX: Change the second 'status' to 'label' or another unique field\nFUNCTION: process_response_auth | BUG: Uses undefined variable 'items' instead of 'data' | FIX: Replace 'items' with 'data' in len(items) and dictionary assignment\nFUNCTION: process_event_scheduler | BUG: Uses undefined variable 'order_data' instead of 'data' | FIX: Replace 'order_data' with 'data' in isinstance check and TypeError message\nFUNCTION: process_config_notifications | BUG: Uses undefined variable 'metric_data' instead of 'data' | FIX: Replace 'metric_data' with 'data' in isinstance check and TypeError message\nFUNCTION: process_session_billing | BUG: Variable 'metric_data' is used instead of function argument 'data' | FIX: Replace 'metric_data' with 'data' in isinstance check and error message\nFUNCTION: process_record_notifications | BUG: Variable 'items' is used but 'data' is the function argument | FIX: Replace 'items' with 'data' in len() and stats dictionary\nFUNCTION: process_session_billing | BUG: Duplicate field 'timestamp' in required_fields list | FIX: Remove duplicate 'timestamp' and add a missing required field like 'value' or ensure correct list content",
+      "score": 0.3333333333333333,
+      "found": 1,
+      "total": 3,
+      "details": [
+        {
+          "function": "binary_search",
+          "found": true
+        },
+        {
+          "function": "lru_cache",
+          "found": false
+        },
+        {
+          "function": "calculate_mean",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 34.444398403167725,
+      "prompt_chars": 58888
+    },
+    {
+      "task_id": "debug_013_3bugs_2241lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2241,
+      "expected_bugs": [
+        "dijkstra",
+        "validate_email",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: process_session_db | BUG: Missing 'self' reference in cache lookup | FIX: Ensure the function is defined inside a class or add 'self' to the cache access (e.g., change `self._cache` to a passed cache argument or ensure it's a method).\nFUNCTION: process_session_analytics | BUG: Undeclared variable 'record_data' used in validation | FIX: Change the variable name `record_data` to `data` to match the function argument.\nFUNCTION: process_event_notifications | BUG: Duplicate field 'timestamp' in required_fields list | FIX: Change the second 'timestamp' in the list to a unique required field (e.g., 'id' or 'user_id').\nFUNCTION: process_record_auth | BUG: Variable 'record_data' is used but not defined; the function parameter is 'data'. | FIX: Change 'record_data' to 'data' in the isinstance check and error message.\nFUNCTION: process_session_billing | BUG: Variable 'items' is used but not defined; the function parameter is 'data'. | FIX: Change 'items' to 'data' in the len() and stats dictionary.\nFUNCTION: process_config_notifications | BUG: Variable 'items' is used but not defined; the function parameter is 'data'. | FIX: Change 'items' to 'data' in the len() and stats dictionary.\nFUNCTION: LRUCache.get | BUG: The method fails to update the access order (move to end) when retrieving an existing key, breaking the LRU eviction logic. | FIX: Change `self.order.remove(key)` to `self.order.pop(self.order.index(key))` or remove the key and re-append it to ensure the most recently used item is at the end.\nFUNCTION: parse_csv_line | BUG: The function does not handle escaped quotes (e.g., `\"\"`) inside quoted fields, causing incorrect splitting of fields containing quotes. | FIX: Add logic to detect `\"\"` inside a quoted section and treat it as a single literal quote rather than toggling the `in_quotes` state.\nFUNCTION: process_user_api | BUG: The variable `metric_data` is used in the type check but is not defined as a parameter or local variable within the function scope. | FIX: Change the argument name to `metric_data` or add `metric_data = data` at the start of the function.\nFUNCTION: process_event_auth | BUG: Undefined variable 'event_data' referenced in isinstance check | FIX: Change 'event_data' to 'data' or 'params'\nFUNCTION: process_order_auth | BUG: Undefined variables 'items' and 'elapsed' used in logging and stats | FIX: Change 'items' to 'data' and 'elapsed' to a calculated time difference (e.g., time.time() - start_time)\nFUNCTION: process_response_billing | BUG: Undefined variable 'self' used for cache access in a standalone function | FIX: Pass 'cache' as an argument or remove the self reference if the function is not a class method",
+      "score": 0.0,
+      "found": 0,
+      "total": 3,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        },
+        {
+          "function": "validate_email",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 46.39312291145325,
+      "prompt_chars": 60165
+    },
+    {
+      "task_id": "debug_014_3bugs_2294lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2294,
+      "expected_bugs": [
+        "matrix_multiply",
+        "dijkstra",
+        "calculate_std"
+      ],
+      "predicted": "BUG: process_config_scheduler | Incomplete exception type causing SyntaxError | Change `raise TypeEr` to `raise TypeError`\nBUG: process_request_notifications | Undefined variables `items`, `elapsed`, and `logger` used without definition | Replace `items` with `data`, `elapsed` with a calculated time variable, and ensure `logger` is imported or defined\nBUG: process_event_db | Missing self reference in method definition causing AttributeError | Add `self` as the first parameter to the function definition (`def process_event_db(self, data, params=None):`)\nBUG: process_payment_auth | Uses undefined variables 'items' and 'elapsed' in logging and stats assignment | Replace 'items' with 'data' and define 'elapsed' or remove the stats assignment.\nBUG: process_config_scheduler | Uses undefined variable 'session_data' instead of the function argument 'data' | Change 'session_data' to 'data'.\nBUG: process_user_scheduler | Code snippet is truncated/cut off at 'elapsed' preventing valid syntax | Complete the line to 'stats = {'count': len(data), 'time': elapsed}' or remove the incomplete assignment.",
+      "score": 0.0,
+      "found": 0,
+      "total": 3,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": false
+        },
+        {
+          "function": "dijkstra",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 115.22307348251343,
+      "prompt_chars": 61133
+    }
+  ]
+}

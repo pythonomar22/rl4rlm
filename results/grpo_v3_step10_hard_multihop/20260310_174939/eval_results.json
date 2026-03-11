@@ -1,0 +1,181 @@
+{
+  "benchmark": "hard_multi_hop",
+  "accuracy": 0.15,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "hard_multihop_3hop_0",
+      "n_hops": 3,
+      "expected": "$1.9 million",
+      "predicted": "No approved budget amount or project name found in the text.",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find who is Senior Manager of Human Resources \u2192 Maria Thompson",
+        "Find what project the Senior Manager of Human Resources sponsors \u2192 Project Forge",
+        "Find the budget of Project Forge \u2192 $1.9 million"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 93.54256510734558,
+      "doc_length": 150180
+    },
+    {
+      "task_id": "hard_multihop_3hop_1",
+      "n_hops": 3,
+      "expected": "January 10, 2027",
+      "predicted": "18 months",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find what milestone Research and Development completed \u2192 delivery of Project Summit",
+        "Find what project was delivered \u2192 Project Summit",
+        "Find the delivery date of Project Summit \u2192 January 10, 2027"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 173.2915439605713,
+      "doc_length": 150136
+    },
+    {
+      "task_id": "hard_multihop_2hop_2",
+      "n_hops": 2,
+      "expected": "$4.2 million",
+      "predicted": "$15.7 million",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find what project David Garcia leads \u2192 Project Meridian",
+        "Find the budget of Project Meridian \u2192 $4.2 million"
+      ],
+      "n_distractors": 2,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 62.95457434654236,
+      "doc_length": 100084
+    },
+    {
+      "task_id": "hard_multihop_3hop_3",
+      "n_hops": 3,
+      "expected": "$7.8 million",
+      "predicted": "Not found",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find who is Principal of Human Resources \u2192 Frank Anderson",
+        "Find what project the Principal of Human Resources sponsors \u2192 Project Summit",
+        "Find the budget of Project Summit \u2192 $7.8 million"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 223.61179375648499,
+      "doc_length": 150133
+    },
+    {
+      "task_id": "hard_multihop_3hop_4",
+      "n_hops": 3,
+      "expected": "$15.7 million",
+      "predicted": "Project Nexus: $15.7 million",
+      "score": 1.0,
+      "match_type": "contains",
+      "decomposition": [
+        "Find who is Chief of Data Science \u2192 David Garcia",
+        "Find what project the Chief of Data Science sponsors \u2192 Project Nexus",
+        "Find the budget of Project Nexus \u2192 $15.7 million"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 75.19651961326599,
+      "doc_length": 150133
+    },
+    {
+      "task_id": "hard_multihop_2hop_5",
+      "n_hops": 2,
+      "expected": "Toronto",
+      "predicted": "Berlin",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find who is the Principal of Legal \u2192 Rachel Robinson",
+        "Find where Rachel Robinson is based \u2192 Toronto"
+      ],
+      "n_distractors": 2,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 49.24829292297363,
+      "doc_length": 100083
+    },
+    {
+      "task_id": "hard_multihop_2hop_6",
+      "n_hops": 2,
+      "expected": "New York",
+      "predicted": "Zurich",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find who is the Director of Human Resources \u2192 Victor Hall",
+        "Find where Victor Hall is based \u2192 New York"
+      ],
+      "n_distractors": 2,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 40.37025713920593,
+      "doc_length": 100083
+    },
+    {
+      "task_id": "hard_multihop_3hop_7",
+      "n_hops": 3,
+      "expected": "San Francisco",
+      "predicted": "The provided text does not contain any information about Carol Brown or a project she leads, nor does it mention any headquarters location. Therefore, the requested information cannot be extracted from the text.",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find what initiative Carol Brown leads \u2192 Project Atlas",
+        "Find where Project Atlas is headquartered \u2192 San Francisco"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 75.24505639076233,
+      "doc_length": 200134
+    },
+    {
+      "task_id": "hard_multihop_2hop_8",
+      "n_hops": 2,
+      "expected": "$4.2 million",
+      "predicted": "4.2 million",
+      "score": 0.5,
+      "match_type": "partial",
+      "decomposition": [
+        "Find what project Rachel Robinson leads \u2192 Project Atlas",
+        "Find the budget of Project Atlas \u2192 $4.2 million"
+      ],
+      "n_distractors": 2,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 35.30641198158264,
+      "doc_length": 150153
+    },
+    {
+      "task_id": "hard_multihop_3hop_9",
+      "n_hops": 3,
+      "expected": "New York",
+      "predicted": "None",
+      "score": 0.0,
+      "match_type": "none",
+      "decomposition": [
+        "Find what initiative Olivia Lopez leads \u2192 Project Prism",
+        "Find where Project Prism is headquartered \u2192 New York"
+      ],
+      "n_distractors": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 77.86400365829468,
+      "doc_length": 150112
+    }
+  ]
+}

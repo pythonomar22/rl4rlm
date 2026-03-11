@@ -1,0 +1,402 @@
+{
+  "benchmark": "code_debug",
+  "accuracy": 0.2777777777777778,
+  "n_tasks": 15,
+  "per_task": [
+    {
+      "task_id": "debug_000_1bugs_599lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 599,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_payment_notifications | BUG: The `required_fields` list contains the string 'timestamp' twice instead of having unique required fields (e.g., 'timestamp', 'id', 'status' or similar), which is a logical error in validation configuration. | FIX: Change `required_fields = ['timestamp', 'timestamp', 'status']` to `required_fields = ['timestamp', 'id', 'status']` (or another appropriate unique set of fields).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 24.698740243911743,
+      "prompt_chars": 16255
+    },
+    {
+      "task_id": "debug_001_1bugs_554lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 554,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_user_cache | BUG: The function references `self._cache` and `self` without being defined as a method within a class, causing a `NameError` when called. | FIX: Remove the `self` references or implement the function as part of a class (e.g., `class CacheManager: def process_user_cache(self, data, params=None): ...`). Alternatively, if it's meant to be a standalone function, use a global cache or pass the cache as an argument.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 24.343361854553223,
+      "prompt_chars": 15365
+    },
+    {
+      "task_id": "debug_002_1bugs_585lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 585,
+      "expected_bugs": [
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_record_auth | BUG: The function `process_record_auth` in `utils_0.py` attempts to use a variable named `record_data` inside the `isinstance` check and `TypeError` message, but this variable is never defined in the function's scope or passed as an argument. The function receives `data` as an argument, but the code incorrectly references `record_data`. | FIX: Replace `record_data` with `data` in the `isinstance` check and the `TypeError` message. The corrected lines should be: `if not isinstance(data, dict):` and `raise TypeError(f'Expected dict, got {type(data)}')`.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 29.450089931488037,
+      "prompt_chars": 15596
+    },
+    {
+      "task_id": "debug_003_1bugs_595lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 595,
+      "expected_bugs": [
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: calculate_mean | BUG: The function incorrectly subtracts 1 from the calculated mean, returning `sum(values) / len(values) - 1` instead of just `sum(values) / len(values)`. | FIX: Remove the `- 1` from the return statement so it returns `return sum(values) / len(values)`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 106.46760201454163,
+      "prompt_chars": 15881
+    },
+    {
+      "task_id": "debug_004_1bugs_1472lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1472,
+      "expected_bugs": [
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: matrix_multiply | BUG: Incorrect indexing in the inner loop; it uses `b[j][k]` instead of `b[k][j]`, which accesses the wrong element from the second matrix. | FIX: Change `b[j][k]` to `b[k][j]` in the line `result[i][j] += a[i][k] * b[j][k]`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 21.06804895401001,
+      "prompt_chars": 39655
+    },
+    {
+      "task_id": "debug_005_1bugs_1446lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1446,
+      "expected_bugs": [
+        "lru_cache"
+      ],
+      "predicted": "FUNCTION: process_record_scheduler | BUG: The function references a variable `event_data` in the type check and error message, but the function parameter is named `data`. | FIX: Change `event_data` to `data` in the `isinstance` check and the `TypeError` message.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 109.09084677696228,
+      "prompt_chars": 38892
+    },
+    {
+      "task_id": "debug_006_1bugs_1353lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1353,
+      "expected_bugs": [
+        "calculate_median"
+      ],
+      "predicted": "FUNCTION: process_request_db | BUG: The function logs a message using variables `items` and `elapsed` which are not defined in the scope. | FIX: Replace `items` with `data` and define or remove `elapsed` to match the actual data being processed.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_median",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 59.545551776885986,
+      "prompt_chars": 36024
+    },
+    {
+      "task_id": "debug_007_1bugs_1409lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1409,
+      "expected_bugs": [
+        "dijkstra"
+      ],
+      "predicted": "FUNCTION: process_event_billing | BUG: Uses undefined variable 'self' to access cache without being a method of a class | FIX: Remove the self reference or ensure the function is part of a class instance",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 206.51746153831482,
+      "prompt_chars": 37582
+    },
+    {
+      "task_id": "debug_008_2bugs_1418lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1418,
+      "expected_bugs": [
+        "binary_search",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: binary_search | BUG: Infinite loop when target is greater than arr[mid] | FIX: Change `left = mid` to `left = mid + 1` to avoid re-checking the same index.\nFUNCTION: process_order_api | BUG: Duplicate field in required_fields list | FIX: Change the second `'status'` in `['status', 'timestamp', 'status']` to a unique field like `'id'` or `'amount'`.",
+      "score": 0.5,
+      "found": 1,
+      "total": 2,
+      "details": [
+        {
+          "function": "binary_search",
+          "found": true
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 102.35824060440063,
+      "prompt_chars": 37848
+    },
+    {
+      "task_id": "debug_009_2bugs_1329lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1329,
+      "expected_bugs": [
+        "count_words",
+        "flatten_list"
+      ],
+      "predicted": "[\"FUNCTION: process_session_api | BUG: Variable 'event_data' is used but not defined; the function parameter is named 'data'. | FIX: Change 'event_data' to 'data' in the isinstance check and error message.\", \"FUNCTION: process_session_db | BUG: Variables 'items' and 'elapsed' are used but not defined; the function parameter is named 'data' and no 'elapsed' time is calculated. | FIX: Change 'items' to 'data' and remove or define 'elapsed' (e.g., 'elapsed = time.time()' or pass it as a parameter) to match the logging and stats logic.\"]",
+      "score": 0.0,
+      "found": 0,
+      "total": 2,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        },
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 114.92816877365112,
+      "prompt_chars": 35495
+    },
+    {
+      "task_id": "debug_010_2bugs_1445lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1445,
+      "expected_bugs": [
+        "calculate_mean",
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: stats.py | calculate_mean | BUG: The function subtracts 1 from the calculated mean, which is incorrect for arithmetic mean calculation. | FIX: Remove the `- 1` from the return statement so it returns `sum(values) / len(values)`.\nFUNCTION: sort.py | merge | BUG: The variable name `lef` is a typo and should be `left`, causing a NameError. | FIX: Change `result.append(lef` to `result.append(left[i]`.",
+      "score": 0.5,
+      "found": 1,
+      "total": 2,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        },
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 110.18326544761658,
+      "prompt_chars": 37809
+    },
+    {
+      "task_id": "debug_011_2bugs_1455lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1455,
+      "expected_bugs": [
+        "lru_cache",
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: process_config_billing | BUG: Variable `resul` is misspelled and will raise a NameError instead of `result`. | FIX: Change `resul` to `result`.\nFUNCTION: matrix_multiply | BUG: The inner loop index `k` iterates over `cols_a` but accesses `b[j][k]` instead of `b[k][j]`, causing incorrect matrix multiplication results. | FIX: Change `b[j][k]` to `b[k][j]`.\nFUNCTION: process_request_cache | BUG: Variable 'user_data' is undefined; function parameter is 'data' | FIX: Change 'user_data' to 'data'\nFUNCTION: process_response_api | BUG: Variable 'request_data' is undefined; function parameter is 'data' | FIX: Change 'request_data' to 'data'\nFUNCTION: process_metric_cache | BUG: Variables 'items' and 'elapsed' are undefined | FIX: Replace with valid variables (e.g., 'data' and a computed time) or remove the lines\nFUNCTION: process_payment_billing | BUG: Variables 'items' and 'elapsed' are undefined | FIX: Replace with valid variables (e.g., 'data' and a computed time) or remove the lines\nFUNCTION: process_response_analytics | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_event_notifications | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_event_api | BUG: Variables 'items' and 'elapsed' are undefined | FIX: Replace with valid variables (e.g., 'data' and a computed time) or remove the lines\nFUNCTION: process_session_cache | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_session_auth | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_order_notifications | BUG: Variables 'items' and 'elapsed' are undefined | FIX: Replace with valid variables (e.g., 'data' and a computed time) or remove the lines\nFUNCTION: process_user_analytics | BUG: Duplicate field 'timestamp' in required_fields list | FIX: Remove one of the 'timestamp' entries\nFUNCTION: process_record_db | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_config_api | BUG: Variables 'items' and 'elapsed' are undefined | FIX: Replace with valid variables (e.g., 'data' and a computed time) or remove the lines\nFUNCTION: process_response_api | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_config_db | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_metric_billing | BUG: Variables 'items' and 'elapsed' are undefined | FIX: Replace with valid variables (e.g., 'data' and a computed time) or remove the lines\nFUNCTION: process_response_auth | BUG: Variables 'items' and 'elapsed' are undefined | FIX: Replace with valid variables (e.g., 'data' and a computed time) or remove the lines\nFUNCTION: process_session_analytics | BUG: Variables 'items' and 'elapsed' are undefined | FIX: Replace with valid variables (e.g., 'data' and a computed time) or remove the lines\nFUNCTION: process_session_auth | BUG: Duplicate function definition in module (appears again in middleware_17.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_response_analytics | BUG: Variables 'items' and 'elapsed' are undefined | FIX: Replace with valid variables (e.g., 'data' and a computed time) or remove the lines\nFUNCTION: process_record_db | BUG: Duplicate function definition in module (appears again in handlers_9.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_metric_db | BUG: Duplicate function definition in module (appears twice in handlers_9.py with different logic) | FIX: Rename the second function or merge logic\nFUNCTION: process_order_billing | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_metric_cache | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_metric_notifications | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_response_scheduler | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_record_db | BUG: Duplicate function definition in module (appears again in services_12.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_record_cache | BUG: Duplicate field 'timestamp' in required_fields list | FIX: Remove one of the 'timestamp' entries\nFUNCTION: process_order_billing | BUG: Duplicate function definition in module (appears again in utils_2.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_config_scheduler | BUG: Duplicate function definition in module (appears again in utils_2.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_payment_analytics | BUG: Variable 'self' is undefined in a standalone function | FIX: Pass 'self' as an argument or remove the self-referencing cache logic\nFUNCTION: process_record_notifications | BUG: Duplicate function definition in module (appears again in helpers_28.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_metric_scheduler | BUG: Duplicate function definition in module (appears again in helpers_28.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_response_api | BUG: Duplicate function definition in module (appears again in helpers_16.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_response_analytics | BUG: Duplicate function definition in module (appears again in helpers_20.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_metric_notifications | BUG: Duplicate function definition in module (appears twice in helpers_20.py with different logic) | FIX: Rename the second function or merge logic\nFUNCTION: process_response_api | BUG: Duplicate function definition in module (appears again in helpers_16.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_event_db | BUG: Duplicate function definition in module (appears again in handlers_5.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_response_analytics | BUG: Duplicate function definition in module (appears again in handlers_5.py with same name) | FIX: Rename one of the functions or consolidate logic\nFUNCTION: process_response_analytics | BUG: Variable 'ca' is truncated/undefined in the final line | FIX: Complete the variable name (e.g., 'cache_key')",
+      "score": 0.5,
+      "found": 1,
+      "total": 2,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        },
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 103.42592430114746,
+      "prompt_chars": 38445
+    },
+    {
+      "task_id": "debug_012_3bugs_2201lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2201,
+      "expected_bugs": [
+        "binary_search",
+        "lru_cache",
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: stats.py | BUG: The calculate_mean function subtracts 1 from the result, which is mathematically incorrect for calculating an arithmetic mean. | FIX: Remove the `- 1` from the return statement so it returns `sum(values) / len(values)`.\nFUNCTION: middleware_42.py | BUG: The function process_config_notifications references undefined variables 'items', 'logger', and 'elapsed' instead of the function argument 'data' and proper logging setup. | FIX: Replace 'items' with 'data', ensure 'logger' is imported, and calculate 'elapsed' time properly or remove the references if not needed.\nFUNCTION: handlers_43.py | BUG: The function process_user_db references an undefined variable 'config_data' instead of the function argument 'data'. | FIX: Replace 'config_data' with 'data' in the `isinstance` check and `TypeError` message.",
+      "score": 0.3333333333333333,
+      "found": 1,
+      "total": 3,
+      "details": [
+        {
+          "function": "binary_search",
+          "found": false
+        },
+        {
+          "function": "lru_cache",
+          "found": false
+        },
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 4,
+      "total_time": 331.2901768684387,
+      "prompt_chars": 58888
+    },
+    {
+      "task_id": "debug_013_3bugs_2241lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2241,
+      "expected_bugs": [
+        "dijkstra",
+        "validate_email",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: process_session_db | BUG: The function uses `self._cache` but is a standalone function, not a method of a class, so `self` is undefined. | FIX: Remove the `self.` references and pass the cache as a parameter or use a module-level cache.\nFUNCTION: calculate_std | BUG: The function calculates variance using population formula (dividing by `len(values)`) but standard deviation for a sample should divide by `len(values) - 1`. | FIX: Change `len(values)` to `len(values) - 1` in the variance calculation.\nFUNCTION: process_event_notifications | BUG: The function defines `required_fields` with duplicate `'timestamp'` entries (`['timestamp', 'timestamp', 'status']`). | FIX: Remove the duplicate entry so `required_fields` is `['timestamp', 'status']` or includes the missing field like `'type'` or `'id'` depending on intended logic.",
+      "score": 0.3333333333333333,
+      "found": 1,
+      "total": 3,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        },
+        {
+          "function": "validate_email",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 6,
+      "total_time": 577.9171226024628,
+      "prompt_chars": 60165
+    },
+    {
+      "task_id": "debug_014_3bugs_2294lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2294,
+      "expected_bugs": [
+        "matrix_multiply",
+        "dijkstra",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: process_request_notifications | BUG: Uses undefined variables `items` and `elapsed` instead of the function argument `data` | FIX: Replace `items` with `data` and define or remove `elapsed`\nFUNCTION: process_config_scheduler | BUG: Function definition is truncated at the end of the code, causing a SyntaxError | FIX: Complete the line `raise TypeError(...)` with the closing parenthesis and function body\nFUNCTION: process_metric_cache | BUG: Function defined twice in different modules (middleware_8.py and services_4.py), causing potential logic duplication or override issues | FIX: Consolidate logic into a single function or rename one instance",
+      "score": 0.0,
+      "found": 0,
+      "total": 3,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": false
+        },
+        {
+          "function": "dijkstra",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 108.10397291183472,
+      "prompt_chars": 61133
+    }
+  ]
+}

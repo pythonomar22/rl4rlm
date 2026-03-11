@@ -1,0 +1,210 @@
+{
+  "benchmark": "multi_niah",
+  "accuracy": 0.7533333333333333,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "mniah_000_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "BH1-PEARL",
+        "YM2-BRONZE",
+        "0R9-CYAN"
+      ],
+      "predicted": "0R9-CYAN, 0R9-CYAN, 0R9-CYAN",
+      "recall": 0.3333333333333333,
+      "f1": 0.3333333333333333,
+      "found": 1,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 5.660020589828491,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_001_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "4H7-PURPLE",
+        "8M4-GREEN",
+        "6T5-WHITE"
+      ],
+      "predicted": "4H7-PURPLE, 8M4-GREEN, 6T5-WHITE",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 3,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 5.663540840148926,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_002_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "UC7-CHROME",
+        "6T5-WHITE",
+        "BH1-PEARL"
+      ],
+      "predicted": "3, UC7-CHROME, 6T5-WHITE, BH1-PEARL",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 3,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 5.631516933441162,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_003_10000_3needles",
+      "n_needles": 3,
+      "expected": [
+        "7X9-BLUE",
+        "VL2-JADE",
+        "XP5-SLATE"
+      ],
+      "predicted": "7X9-BLUE, VL2-JADE, XP5-SLATE",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 3,
+      "total": 3,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 5.529765605926514,
+      "doc_length": 10000
+    },
+    {
+      "task_id": "mniah_004_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "VL2-JADE",
+        "WN8-IVORY",
+        "BH1-PEARL",
+        "FS7-ONYX",
+        "0R9-CYAN"
+      ],
+      "predicted": "3, 5, 7, 9, 11,SECRET_CODE_[NAME]: [VALUE]",
+      "recall": 0.0,
+      "f1": 0.0,
+      "found": 0,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 5.806394577026367,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_005_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "BH1-PEARL",
+        "6T5-WHITE",
+        "FS7-ONYX",
+        "2W6-SILVER",
+        "DK6-AMBER"
+      ],
+      "predicted": "3,6T5-WHITE,2W6-SILVER,DK6-AMBER,SECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VALUE]  \nSECRET_CODE_[NAME]: [VALUE]",
+      "recall": 0.6,
+      "f1": 0.6,
+      "found": 3,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 6.939190864562988,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_006_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "BH1-PEARL",
+        "XP5-SLATE",
+        "6T5-WHITE",
+        "9J3-ORANGE",
+        "4H7-PURPLE"
+      ],
+      "predicted": "3T5-WHITE, 6T5-SLATE, 9J3-ORANGE, 4H7-PURPLE, BH1-PEARL,SECRET_CODE_[NAME]: [VALUE]  \n1: programs were expanded to include additional departments.  \n2: The logistics department streamlined several delivery processes.  \n3: Safety inspections confirmed compliance with all regulations.  \n4: The development team completed the scheduled maintena",
+      "recall": 0.6,
+      "f1": 0.6,
+      "found": 3,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 8.0279061794281,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_007_20000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "UC7-CHROME",
+        "0R9-CYAN",
+        "1N8-BLACK",
+        "7X9-BLUE",
+        "DK6-AMBER"
+      ],
+      "predicted": "COMMA_SEPARATED_LIST: UC7-CHROME,0R9-CYAN,1N8-BLACK,7X9-BLUE,DK6-AMBER,SECRET_CODE_[NAME]: [VALUE]",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 6.672261476516724,
+      "doc_length": 20000
+    },
+    {
+      "task_id": "mniah_008_50000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "BH1-PEARL",
+        "YM2-BRONZE",
+        "2W6-SILVER",
+        "1N8-BLACK",
+        "7X9-BLUE"
+      ],
+      "predicted": "3, BH1-PEARL, YM2-BRONZE, BH1-PEARL, YM2-BRONZE, BH1-PEARL, YM2-BRONZE,2W6-SILVER,1N8-BLACK,7X9-BLUE,SECRET_CODE_FOXTROT",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 7.243789196014404,
+      "doc_length": 50000
+    },
+    {
+      "task_id": "mniah_009_50000_5needles",
+      "n_needles": 5,
+      "expected": [
+        "1N8-BLACK",
+        "WN8-IVORY",
+        "FS7-ONYX",
+        "6T5-WHITE",
+        "QZ4-RUBY"
+      ],
+      "predicted": "COMMA_SEPARATED_LIST: 1N8-BLACK,WN8-IVORY,comma-separated list: FS7-ONYX, 6T5-WHITE,QZ4-RUBY,RECENT_STUDIES,ENVIRONMENTAL_MONITORING,COMMUNICATION_SYSTEMS,LOGISTICS_DEPARTMENT,RESEARCH_TEAM,ANNUAL_REVIEW,BUDGET_ALLOCATIONS,COMMUNICATION_SYSTEMS,TECHNICAL_TEAM,REGIONAL_OFFICES,NEW_POLICIES,INTERNATIONAL_PARTNERSHIPS,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMITTEE,TECHNICAL_TEAM,REGIONAL_OFFICES,RESEARCH_TEAM,ANNUAL_REVIEW,COMMIT",
+      "recall": 1.0,
+      "f1": 1.0,
+      "found": 5,
+      "total": 5,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 42.24661040306091,
+      "doc_length": 50000
+    }
+  ],
+  "by_doc_length": {
+    "10K": 0.8333333333333334,
+    "20K": 0.55,
+    "50K": 1.0
+  },
+  "by_n_needles": {
+    "3 needles": 0.8333333333333334,
+    "5 needles": 0.7000000000000001
+  },
+  "avg_recall": 0.7533333333333333,
+  "avg_f1": 0.7533333333333333
+}

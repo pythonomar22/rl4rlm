@@ -1,0 +1,191 @@
+{
+  "benchmark": "code_debug",
+  "accuracy": 0.25,
+  "n_tasks": 8,
+  "per_task": [
+    {
+      "task_id": "debug_000_1bugs_599lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 599,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_payment_api | BUG: The code references `config_data` in the `isinstance` check and `TypeError` message, but the function parameter is named `data`. This will raise a `NameError` because `config_data` is undefined. | FIX: Replace all occurrences of `config_data` with `data`.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 28.493240118026733,
+      "prompt_chars": 16255
+    },
+    {
+      "task_id": "debug_001_1bugs_554lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 554,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_response_billing | BUG: The function uses the variable `order_data` which is not defined in its scope (the input parameter is named `data`). | FIX: Replace `order_data` with `data` in the `isinstance` check and the error message.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 26.818310499191284,
+      "prompt_chars": 15365
+    },
+    {
+      "task_id": "debug_002_1bugs_585lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 585,
+      "expected_bugs": [
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_config_notifications | BUG: The 'required_fields' list contains a duplicate entry 'timestamp' instead of a distinct field like 'id' or 'value', which is inconsistent with other validation functions and likely a typo. | FIX: Change 'required_fields = ['timestamp', 'timestamp', 'status']' to 'required_fields = ['timestamp', 'id', 'status']' (or another appropriate distinct field).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 27.448657751083374,
+      "prompt_chars": 15596
+    },
+    {
+      "task_id": "debug_003_1bugs_595lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 595,
+      "expected_bugs": [
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean, which is incorrect for an arithmetic mean calculation. | FIX: Remove the `- 1` from the return statement so it returns `sum(values) / len(values)`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 31.218451499938965,
+      "prompt_chars": 15881
+    },
+    {
+      "task_id": "debug_004_1bugs_1472lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1472,
+      "expected_bugs": [
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: matrix_multiply | BUG: Incorrect indexing in the inner loop; accessing `b[j][k]` instead of `b[k][j]` causes incorrect matrix multiplication results. | FIX: Change `b[j][k]` to `b[k][j]` in the line `result[i][j] += a[i][k] * b[j][k]`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 77.53610420227051,
+      "prompt_chars": 39655
+    },
+    {
+      "task_id": "debug_005_1bugs_1446lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1446,
+      "expected_bugs": [
+        "lru_cache"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: The function references an undefined variable `event_data` instead of the function argument `data`. | FIX: Replace `event_data` with `data` in the `isinstance` check.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 21.179678440093994,
+      "prompt_chars": 38892
+    },
+    {
+      "task_id": "debug_006_1bugs_1353lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1353,
+      "expected_bugs": [
+        "calculate_median"
+      ],
+      "predicted": "FUNCTION: process_request_db | BUG: The function returns prematurely inside the loop without iterating through the entire dataset or returning a result, causing incomplete data processing. | FIX: Remove the premature return statement and ensure the function processes all items in the loop before returning the `result` list.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_median",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 21.333040475845337,
+      "prompt_chars": 36024
+    },
+    {
+      "task_id": "debug_007_1bugs_1409lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1409,
+      "expected_bugs": [
+        "dijkstra"
+      ],
+      "predicted": "FUNCTION: process_payment_billing | BUG: The function definition is incomplete and cuts off mid-statement (`resu`), causing a syntax error. | FIX: Complete the statement (e.g., `result = []`) and close the function definition properly.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 89.79694890975952,
+      "prompt_chars": 37582
+    }
+  ]
+}

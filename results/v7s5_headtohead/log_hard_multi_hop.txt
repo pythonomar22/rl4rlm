@@ -1,0 +1,75 @@
+2026-03-11 01:11:05,146 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-11 01:11:10,058 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-11 01:11:18,326 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session d24441ed-6575-5676-94d9-c79c29fbe4c8
+2026-03-11 01:11:18,326 scaffold.llm_query INFO: Loading from state checkpoint: tinker://2e48210b-f605-566d-86c6-f8c3c0f8a95f:train:0/weights/state-0005
+2026-03-11 01:11:37,011 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model d24441ed-6575-5676-94d9-c79c29fbe4c8:train:0
+2026-03-11 01:11:41,449 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://2e48210b-f605-566d-86c6-f8c3c0f8a95f:train:0/weights/state-0005
+2026-03-11 01:11:41,450 scaffold.llm_query INFO: TinkerModel ready in 31.4s
+2026-03-11 01:11:41,450 eval INFO: Model loaded in 36.3s
+2026-03-11 01:11:41,450 eval INFO: 
+============================================================
+2026-03-11 01:11:41,450 eval INFO: Running benchmark: hard_multi_hop
+2026-03-11 01:11:41,450 eval INFO: ============================================================
+HardMultiHop:   0%|          | 0/10 [00:00<?, ?it/s]2026-03-11 01:11:41,512 eval INFO: 
+Task: hard_multihop_3hop_0 | 3-hop | 150,180 chars
+2026-03-11 01:11:41,512 eval INFO:   Q: What is the approved budget for the project sponsored by the Senior Manager of Human Resources?
+2026-03-11 01:11:41,512 eval INFO:   Decomposition: Find who is Senior Manager of Human Resources → Maria Thompson → Find what project the Senior Manager of Human Resources sponsors → Project Forge → Find the budget of Project Forge → $1.9 million
+2026-03-11 01:12:59,575 eval INFO:   Score: 0.0 (none) | Expected: $1.9 million | Got: Not found
+HardMultiHop:  10%|█         | 1/10 [01:18<11:42, 78.06s/it]2026-03-11 01:12:59,575 eval INFO: 
+Task: hard_multihop_3hop_1 | 3-hop | 150,136 chars
+2026-03-11 01:12:59,575 eval INFO:   Q: On what date was the project completed by the Research and Development department delivered?
+2026-03-11 01:12:59,575 eval INFO:   Decomposition: Find what milestone Research and Development completed → delivery of Project Summit → Find what project was delivered → Project Summit → Find the delivery date of Project Summit → January 10, 2027
+2026-03-11 01:14:14,910 eval INFO:   Score: 0.0 (none) | Expected: January 10, 2027 | Got: March 15, 2026
+HardMultiHop:  20%|██        | 2/10 [02:33<10:11, 76.46s/it]2026-03-11 01:14:14,911 eval INFO: 
+Task: hard_multihop_2hop_2 | 2-hop | 100,084 chars
+2026-03-11 01:14:14,911 eval INFO:   Q: What is the budget for the project led by David Garcia?
+2026-03-11 01:14:14,912 eval INFO:   Decomposition: Find what project David Garcia leads → Project Meridian → Find the budget of Project Meridian → $4.2 million
+2026-03-11 01:15:08,491 eval INFO:   Score: 0.0 (none) | Expected: $4.2 million | Got: $15.7 million
+HardMultiHop:  30%|███       | 3/10 [03:26<07:42, 66.01s/it]2026-03-11 01:15:08,499 eval INFO: 
+Task: hard_multihop_3hop_3 | 3-hop | 150,133 chars
+2026-03-11 01:15:08,499 eval INFO:   Q: What is the approved budget for the project sponsored by the Principal of Human Resources?
+2026-03-11 01:15:08,500 eval INFO:   Decomposition: Find who is Principal of Human Resources → Frank Anderson → Find what project the Principal of Human Resources sponsors → Project Summit → Find the budget of Project Summit → $7.8 million
+2026-03-11 01:16:20,702 eval INFO:   Score: 0.0 (none) | Expected: $7.8 million | Got: Not found
+HardMultiHop:  40%|████      | 4/10 [04:39<06:50, 68.46s/it]2026-03-11 01:16:20,703 eval INFO: 
+Task: hard_multihop_3hop_4 | 3-hop | 150,133 chars
+2026-03-11 01:16:20,703 eval INFO:   Q: What is the approved budget for the project sponsored by the Chief of Data Science?
+2026-03-11 01:16:20,703 eval INFO:   Decomposition: Find who is Chief of Data Science → David Garcia → Find what project the Chief of Data Science sponsors → Project Nexus → Find the budget of Project Nexus → $15.7 million
+2026-03-11 01:18:10,392 eval INFO:   Score: 1.0 (contains) | Expected: $15.7 million | Got: Project Nexus: $15.7 million
+HardMultiHop:  50%|█████     | 5/10 [06:28<06:56, 83.33s/it]2026-03-11 01:18:10,393 eval INFO: 
+Task: hard_multihop_2hop_5 | 2-hop | 100,083 chars
+2026-03-11 01:18:10,393 eval INFO:   Q: In which city is the Principal of Legal based?
+2026-03-11 01:18:10,393 eval INFO:   Decomposition: Find who is the Principal of Legal → Rachel Robinson → Find where Rachel Robinson is based → Toronto
+2026-03-11 01:19:04,511 eval INFO:   Score: 0.0 (none) | Expected: Toronto | Got: Berlin
+HardMultiHop:  60%|██████    | 6/10 [07:22<04:53, 73.40s/it]2026-03-11 01:19:04,511 eval INFO: 
+Task: hard_multihop_2hop_6 | 2-hop | 100,083 chars
+2026-03-11 01:19:04,512 eval INFO:   Q: In which city is the Director of Human Resources based?
+2026-03-11 01:19:04,512 eval INFO:   Decomposition: Find who is the Director of Human Resources → Victor Hall → Find where Victor Hall is based → New York
+2026-03-11 01:19:58,066 eval INFO:   Score: 0.0 (none) | Expected: New York | Got: Zurich
+HardMultiHop:  70%|███████   | 7/10 [08:16<03:20, 66.91s/it]2026-03-11 01:19:58,071 eval INFO: 
+Task: hard_multihop_3hop_7 | 3-hop | 200,134 chars
+2026-03-11 01:19:58,071 eval INFO:   Q: Where is the project led by Carol Brown headquartered?
+2026-03-11 01:19:58,071 eval INFO:   Decomposition: Find what initiative Carol Brown leads → Project Atlas → Find where Project Atlas is headquartered → San Francisco
+2026-03-11 01:22:12,601 eval INFO:   Score: 1.0 (contains) | Expected: San Francisco | Got: San Francisco
+HardMultiHop:  80%|████████  | 8/10 [10:31<02:56, 88.44s/it]2026-03-11 01:22:12,602 eval INFO: 
+Task: hard_multihop_2hop_8 | 2-hop | 150,153 chars
+2026-03-11 01:22:12,603 eval INFO:   Q: What is the budget for the project led by Rachel Robinson?
+2026-03-11 01:22:12,603 eval INFO:   Decomposition: Find what project Rachel Robinson leads → Project Atlas → Find the budget of Project Atlas → $4.2 million
+2026-03-11 01:23:24,567 eval INFO:   Score: 1.0 (contains) | Expected: $4.2 million | Got: $4.2 million
+HardMultiHop:  90%|█████████ | 9/10 [11:43<01:23, 83.29s/it]2026-03-11 01:23:24,568 eval INFO: 
+Task: hard_multihop_3hop_9 | 3-hop | 150,112 chars
+2026-03-11 01:23:24,568 eval INFO:   Q: Where is the project led by Olivia Lopez headquartered?
+2026-03-11 01:23:24,568 eval INFO:   Decomposition: Find what initiative Olivia Lopez leads → Project Prism → Find where Project Prism is headquartered → New York
+2026-03-11 01:25:09,281 eval INFO:   Score: 1.0 (contains) | Expected: New York | Got: New York
+HardMultiHop: 100%|██████████| 10/10 [13:27<00:00, 89.90s/it]HardMultiHop: 100%|██████████| 10/10 [13:27<00:00, 80.78s/it]
+2026-03-11 01:25:09,282 eval INFO: 
+--- hard_multi_hop Results ---
+2026-03-11 01:25:09,283 eval INFO: Accuracy/Recall: 40.0%
+2026-03-11 01:25:09,283 eval INFO: Tasks: 10
+2026-03-11 01:25:09,306 eval INFO: 
+============================================================
+2026-03-11 01:25:09,307 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-11 01:25:09,307 eval INFO: ============================================================
+2026-03-11 01:25:09,307 eval INFO:   hard_multi_hop: 40.0% (10 tasks)
+2026-03-11 01:25:09,307 eval INFO: Total time: 807.8s
+2026-03-11 01:25:09,307 eval INFO: Model stats: {'root_calls': 10, 'sub_calls': 93, 'total_input_tokens': 286425, 'total_output_tokens': 2025, 'total_time': 805.6528398990631}
+2026-03-11 01:25:09,307 eval INFO: Results saved to: results/v7s5_headtohead/20260311_011105

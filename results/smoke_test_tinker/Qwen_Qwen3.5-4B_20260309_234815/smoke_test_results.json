@@ -1,0 +1,83 @@
+{
+  "model": "Qwen/Qwen3.5-4B",
+  "timestamp": "2026-03-09T23:48:15.816216",
+  "results": [
+    {
+      "task": "needle_in_haystack",
+      "correct": true,
+      "answer": "PHOENIX-42",
+      "expected": "PHOENIX-42",
+      "valid_python": false,
+      "uses_context": false,
+      "uses_llm_query": false,
+      "uses_final": false,
+      "turns": 1,
+      "terminated": true,
+      "time": 5.740010738372803
+    },
+    {
+      "task": "count_lines",
+      "correct": false,
+      "answer": "['QUESTION: How many lines are in this document?', '', 'Line one of the document.', 'Line two of the document.', 'Line three of the document.', 'Line four of the document.', 'Line five of the document",
+      "expected": "7",
+      "valid_python": false,
+      "uses_context": false,
+      "uses_llm_query": false,
+      "uses_final": false,
+      "turns": 1,
+      "terminated": true,
+      "time": 1.7286601066589355
+    },
+    {
+      "task": "first_last_word",
+      "correct": false,
+      "answer": "Based on the text you provided, here is the analysis:\n\n1.  **First word**: The text begins with the word **\"Artificial\"**.\n2.  **Last word**: The text ends with the word **\"entertainment\"**.\n\n**Answer",
+      "expected": "Artificial entertainment",
+      "valid_python": false,
+      "uses_context": false,
+      "uses_llm_query": false,
+      "uses_final": false,
+      "turns": 1,
+      "terminated": true,
+      "time": 5.818685293197632
+    },
+    {
+      "task": "multi_fact_extraction",
+      "correct": false,
+      "answer": "Based on the text provided, the name and city mentioned are:\n\n*   **Name:** Seattle\n*   **City:** Seattle\n\nThe text states that the annual technology conference was held in **Seattle**, so the locatio",
+      "expected": "Sarah Mitchell Seattle",
+      "valid_python": false,
+      "uses_context": false,
+      "uses_llm_query": false,
+      "uses_final": false,
+      "turns": 1,
+      "terminated": true,
+      "time": 6.101260662078857
+    },
+    {
+      "task": "character_count",
+      "correct": false,
+      "answer": null,
+      "expected": "11",
+      "valid_python": false,
+      "uses_context": false,
+      "uses_llm_query": false,
+      "uses_final": false,
+      "turns": 5,
+      "terminated": false,
+      "time": 5.218735933303833
+    }
+  ],
+  "model_stats": {
+    "root_calls": 9,
+    "sub_calls": 3,
+    "total_input_tokens": 9992,
+    "total_output_tokens": 616,
+    "total_time": 24.403711557388306
+  },
+  "summary": {
+    "correct": 1,
+    "total": 5,
+    "accuracy": 0.2
+  }
+}

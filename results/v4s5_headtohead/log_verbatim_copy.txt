@@ -1,0 +1,56 @@
+2026-03-11 01:07:55,629 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-11 01:07:59,478 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-11 01:08:07,741 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session 72a9e862-dcac-5ff6-b2bc-5be3383dc6ab
+2026-03-11 01:08:07,742 scaffold.llm_query INFO: Loading from state checkpoint: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-11 01:08:26,019 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model 72a9e862-dcac-5ff6-b2bc-5be3383dc6ab:train:0
+2026-03-11 01:08:30,093 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-11 01:08:30,094 scaffold.llm_query INFO: TinkerModel ready in 30.6s
+2026-03-11 01:08:30,094 eval INFO: Model loaded in 34.5s
+2026-03-11 01:08:30,094 eval INFO: 
+============================================================
+2026-03-11 01:08:30,094 eval INFO: Running benchmark: verbatim_copy
+2026-03-11 01:08:30,094 eval INFO: ============================================================
+VerbatimCopy:   0%|          | 0/10 [00:00<?, ?it/s]2026-03-11 01:08:30,104 eval INFO: 
+Task: verbatim_000_10000 | 10002 chars, target 620 chars
+2026-03-11 01:09:04,386 eval INFO:   Score: 1.00 | Expected: MEMORANDUM — Reference MEM-6738-Z. From: Desmond Whitfield. ... | Got: MEMORANDUM — Reference MEM-6738-Z. From: Desmond Whitfield. ...
+VerbatimCopy:  10%|█         | 1/10 [00:34<05:08, 34.28s/it]2026-03-11 01:09:04,387 eval INFO: 
+Task: verbatim_001_20000 | 20002 chars, target 560 chars
+2026-03-11 01:09:37,069 eval INFO:   Score: 1.00 | Expected: TECHNICAL SPECIFICATION SPEC-30897 (Revision 8.3.54). Materi... | Got: International partnership
+TECHNICAL SPECIFICATION SPEC-30897...
+VerbatimCopy:  20%|██        | 2/10 [01:06<04:26, 33.34s/it]2026-03-11 01:09:37,070 eval INFO: 
+Task: verbatim_002_50000 | 50002 chars, target 587 chars
+2026-03-11 01:10:21,335 eval INFO:   Score: 1.00 | Expected: LETTER — Reference LTR-8485. Dear Prof. Lucien Sorensen, I a... | Got: LETTER — Reference LTR-8485. Dear Prof. Lucien Sorensen, I a...
+VerbatimCopy:  30%|███       | 3/10 [01:51<04:28, 38.33s/it]2026-03-11 01:10:21,336 eval INFO: 
+Task: verbatim_003_100000 | 100002 chars, target 566 chars
+2026-03-11 01:11:20,771 eval INFO:   Score: 1.00 | Expected: TECHNICAL SPECIFICATION SPEC-94711 (Revision 3.0.6). Materia... | Got: TECHNICAL SPECIFICATION SPEC-94711 (Revision 3.0.6). Materia...
+VerbatimCopy:  40%|████      | 4/10 [02:50<04:39, 46.66s/it]2026-03-11 01:11:20,771 eval INFO: 
+Task: verbatim_004_10000 | 10002 chars, target 608 chars
+2026-03-11 01:11:47,843 eval INFO:   Score: 1.00 | Expected: MEMORANDUM — Reference MEM-2862-X. From: Rafael Ashworth. To... | Got: MEMORANDUM — Reference MEM-2862-X. From: Rafael Ashworth. To...
+VerbatimCopy:  50%|█████     | 5/10 [03:17<03:17, 39.60s/it]2026-03-11 01:11:47,844 eval INFO: 
+Task: verbatim_005_20000 | 20002 chars, target 563 chars
+2026-03-11 01:12:13,459 eval INFO:   Score: 1.00 | Expected: RESEARCH SUMMARY — STUDY-CHM-7770. Principal investigator: D... | Got: RESEARCH SUMMARY — STUDY-CHM-7770. Principal investigator: D...
+VerbatimCopy:  60%|██████    | 6/10 [03:43<02:19, 34.84s/it]2026-03-11 01:12:13,460 eval INFO: 
+Task: verbatim_006_50000 | 50002 chars, target 577 chars
+2026-03-11 01:12:54,747 eval INFO:   Score: 1.00 | Expected: LEGAL NOTICE — CASE-2020-73312. In the matter of Lucien Whit... | Got: LEGAL NOTICE — CASE-2020-73312. In the matter of Lucien Whit...
+VerbatimCopy:  70%|███████   | 7/10 [04:24<01:50, 36.95s/it]2026-03-11 01:12:54,748 eval INFO: 
+Task: verbatim_007_100000 | 100002 chars, target 608 chars
+2026-03-11 01:13:52,692 eval INFO:   Score: 1.00 | Expected: MEMORANDUM — Reference MEM-1581-C. From: Lucien Mbeki. To: M... | Got: MEMORANDUM — Reference MEM-1581-C. From: Lucien Mbeki. To: M...
+VerbatimCopy:  80%|████████  | 8/10 [05:22<01:27, 43.63s/it]2026-03-11 01:13:52,693 eval INFO: 
+Task: verbatim_008_10000 | 10002 chars, target 572 chars
+2026-03-11 01:14:25,333 eval INFO:   Score: 1.00 | Expected: LEGAL NOTICE — CASE-2025-30840. In the matter of Fiona Kowal... | Got: LEGAL NOTICE — CASE-2025-30840. In the matter of Fiona Kowal...
+VerbatimCopy:  90%|█████████ | 9/10 [05:55<00:40, 40.20s/it]2026-03-11 01:14:25,334 eval INFO: 
+Task: verbatim_009_20000 | 20002 chars, target 574 chars
+2026-03-11 01:14:49,958 eval INFO:   Score: 1.00 | Expected: LEGAL NOTICE — CASE-2021-16556. In the matter of Yuki Nakamu... | Got: LEGAL NOTICE — CASE-2021-16556. In the matter of Yuki Nakamu...
+VerbatimCopy: 100%|██████████| 10/10 [06:19<00:00, 35.39s/it]VerbatimCopy: 100%|██████████| 10/10 [06:19<00:00, 37.99s/it]
+2026-03-11 01:14:49,960 eval INFO: 
+--- verbatim_copy Results ---
+2026-03-11 01:14:49,960 eval INFO: Accuracy/Recall: 100.0%
+2026-03-11 01:14:49,960 eval INFO: Tasks: 10
+2026-03-11 01:14:49,975 eval INFO: 
+============================================================
+2026-03-11 01:14:49,975 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-11 01:14:49,975 eval INFO: ============================================================
+2026-03-11 01:14:49,975 eval INFO:   verbatim_copy: 100.0% (10 tasks)
+2026-03-11 01:14:49,975 eval INFO: Total time: 379.9s
+2026-03-11 01:14:49,975 eval INFO: Model stats: {'root_calls': 10, 'sub_calls': 24, 'total_input_tokens': 82377, 'total_output_tokens': 2809, 'total_time': 379.1641700267792}
+2026-03-11 01:14:49,975 eval INFO: Results saved to: results/v4s5_headtohead/20260311_010755

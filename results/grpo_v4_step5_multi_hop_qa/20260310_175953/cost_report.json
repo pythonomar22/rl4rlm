@@ -1,0 +1,12 @@
+{
+  "model_load_time": 47.11372351646423,
+  "eval_time": 342.93459248542786,
+  "total_time": 390.0483160018921,
+  "model_stats": {
+    "root_calls": 10,
+    "sub_calls": 33,
+    "total_input_tokens": 99444,
+    "total_output_tokens": 1572,
+    "total_time": 341.90245270729065
+  }
+}

@@ -1,0 +1,74 @@
+2026-03-11 00:24:07,725 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-11 00:24:12,286 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-11 00:24:20,663 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session 19f7cde7-fb35-5941-96d0-aaf38d1496c7
+2026-03-11 00:24:20,664 scaffold.llm_query INFO: Loading from state checkpoint: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-11 00:28:10,405 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model 19f7cde7-fb35-5941-96d0-aaf38d1496c7:train:0
+2026-03-11 00:28:48,637 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-11 00:28:48,638 scaffold.llm_query INFO: TinkerModel ready in 276.4s
+2026-03-11 00:28:48,638 eval INFO: Model loaded in 280.9s
+2026-03-11 00:28:48,638 eval INFO: 
+============================================================
+2026-03-11 00:28:48,638 eval INFO: Running benchmark: notebook_qa
+2026-03-11 00:28:48,638 eval INFO: ============================================================
+NotebookQA:   0%|          | 0/15 [00:00<?, ?it/s]2026-03-11 00:28:48,655 eval INFO: 
+Task: notebook_output_0 | output_lookup | 245 cells, 61994 chars
+2026-03-11 00:29:37,434 eval INFO:   Score: 1.0 (exact) | Expected: 0.1 | Got: 0.1
+NotebookQA:   7%|▋         | 1/15 [00:48<11:22, 48.78s/it]2026-03-11 00:29:37,434 eval INFO: 
+Task: notebook_cross_1 | cross_cell | 106 cells, 25985 chars
+2026-03-11 00:30:04,135 eval INFO:   Score: 1.0 (exact) | Expected: 0.8032 | Got: 0.8032
+NotebookQA:  13%|█▎        | 2/15 [01:15<07:45, 35.79s/it]2026-03-11 00:30:04,135 eval INFO: 
+Task: notebook_cross_2 | cross_cell | 163 cells, 41509 chars
+2026-03-11 00:30:37,647 eval INFO:   Score: 1.0 (exact) | Expected: 0.7247 | Got: 0.7247
+NotebookQA:  20%|██        | 3/15 [01:48<06:57, 34.75s/it]2026-03-11 00:30:37,648 eval INFO: 
+Task: notebook_cross_3 | cross_cell | 62 cells, 15550 chars
+2026-03-11 00:31:00,070 eval INFO:   Score: 0.5 (partial_numeric) | Expected: 4 models, LightGBM performed worst | Got: 4 LightGBM
+NotebookQA:  27%|██▋       | 4/15 [02:11<05:28, 29.88s/it]2026-03-11 00:31:00,071 eval INFO: 
+Task: notebook_trace_4 | variable_trace | 256 cells, 62023 chars
+2026-03-11 00:31:43,664 eval INFO:   Score: 1.0 (exact) | Expected: 11217 | Got: 11217
+NotebookQA:  33%|███▎      | 5/15 [02:55<05:48, 34.83s/it]2026-03-11 00:31:43,665 eval INFO: 
+Task: notebook_trace_5 | variable_trace | 63 cells, 15765 chars
+2026-03-11 00:32:00,735 eval INFO:   Score: 0.0 (none) | Expected: 87.0% | Got: 0.8700000000000001
+NotebookQA:  40%|████      | 6/15 [03:12<04:19, 28.79s/it]2026-03-11 00:32:00,737 eval INFO: 
+Task: notebook_cross_6 | cross_cell | 103 cells, 25985 chars
+2026-03-11 00:32:48,790 eval INFO:   Score: 0.5 (partial_numeric) | Expected: 4 models, LightGBM performed worst | Got: Based on the `customer_churn_analysis` notebook provided:
+
+1
+NotebookQA:  47%|████▋     | 7/15 [04:00<04:40, 35.09s/it]2026-03-11 00:32:48,792 eval INFO: 
+Task: notebook_cross_7 | cross_cell | 65 cells, 15585 chars
+2026-03-11 00:33:05,555 eval INFO:   Score: 0.5 (partial_numeric) | Expected: CatBoost with accuracy 0.9152 | Got: CatBoost: 0.9152
+NotebookQA:  53%|█████▎    | 8/15 [04:16<03:24, 29.26s/it]2026-03-11 00:33:05,556 eval INFO: 
+Task: notebook_output_8 | output_lookup | 62 cells, 15572 chars
+2026-03-11 00:33:21,274 eval INFO:   Score: 1.0 (exact) | Expected: engagement_score | Got: engagement_score
+NotebookQA:  60%|██████    | 9/15 [04:32<02:30, 25.02s/it]2026-03-11 00:33:21,275 eval INFO: 
+Task: notebook_trace_9 | variable_trace | 63 cells, 15704 chars
+2026-03-11 00:33:39,373 eval INFO:   Score: 1.0 (exact) | Expected: 10608 | Got: 10608
+NotebookQA:  67%|██████▋   | 10/15 [04:50<01:54, 22.89s/it]2026-03-11 00:33:39,373 eval INFO: 
+Task: notebook_output_10 | output_lookup | 105 cells, 25963 chars
+2026-03-11 00:33:55,673 eval INFO:   Score: 1.0 (exact) | Expected: engagement_score | Got: engagement_score
+NotebookQA:  73%|███████▎  | 11/15 [05:07<01:23, 20.87s/it]2026-03-11 00:33:55,673 eval INFO: 
+Task: notebook_trace_11 | variable_trace | 256 cells, 62047 chars
+2026-03-11 00:35:17,958 eval INFO:   Score: 1.0 (exact) | Expected: 16677 | Got: 16677
+NotebookQA:  80%|████████  | 12/15 [06:29<01:58, 39.55s/it]2026-03-11 00:35:17,959 eval INFO: 
+Task: notebook_output_12 | output_lookup | 63 cells, 15555 chars
+2026-03-11 00:35:37,682 eval INFO:   Score: 1.0 (exact) | Expected: 0.7578 | Got: 0.7578
+NotebookQA:  87%|████████▋ | 13/15 [06:49<01:07, 33.55s/it]2026-03-11 00:35:37,683 eval INFO: 
+Task: notebook_trace_13 | variable_trace | 170 cells, 41512 chars
+2026-03-11 00:36:12,264 eval INFO:   Score: 0.0 (none) | Expected: 77.4% | Got: 0.7740035605855118
+NotebookQA:  93%|█████████▎| 14/15 [07:23<00:33, 33.86s/it]2026-03-11 00:36:12,264 eval INFO: 
+Task: notebook_cross_14 | cross_cell | 61 cells, 15639 chars
+2026-03-11 00:36:39,587 eval INFO:   Score: 0.5 (partial_numeric) | Expected: 4 models, CatBoost performed worst | Got: Based on the `supply_chain_opt` notebook provided:
+
+1.  **Co
+NotebookQA: 100%|██████████| 15/15 [07:50<00:00, 31.89s/it]NotebookQA: 100%|██████████| 15/15 [07:50<00:00, 31.40s/it]
+2026-03-11 00:36:39,589 eval INFO: 
+--- notebook_qa Results ---
+2026-03-11 00:36:39,589 eval INFO: Accuracy/Recall: 73.3%
+2026-03-11 00:36:39,589 eval INFO: Tasks: 15
+2026-03-11 00:36:39,659 eval INFO: 
+============================================================
+2026-03-11 00:36:39,659 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-11 00:36:39,659 eval INFO: ============================================================
+2026-03-11 00:36:39,659 eval INFO:   notebook_qa: 73.3% (15 tasks)
+2026-03-11 00:36:39,659 eval INFO: Total time: 471.0s
+2026-03-11 00:36:39,659 eval INFO: Model stats: {'root_calls': 15, 'sub_calls': 30, 'total_input_tokens': 204023, 'total_output_tokens': 2635, 'total_time': 469.30413460731506}
+2026-03-11 00:36:39,659 eval INFO: Results saved to: results/v4s5_headtohead/20260311_002407

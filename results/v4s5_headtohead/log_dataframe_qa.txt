@@ -1,0 +1,52 @@
+2026-03-11 00:58:59,182 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-11 00:59:03,956 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-11 00:59:11,085 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session c8b5b3a8-4aef-51f1-bd7d-f5bcd58aca88
+2026-03-11 00:59:11,087 scaffold.llm_query INFO: Loading from state checkpoint: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-11 00:59:34,884 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model c8b5b3a8-4aef-51f1-bd7d-f5bcd58aca88:train:0
+2026-03-11 00:59:41,146 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-11 00:59:41,147 scaffold.llm_query INFO: TinkerModel ready in 37.2s
+2026-03-11 00:59:41,152 eval INFO: Model loaded in 42.0s
+2026-03-11 00:59:41,152 eval INFO: 
+============================================================
+2026-03-11 00:59:41,152 eval INFO: Running benchmark: dataframe_qa
+2026-03-11 00:59:41,152 eval INFO: ============================================================
+DataFrame QA:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-11 00:59:42,441 eval INFO: 
+Task: dfqa_000_5t_30d_multi_step | 120 rows, 7,369 chars
+2026-03-11 01:00:45,048 eval INFO:   Score: 1.00 (exact) | Answer: 2024-01-06 | Expected: 2024-01-06
+DataFrame QA:   5%|▌         | 1/20 [01:02<19:49, 62.61s/it]2026-03-11 01:00:45,050 eval INFO: 
+Task: dfqa_001_5t_30d_multi_step | 120 rows, 7,387 chars
+2026-03-11 01:01:58,747 eval INFO:   Score: 0.00 (no_match) | Answer: VLO | Expected: KO
+DataFrame QA:  10%|█         | 2/20 [02:16<20:44, 69.13s/it]2026-03-11 01:01:58,749 eval INFO: 
+Task: dfqa_002_5t_30d_multi_step | 120 rows, 7,501 chars
+2026-03-11 01:04:54,409 eval INFO:   Score: 0.80 (contains) | Answer: To solve this, we need to calculate the return for each stoc | Expected: PSX
+DataFrame QA:  15%|█▌        | 3/20 [05:11<33:22, 117.78s/it]2026-03-11 01:04:54,410 eval INFO: 
+Task: dfqa_003_5t_30d_multi_step | 120 rows, 7,534 chars
+2026-03-11 01:09:15,456 eval INFO:   Score: 0.00 (no_match) | Answer: COP | Expected: PFE
+DataFrame QA:  20%|██        | 4/20 [09:33<46:29, 174.34s/it]2026-03-11 01:09:15,457 eval INFO: 
+Task: dfqa_004_5t_30d_sector | 120 rows, 7,244 chars
+2026-03-11 01:09:37,179 eval INFO:   Score: 0.00 (partial_lines) | Answer:  | Expected: Energy: 2
+Finance: 2
+DataFrame QA:  25%|██▌       | 5/20 [09:54<29:49, 119.30s/it]2026-03-11 01:09:37,179 eval INFO: 
+Task: dfqa_005_15t_60d_sector | 900 rows, 54,549 chars
+2026-03-11 01:14:54,197 eval INFO:   Score: 0.00 (no_match) | Answer: Not found | Expected: Consumer
+DataFrame QA:  30%|███       | 6/20 [15:11<43:31, 186.53s/it]2026-03-11 01:14:54,198 eval INFO: 
+Task: dfqa_006_15t_60d_ranking | 900 rows, 54,611 chars
+2026-03-11 01:16:00,566 eval INFO:   Score: 1.00 (exact) | Answer: ABT | Expected: ABT
+DataFrame QA:  35%|███▌      | 7/20 [16:18<31:54, 147.24s/it]2026-03-11 01:16:00,568 eval INFO: 
+Task: dfqa_007_15t_60d_ranking | 900 rows, 54,271 chars
+2026-03-11 01:20:25,614 eval INFO:   Score: 0.00 (no_match) | Answer: PG | Expected: LLY
+DataFrame QA:  40%|████      | 8/20 [20:43<36:56, 184.75s/it]2026-03-11 01:20:25,617 eval INFO: 
+Task: dfqa_008_15t_60d_ranking | 900 rows, 54,412 chars
+2026-03-11 01:22:26,805 eval INFO:   Score: 0.00 (no_match) | Answer: Not found | Expected: BAC
+DataFrame QA:  45%|████▌     | 9/20 [22:44<30:13, 164.88s/it]2026-03-11 01:22:26,805 eval INFO: 
+Task: dfqa_009_15t_60d_multi_step | 900 rows, 53,652 chars
+2026-03-11 01:22:56,973 eval INFO:   Score: 1.00 (exact) | Answer: Finance | Expected: Finance
+DataFrame QA:  50%|█████     | 10/20 [23:14<20:32, 123.29s/it]2026-03-11 01:22:56,973 eval INFO: 
+Task: dfqa_010_30t_120d_multi_step | 3600 rows, 216,972 chars
+2026-03-11 01:29:04,291 tinker.lib.retry_handler ERROR: Request failed with non-retryable error: BadRequestError: Error code: 400 - {'detail': "Prompt length plus max_tokens exceeds the model's context window: 185432 prompt tokens + 2048 max_tokens > 65536."}
+2026-03-11 01:29:04,607 tinker.lib.telemetry INFO: Exception logged for session ID: c8b5b3a8-4aef-51f1-bd7d-f5bcd58aca88
+2026-03-11 01:35:36,834 eval INFO:   Score: 0.00 (no_match) | Answer: Consumer | Expected: Healthcare
+DataFrame QA:  55%|█████▌    | 11/20 [35:54<47:43, 318.11s/it]2026-03-11 01:35:36,835 eval INFO: 
+Task: dfqa_011_30t_120d_multi_step | 3600 rows, 217,802 chars
+2026-03-11 01:53:27,896 tinker.lib.retry_handler ERROR: Request failed with non-retryable error: BadRequestError: Error code: 400 - {'detail': "Prompt length plus max_tokens exceeds the model's context window: 85592 prompt tokens + 2048 max_tokens > 65536."}
+2026-03-11 01:53:28,102 tinker.lib.telemetry INFO: Exception logged for session ID: c8b5b3a8-4aef-51f1-bd7d-f5bcd58aca88

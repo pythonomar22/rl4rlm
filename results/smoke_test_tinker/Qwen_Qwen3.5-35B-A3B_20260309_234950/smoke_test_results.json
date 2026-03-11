@@ -1,0 +1,83 @@
+{
+  "model": "Qwen/Qwen3.5-35B-A3B",
+  "timestamp": "2026-03-09T23:49:50.414105",
+  "results": [
+    {
+      "task": "needle_in_haystack",
+      "correct": true,
+      "answer": "PHOENIX-42",
+      "expected": "PHOENIX-42",
+      "valid_python": true,
+      "uses_context": true,
+      "uses_llm_query": true,
+      "uses_final": true,
+      "turns": 1,
+      "terminated": true,
+      "time": 7.717360973358154
+    },
+    {
+      "task": "count_lines",
+      "correct": true,
+      "answer": "Based on the text provided, we can count the lines as follows:\n\n1.  **QUESTION:** How many lines are in this document?\n2.  Line one of the document.\n3.  Line two of the document.\n4.  Line three of the",
+      "expected": "7",
+      "valid_python": true,
+      "uses_context": true,
+      "uses_llm_query": true,
+      "uses_final": true,
+      "turns": 1,
+      "terminated": true,
+      "time": 6.94594407081604
+    },
+    {
+      "task": "first_last_word",
+      "correct": false,
+      "answer": "First: Artificial, Last: entertainment.",
+      "expected": "Artificial entertainment",
+      "valid_python": true,
+      "uses_context": true,
+      "uses_llm_query": true,
+      "uses_final": true,
+      "turns": 1,
+      "terminated": true,
+      "time": 6.562765598297119
+    },
+    {
+      "task": "multi_fact_extraction",
+      "correct": false,
+      "answer": "Based on the text provided:\n\n*   **Name:** Dr. Sarah Mitchell\n*   **City:** Seattle",
+      "expected": "Sarah Mitchell Seattle",
+      "valid_python": true,
+      "uses_context": true,
+      "uses_llm_query": true,
+      "uses_final": true,
+      "turns": 1,
+      "terminated": true,
+      "time": 10.789849281311035
+    },
+    {
+      "task": "character_count",
+      "correct": true,
+      "answer": "11",
+      "expected": "11",
+      "valid_python": true,
+      "uses_context": true,
+      "uses_llm_query": false,
+      "uses_final": true,
+      "turns": 1,
+      "terminated": true,
+      "time": 8.587392568588257
+    }
+  ],
+  "model_stats": {
+    "root_calls": 5,
+    "sub_calls": 4,
+    "total_input_tokens": 5365,
+    "total_output_tokens": 826,
+    "total_time": 40.54729962348938
+  },
+  "summary": {
+    "correct": 3,
+    "total": 5,
+    "accuracy": 0.6
+  }
+}

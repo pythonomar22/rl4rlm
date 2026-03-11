@@ -1,0 +1,86 @@
+2026-03-10 22:25:57,114 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-10 22:26:02,865 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-10 22:26:11,259 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session a88541f9-1494-5b21-b53d-ec73be08231a
+2026-03-10 22:26:11,259 scaffold.llm_query INFO: Loading from state checkpoint: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-10 22:26:29,769 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model a88541f9-1494-5b21-b53d-ec73be08231a:train:0
+2026-03-10 22:26:34,406 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-10 22:26:34,406 scaffold.llm_query INFO: TinkerModel ready in 31.5s
+2026-03-10 22:26:34,407 eval INFO: Model loaded in 37.3s
+2026-03-10 22:26:34,407 eval INFO: 
+============================================================
+2026-03-10 22:26:34,407 eval INFO: Running benchmark: multi_hop_qa
+2026-03-10 22:26:34,407 eval INFO: ============================================================
+MultiHopQA:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-10 22:26:34,432 eval INFO: 
+Task: multihop_3hop_0 | 3 hops, 50136 chars
+2026-03-10 22:27:09,492 eval INFO:   Score: 1.0 | Expected: quantum computing | Got: quantum computing
+MultiHopQA:   5%|▌         | 1/20 [00:35<11:06, 35.06s/it]2026-03-10 22:27:09,493 eval INFO: 
+Task: multihop_3hop_1 | 3 hops, 10114 chars
+2026-03-10 22:27:51,210 eval INFO:   Score: 1.0 | Expected: $4.2 million | Got: $4.2 million
+MultiHopQA:  10%|█         | 2/20 [01:16<11:41, 38.98s/it]2026-03-10 22:27:51,212 eval INFO: 
+Task: multihop_2hop_2 | 2 hops, 100086 chars
+2026-03-10 22:28:46,910 eval INFO:   Score: 0.0 | Expected: next-generation sustainability solutions | Got: Not found
+MultiHopQA:  15%|█▌        | 3/20 [02:12<13:12, 46.61s/it]2026-03-10 22:28:46,910 eval INFO: 
+Task: multihop_3hop_3 | 3 hops, 20104 chars
+2026-03-10 22:29:15,057 eval INFO:   Score: 1.0 | Expected: $4.2 million | Got: $4.2 million
+MultiHopQA:  20%|██        | 4/20 [02:40<10:29, 39.32s/it]2026-03-10 22:29:15,059 eval INFO: 
+Task: multihop_3hop_4 | 3 hops, 50094 chars
+2026-03-10 22:29:52,619 eval INFO:   Score: 1.0 | Expected: $4.2 million | Got: $4.2 million
+MultiHopQA:  25%|██▌       | 5/20 [03:18<09:40, 38.69s/it]2026-03-10 22:29:52,620 eval INFO: 
+Task: multihop_3hop_5 | 3 hops, 100120 chars
+2026-03-10 22:30:47,775 eval INFO:   Score: 1.0 | Expected: $4.2 million | Got: $4.2 million
+MultiHopQA:  30%|███       | 6/20 [04:13<10:20, 44.29s/it]2026-03-10 22:30:47,776 eval INFO: 
+Task: multihop_2hop_6 | 2 hops, 20078 chars
+2026-03-10 22:31:20,623 eval INFO:   Score: 1.0 | Expected: next-generation sustainability solutions | Got: developing next-generation sustainability solutions
+MultiHopQA:  35%|███▌      | 7/20 [04:46<08:47, 40.55s/it]2026-03-10 22:31:20,624 eval INFO: 
+Task: multihop_2hop_7 | 2 hops, 100104 chars
+2026-03-10 22:32:34,693 eval INFO:   Score: 1.0 | Expected: Berlin branch | Got: Bob Hernandez, Berlin branch
+MultiHopQA:  40%|████      | 8/20 [06:00<10:14, 51.22s/it]2026-03-10 22:32:34,697 eval INFO: 
+Task: multihop_2hop_8 | 2 hops, 50076 chars
+2026-03-10 22:33:58,348 eval INFO:   Score: 0.0 | Expected: next-generation sustainability solutions | Got: Project Forge; Lead researcher appointment
+MultiHopQA:  45%|████▌     | 9/20 [07:23<11:14, 61.36s/it]2026-03-10 22:33:58,349 eval INFO: 
+Task: multihop_2hop_9 | 2 hops, 20114 chars
+2026-03-10 22:34:38,597 eval INFO:   Score: 0.0 | Expected: Seoul branch | Got: NOT FOUND
+MultiHopQA:  50%|█████     | 10/20 [08:04<09:08, 54.84s/it]2026-03-10 22:34:38,598 eval INFO: 
+Task: multihop_3hop_10 | 3 hops, 100149 chars
+2026-03-10 22:37:02,391 eval INFO:   Score: 0.0 | Expected: Seoul | Got: Not found
+MultiHopQA:  55%|█████▌    | 11/20 [10:27<12:18, 82.07s/it]2026-03-10 22:37:02,392 eval INFO: 
+Task: multihop_2hop_11 | 2 hops, 100137 chars
+2026-03-10 22:38:23,169 eval INFO:   Score: 0.0 | Expected: San Francisco | Got: Not found
+MultiHopQA:  60%|██████    | 12/20 [11:48<10:53, 81.67s/it]2026-03-10 22:38:23,170 eval INFO: 
+Task: multihop_3hop_12 | 3 hops, 50115 chars
+2026-03-10 22:39:42,384 eval INFO:   Score: 1.0 | Expected: quantum computing | Got: quantum computing
+MultiHopQA:  65%|██████▌   | 13/20 [13:07<09:26, 80.93s/it]2026-03-10 22:39:42,385 eval INFO: 
+Task: multihop_3hop_13 | 3 hops, 100140 chars
+2026-03-10 22:43:18,176 eval INFO:   Score: 1.0 | Expected: Tokyo | Got: Tokyo
+MultiHopQA:  70%|███████   | 14/20 [16:43<12:09, 121.66s/it]2026-03-10 22:43:18,178 eval INFO: 
+Task: multihop_3hop_14 | 3 hops, 50128 chars
+2026-03-10 22:43:52,125 eval INFO:   Score: 1.0 | Expected: quantum computing | Got: quantum computing
+MultiHopQA:  75%|███████▌  | 15/20 [17:17<07:56, 95.22s/it] 2026-03-10 22:43:52,125 eval INFO: 
+Task: multihop_3hop_15 | 3 hops, 100123 chars
+2026-03-10 22:45:14,233 eval INFO:   Score: 1.0 | Expected: quantum computing | Got: quantum computing
+MultiHopQA:  80%|████████  | 16/20 [18:39<06:05, 91.28s/it]2026-03-10 22:45:14,233 eval INFO: 
+Task: multihop_3hop_16 | 3 hops, 100151 chars
+2026-03-10 22:46:14,102 eval INFO:   Score: 1.0 | Expected: $4.2 million | Got: Project Forge: $4.2 million
+MultiHopQA:  85%|████████▌ | 17/20 [19:39<04:05, 81.83s/it]2026-03-10 22:46:14,104 eval INFO: 
+Task: multihop_3hop_17 | 3 hops, 50148 chars
+2026-03-10 22:46:49,561 eval INFO:   Score: 0.0 | Expected: quantum computing | Got: Not found
+MultiHopQA:  90%|█████████ | 18/20 [20:15<02:15, 67.90s/it]2026-03-10 22:46:49,562 eval INFO: 
+Task: multihop_2hop_18 | 2 hops, 50146 chars
+2026-03-10 22:48:12,836 eval INFO:   Score: 0.0 | Expected: Human Resources | Got: Not found
+MultiHopQA:  95%|█████████▌| 19/20 [21:38<01:12, 72.52s/it]2026-03-10 22:48:12,837 eval INFO: 
+Task: multihop_2hop_19 | 2 hops, 100143 chars
+2026-03-10 22:50:02,485 eval INFO:   Score: 1.0 | Expected: Toronto branch | Got: Toronto branch
+MultiHopQA: 100%|██████████| 20/20 [23:28<00:00, 83.66s/it]MultiHopQA: 100%|██████████| 20/20 [23:28<00:00, 70.40s/it]
+2026-03-10 22:50:02,487 eval INFO: 
+--- multi_hop_qa Results ---
+2026-03-10 22:50:02,487 eval INFO: Accuracy/Recall: 65.0%
+2026-03-10 22:50:02,487 eval INFO: Tasks: 20
+2026-03-10 22:50:02,634 eval INFO: 
+============================================================
+2026-03-10 22:50:02,635 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-10 22:50:02,635 eval INFO: ============================================================
+2026-03-10 22:50:02,635 eval INFO:   multi_hop_qa: 65.0% (20 tasks)
+2026-03-10 22:50:02,635 eval INFO: Total time: 1408.1s
+2026-03-10 22:50:02,635 eval INFO: Model stats: {'root_calls': 20, 'sub_calls': 92, 'total_input_tokens': 293683, 'total_output_tokens': 4958, 'total_time': 1404.9770455360413}
+2026-03-10 22:50:02,635 eval INFO: Results saved to: results/v4s5_headtohead/20260310_222557
+eval INFO: Results saved to: results/v4s5_headtohead/20260310_221639

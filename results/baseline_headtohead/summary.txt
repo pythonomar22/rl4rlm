@@ -1,0 +1,160 @@
+===============================================================================
+BASE MODEL EVALUATION SUMMARY
+Model: Qwen/Qwen3.5-35B-A3B (no fine-tuning)
+Date: 2026-03-10/11
+Evaluation: Head-to-head baseline for comparison with post-trained model
+===============================================================================
+
+RESULTS BY BENCHMARK (11 benchmarks total)
+===============================================================================
+
+Benchmark          | Accuracy | N Tasks | Notes
+-------------------|----------|---------|--------------------------------------
+NIAH               |   65.0%  |   20    | 5K: 100%, 10K: 60%, 20K: 60%, 50K: 40%
+Multi-NIAH         |   83.9%  |   20    | 3-needle: 83%, 5-needle: 78%, 8-needle: 91%
+Doc Classify       |   88.4%  |   20    | 5-doc: 72%, 10-doc: 96%, 15-doc: 87%, 20-doc: 99%
+Multi-Hop QA       |   55.0%  |   20    | 2-hop and 3-hop tasks
+Code Debug         |   28.9%  |   15    | 1-bug: 50%, 2-bug: 20%, 3-bug: 11%
+DataFrame QA       |   73.3%  |   15*   | *1 task timed out (context overflow on 218K char aggregation)
+Notebook QA        |   80.0%  |   15    | output_lookup: strong, variable_trace: strong, cross_cell: partial
+Hard NIAH          |  100.0%  |   15    | boundary, distractor, extreme_length (up to 1M chars)
+Verbatim Copy      |   87.5%  |   10    | 10K-20K: perfect, 50K-100K: occasional failures
+Event Counting     |   47.4%  |   20    | Counting/aggregation over long documents
+Hard Multi-Hop     |   10.0%  |   10    | Only 1/10 correct; multi-step decomposition very hard
+
+===============================================================================
+OVERALL AVERAGE:     65.4%  (weighted by tasks run)
+SIMPLE AVERAGE:      65.4%  (equal weight per benchmark)
+===============================================================================
+
+DETAILED BREAKDOWN
+===============================================================================
+
+1. NIAH (Needle in a Haystack) - 65.0%
+   - By doc length: 5K=100%, 10K=60%, 20K=60%, 50K=40%
+   - By position: 0.10=75%, 0.25=50%, 0.50=50%, 0.75=75%, 0.90=75%
+   - Model finds needles reliably at short lengths, degrades at 20K+
+
+2. Multi-NIAH (Multiple Needles) - 83.9%
+   - By needle count: 3 needles=83%, 5 needles=78%, 8 needles=91%
+   - By doc length: 10K=83%, 20K=55%, 50K=81%-95%, 100K=100%
+   - Surprisingly strong at 100K with 8 needles
+
+3. Doc Classify (Document Classification) - 88.4%
+   - By doc count: 5=72%, 10=96%, 15=87%, 20=99%
+   - Strong performance across sizes, weakest on small sets (5 docs)
+
+4. Multi-Hop QA - 55.0%
+   - Mixed results across 2-hop and 3-hop tasks
+   - Many "Not found" failures on larger contexts (100K chars)
+
+5. Code Debug - 28.9%
+   - Found 50% of single-bug tasks, struggled with multi-bug
+   - Often identified wrong function or wrong bug type
+
+6. DataFrame QA - 73.3% (14 of 15 tasks completed, 1 timed out)
+   - Strong on simple lookups and sector queries
+   - Weaker on ranking and aggregation tasks
+   - 50-ticker tasks (750K chars) cause context overflow crashes
+
+7. Notebook QA - 80.0%
+   - output_lookup and variable_trace: near-perfect
+   - cross_cell: partial scores (0.5 often)
+   - One variable_trace failure (got 10000 instead of 16677)
+
+8. Hard NIAH - 100.0%
+   - Perfect across all difficulty levels
+   - Handled boundary, distractor, and extreme_length (up to 1M chars)
+   - RLM scaffold enables reliable search even at extreme lengths
+
+9. Verbatim Copy - 87.5%
+   - 10K-20K documents: perfect reproduction
+   - 50K: one failure (returned instructions instead of content)
+   - 100K: one partial (prepended extra text)
+
+10. Event Counting - 47.4%
+    - Counting/aggregation tasks over long documents
+    - per_entity counting: partial scores (undercounting common)
+    - ratio/percentage tasks: close but often off by 1
+
+11. Hard Multi-Hop - 10.0%
+    - Only 1 of 10 tasks correct
+    - Model cannot reliably decompose multi-hop questions
+    - Frequent "Not found" or wrong entity returned
+    - This is the benchmark where fine-tuning should help most
+
+===============================================================================
+COMPARISON CONTEXT (from MEMORY.md - V4-s5 checkpoint)
+===============================================================================
+
+Benchmark      | Base (this eval) | V4-s5 (prev eval) | Delta
+---------------|------------------|-------------------|-------
+NIAH           |   65.0%          |   100%            | +35.0%
+Multi-NIAH     |   83.9%          |    96%            | +12.1%
+Doc Classify   |   88.4%          |    98%            | + 9.6%
+Multi-Hop QA   |   55.0%          |    70%            | +15.0%
+Code Debug     |   28.9%          |    25%            | - 3.9%
+DataFrame QA   |   73.3%          |    75%            | + 1.7%
+Notebook QA    |   80.0%          |    80%            |   0.0%
+Hard NIAH      |  100.0%          |    90%            |-10.0%
+Verbatim Copy  |   87.5%          |   100%            | +12.5%
+Event Counting |   47.4%          |    N/A            |   N/A
+Hard Multi-Hop |   10.0%          |    10%            |   0.0%
+
+NOTE: The V4-s5 scores above are from MEMORY.md (previous evaluation with
+different seeds/task counts). This head-to-head evaluation uses fresh seeds
+(seed_offset=10000) and 20 tasks per benchmark for better statistical power.
+The V4-s5 model should be re-evaluated with the same protocol for a fair
+head-to-head comparison.
+
+===============================================================================
+MODEL STATS (aggregated across all benchmarks)
+===============================================================================
+
+Total benchmarks run: 11
+Total tasks evaluated: 180
+Total evaluation time: ~80 minutes (wall clock, sequential)
+
+Per-benchmark timing:
+  NIAH:            8 min 22s  (20 tasks)
+  Multi-NIAH:     12 min  8s  (20 tasks)
+  Doc Classify:    9 min 36s  (20 tasks)
+  Multi-Hop QA:   16 min 17s  (20 tasks)
+  Code Debug:     29 min 11s  (15 tasks)
+  DataFrame QA:   12 min 14s  (14 completed)
+  Notebook QA:     3 min 12s  (15 tasks)
+  Hard NIAH:       6 min  4s  (15 tasks)
+  Verbatim Copy:   2 min 47s  (10 tasks)
+  Event Counting: 14 min 11s  (20 tasks)
+  Hard Multi-Hop:  6 min 18s  (10 tasks)
+
+===============================================================================
+KEY OBSERVATIONS
+===============================================================================
+
+1. STRENGTHS of base model:
+   - Hard NIAH is PERFECT (100%) - the RLM scaffold enables search at any length
+   - Doc Classify (88.4%) and Multi-NIAH (83.9%) are strong
+   - Verbatim Copy (87.5%) works well for most document sizes
+   - Notebook QA (80%) is solid
+
+2. WEAKNESSES of base model:
+   - Hard Multi-Hop (10%) - almost completely broken without training
+   - Code Debug (28.9%) - struggles with multi-bug scenarios
+   - Event Counting (47.4%) - counting/aggregation is imprecise
+   - Multi-Hop QA (55%) - multi-step reasoning needs improvement
+   - NIAH (65%) - surprisingly weaker than Hard NIAH due to different task design
+
+3. OPPORTUNITIES for fine-tuning:
+   - Hard Multi-Hop and Code Debug have the most room for improvement
+   - Event Counting could benefit from better chunking strategies
+   - NIAH degradation at longer contexts (50K) is addressable
+   - Multi-Hop QA "Not found" failures suggest better search strategies needed
+
+4. SURPRISES:
+   - Hard NIAH (100%) vs NIAH (65%): Hard NIAH uses cleaner needle formats
+   - Multi-NIAH at 100K (100%) vs NIAH at 50K (40%): task design matters
+   - Base model already strong on Doc Classify and Notebook QA
+
+Results saved to: /root/rlm/results/baseline_headtohead/
+Individual benchmark results in timestamped subdirectories.

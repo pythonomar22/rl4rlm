@@ -1,0 +1,127 @@
+{
+  "benchmark": "oolong",
+  "accuracy": 0.1,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "oolong_000_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "2",
+      "predicted": "8",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 78.9204695224762,
+      "context_length": 152518
+    },
+    {
+      "task_id": "oolong_001_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "11",
+      "predicted": "5",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 269.60206270217896,
+      "context_length": 152527
+    },
+    {
+      "task_id": "oolong_002_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "3",
+      "predicted": "8",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 74.89071202278137,
+      "context_length": 152531
+    },
+    {
+      "task_id": "oolong_003_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "4",
+      "predicted": "4",
+      "score": 1.0,
+      "match_type": "exact",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 75.6186351776123,
+      "context_length": 152520
+    },
+    {
+      "task_id": "oolong_004_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "3",
+      "predicted": "7",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 72.56183099746704,
+      "context_length": 152522
+    },
+    {
+      "task_id": "oolong_005_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "1",
+      "predicted": "29",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 179.85277032852173,
+      "context_length": 152554
+    },
+    {
+      "task_id": "oolong_006_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "Detect Magic",
+      "predicted": "Thaumaturgy by Jester",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 89.26536893844604,
+      "context_length": 152511
+    },
+    {
+      "task_id": "oolong_007_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "11",
+      "predicted": "12",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 76.9189338684082,
+      "context_length": 152525
+    },
+    {
+      "task_id": "oolong_008_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "2",
+      "predicted": "5",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 186.94439506530762,
+      "context_length": 152524
+    },
+    {
+      "task_id": "oolong_009_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "Chromatic Orb, Hex, Cure Wounds, Blood Curse of the Eyeless",
+      "predicted": "To provide the list of **'Character: Last Spell'** you requested, please provide the full text of the episode segment. Once you paste the complete text, I will immediately:",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 194.40314936637878,
+      "context_length": 152620
+    }
+  ]
+}

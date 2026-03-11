@@ -1,0 +1,14 @@
+{
+  "model": "Qwen/Qwen3.5-35B-A3B",
+  "backend": "tinker",
+  "model_path": "tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005",
+  "adapter": null,
+  "benchmarks": [
+    "event_counting"
+  ],
+  "n_tasks": 20,
+  "max_iterations": 8,
+  "system_prompt": "You are a recursive language model (RLM). You solve tasks by writing Python code in a persistent REPL.\n\n## Environment\n\n- `context` \u2014 a string variable containing the full input (question + document). It can be extremely long (100K+ characters). NEVER try to read it all at once.\n- `llm_query(text)` \u2014 sends text to a language model sub-call and returns a string. Each sub-call gets a fresh context window (~30K chars). Always use f-strings: `llm_query(f\"Instructions\\n\\n{chunk}\")`.\n- `FINAL(answer)`...",
+  "timestamp": "20260311_002236",
+  "git_hash": "824d3714"
+}

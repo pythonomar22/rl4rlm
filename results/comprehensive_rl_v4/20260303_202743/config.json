@@ -1,0 +1,12 @@
+{
+  "model": "Qwen/Qwen3-1.7B",
+  "adapter": "data/sft/rl_v4/final",
+  "benchmarks": [
+    "doc_classify"
+  ],
+  "n_tasks": 20,
+  "max_iterations": 8,
+  "system_prompt": "You are a code execution agent. You solve tasks by writing Python code in a REPL.\n\n## Your Tools\n\n- `context` \u2014 a string with the full input text (question + document). Can be very long. Do NOT read it all at once.\n- `llm_query(text)` \u2014 send text to a language model, get a string back. Use f-strings: `llm_query(f\"Question\\n\\n{chunk}\")`. Each call handles ~30K characters.\n- `FINAL(answer)` \u2014 call with your answer string to finish. Example: `FINAL(\"Paris\")`\n- `FINAL_VAR(name)` \u2014 call with the name...",
+  "timestamp": "20260303_202743",
+  "git_hash": "d21c9048"
+}

@@ -1,0 +1,127 @@
+{
+  "benchmark": "oolong",
+  "accuracy": 0.2,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "oolong_000_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "2",
+      "predicted": "6",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 93.74053263664246,
+      "context_length": 152518
+    },
+    {
+      "task_id": "oolong_001_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "11",
+      "predicted": "8",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 250.34439778327942,
+      "context_length": 152527
+    },
+    {
+      "task_id": "oolong_002_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "3",
+      "predicted": "10",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 257.98938941955566,
+      "context_length": 152531
+    },
+    {
+      "task_id": "oolong_003_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "4",
+      "predicted": "4",
+      "score": 1.0,
+      "match_type": "exact",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 64.7634003162384,
+      "context_length": 152520
+    },
+    {
+      "task_id": "oolong_004_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "3",
+      "predicted": "6",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 49.38827061653137,
+      "context_length": 152522
+    },
+    {
+      "task_id": "oolong_005_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "1",
+      "predicted": "8",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 4,
+      "total_time": 414.5739436149597,
+      "context_length": 152554
+    },
+    {
+      "task_id": "oolong_006_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "Detect Magic",
+      "predicted": "Detect Magic, Caleb\nThaumaturgy, Jester",
+      "score": 1.0,
+      "match_type": "contains",
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 194.7740888595581,
+      "context_length": 152511
+    },
+    {
+      "task_id": "oolong_007_singledoc_rolls",
+      "question_type": "singledoc_rolls",
+      "expected": "11",
+      "predicted": "29",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 71.68747973442078,
+      "context_length": 152525
+    },
+    {
+      "task_id": "oolong_008_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "2",
+      "predicted": "8",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 329.2937364578247,
+      "context_length": 152524
+    },
+    {
+      "task_id": "oolong_009_singledoc_spells",
+      "question_type": "singledoc_spells",
+      "expected": "Chromatic Orb, Hex, Cure Wounds, Blood Curse of the Eyeless",
+      "predicted": "To determine the last spell cast by each character, we need to look at the chronological order of the spells provided in the text segments and identify the final entry for each player.\n\nThe spells are listed in the following order across the provided text blocks:\n\n1.  **Caleb:** Detect Magic\n2.  **Jester:** Thaumaturgy\n3.  **Laura:** Blessing of the Trickster\n4.  **Laura:** Blessing of the Trickster (2nd time)\n5.  **Laura:** Duplicity\n6.  **Laura:** Duplicity (repeated in the \"List format\" section, but chronologically this is the start of the combat sequence described in the last block)\n7.  **Laura:** Guiding Bolt\n8.  **Liam:** Chromatic Orb\n9.  **Laura:** Toll the Dead\n10. **Travis:** Hex\n11. **Laura:** Cure Wounds\n12. **Laura:** Thaumaturgy\n13. **Liam:** Find Familiar (Summoning Frumpkin)\n\nNow, let's isolate the **last** spell cast by each character based on this sequence:\n\n*   **Caleb:** The only spell listed is *Detect Magic*.\n    *   Last spell: **Detect Magic**\n*   **Jester (Laura):** The list shows Laura casting several spells. The final entry attributed to Laura (Jester) in the detailed list is *Thaumaturgy* (though she casts Blessing of the Trickster earlier, and Toll the Dead, and Cure Wounds, the list ends with her casting Thaumaturgy before Liam's final entry).\n    *   *Correction on character mapping:* In the transcript context, \"Laura\" plays **Jester**, \"Liam\" plays **Fjord** (or similar, but here Liam is casting spells), \"Travis\" plays **Vox Machina** (actually Travis plays **Vax** or **Pike**? Wait, in Critical Role, Travis plays **Vax'ildan** (Warlock) and **Pike** (Cleric)? No, Travis plays **Vax** (Rogue) and **Vex**? Wait, let's stick to the names provided in the prompt's list).\n    *   The prompt lists: **Laura**, **Liam**, **Travis**.\n    *   Let's re-evaluate the characters based on the prompt's explicit list:\n        *   **Laura** (Jester): Casts *Blessing of the Trickster*, *Duplicity*, *Guiding Bolt*, *Toll the Dead*, *Cure Wounds*, *Thaumaturgy*. The last one in the list is **Thaumaturgy**.\n        *   **Liam** (Fjord/Liam O'Brien playing Fjord? Or maybe Matt? The prompt says \"Liam\"). Casts *Chromatic Orb* and *Find Familiar*. The last one in the list is **Find Familiar**.\n        *   **Travis** (Travis Willingham playing Grog/Vax?). Casts *Hex*. This is the only one listed for him.\n        *   **Caleb** (Matt Mercer playing Caleb/Wesley?). Casts *Detect Magic*.\n\n    *   **Jester** (Laura): Last spell is *Thaumaturgy*.\n    *   **Caleb**: Last spell is *Detect Magic*. (Note: Caleb also has Frumpkin summoned, but the prompt attributes the \"Summoning Frumpkin\" action to **Liam** in the list: \"Liam: Find Familiar (Summoning Frumpkin)\"). *Wait, looking closely at the prompt's list:*\n        *   \"Liam: Find Familiar (Summoning Frumpkin)\" -> This implies Liam cast it.\n        *   \"Caleb: Detect Magic\" -> Caleb cast this.\n\n    Let's re-read the specific constraints. The prompt asks for the last spell cast by **each character** based on the text.\n\n    **Characters identified in the text:**\n    1.  **Caleb**: *Detect Magic*. (Last: Detect Magic)\n    2.  **Jester** (played by Laura): *Thaumaturgy* is the last spell listed for Laura in the combat sequence provided (after Cure Wounds).\n    3.  **Laura**: (Same as Jester).\n    4.  **Liam**: *Find Familiar*. (Last: Find Familiar)\n    5.  **Travis**: *Hex*. (Last: Hex)\n\n    *Self-Correction on Character Names vs. Players:* The prompt uses the player names (Laura, Liam, Travis) and a character name (Caleb).\n    *   **Caleb**: Only *Detect Magic* is listed.\n    *   **Laura** (Jester): The sequence ends with her casting *Thaumaturgy*.\n    *   **Travis**: Only *Hex* is listed.\n    *   **Liam**: The sequence ends with *Find Familiar*.\n\n    Therefore, the last spells are:\n    *   Caleb: Detect Magic\n    *   Laura: Thaumaturgy\n    *   Travis: Hex\n    *   Liam: Find Familiar\n\n    The question asks for the output in the order they **appear** in the text.\n    Order of appearance of the characters in the text:\n    1.  **Caleb** (Detect Magic)\n    2.  **Jester** (Laura) (Thaumaturgy) -> *Note: The prompt lists \"Jester\" first in the first block, but the character name in the list format is \"Laura\". The prompt asks for \"each character\". We should list the characters as they first appear or by the order of their last spell?*\n    \n    \"Return a comma separated list in the order they appear.\" This usually refers to the order the characters appear in the text for the first time, or the order of the spells listed.\n    \n    Let's trace the first appearance of each character's name in the text provided:\n    1.  **Caleb** (*Detect Magic*)\n    2.  **Jester** (Laura) (*Thaumaturgy*) - *Wait, the first block says \"Jester: Thaumaturgy\". The second block says \"Laura: Blessing...\". The third block lists \"Laura\", \"Liam\", \"Travis\".*\n    \n    If we group by character name as they appear:\n    1.  **Caleb** (First appearance: Block 1) -> Last spell: **Detect Magic**\n    2.  **Jester** (First appearance: Block 1) / **Laura** (First appearance: Block 2). Since Jester is the character name, and Laura is the player, but the prompt asks for \"each character\", and the list uses \"Laura\", \"Liam\", \"Travis\" as the primary identifiers in the final list, but \"Caleb\" and \"Jester\" in the first list.\n    \n    Let's assume the question wants the list of characters found in the text, ordered by their first mention in the provided text, followed by their last spell.\n    \n    Text Order:\n    1.  **Caleb** (Block 1)\n    2.  **Jester** (Block 1) -> *Note: The final list uses \"Laura\". Is Jester the character? Yes. Is Laura the character? No, Laura is the actor. But the prompt asks for \"each character\". In the final list, it says \"Laura: Duplicity...\". It seems the prompt treats \"Laura\" as the character identifier for the purpose of the list.*\n    \n    Let's look at the \"List format\" section again. It lists:\n    *   Laura\n    *   Liam\n    *   Travis\n    \n    And the first section lists:\n    *   Caleb\n    *   Jester\n    \n    If we must return a list of \"characters\", we should probably map \"Laura\" to \"Jester\" or just use the names provided in the final list which seem to be the active participants in the combat. However, \"Caleb\" is explicitly in the first block.\n    \n    Let's assume the question wants the characters **Caleb, Jester (Laura), Liam, Travis**.\n    \n    Order of first appearance in the text:\n    1.  **Caleb** (Block 1)\n    2.  **Jester** (Block 1) - *But the combat list uses \"Laura\".*\n    3.  **Laura** (Block 2) - *If we treat Laura as the character name for the list.*\n    4.  **Liam** (Block 3)\n    5.  **Travis** (Block 3)\n    \n    If we strictly follow the text's chronological listing of names:\n    1.  Caleb\n    2.  Jester (which is Laura)\n    3.  Laura (which is Jester)\n    4.  Liam\n    5.  Travis\n    \n    This is ambiguous. Let's look at the \"List format\" provided in the prompt as the definitive source for the characters in the scene. It lists: Laura, Liam, Travis. The first block lists Caleb and Jester.\n    \n    If we assume the question implies the characters involved in the *entire* transcript provided:\n    Characters: Caleb, Jester (Laura), Liam, Travis.\n    \n    Last spells:\n    *",
+      "score": 0.0,
+      "match_type": "none",
+      "terminated": true,
+      "num_turns": 4,
+      "total_time": 572.5088777542114,
+      "context_length": 152620
+    }
+  ]
+}

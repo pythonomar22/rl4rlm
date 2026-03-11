@@ -1,0 +1,191 @@
+{
+  "benchmark": "code_debug",
+  "accuracy": 0.25,
+  "n_tasks": 8,
+  "per_task": [
+    {
+      "task_id": "debug_000_1bugs_599lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 599,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_payment_notifications | BUG: The required_fields list contains 'timestamp' twice instead of a distinct field like 'value' or 'record_id', which is a data validation error. | FIX: Change the list to ['timestamp', 'value', 'status'] or include the appropriate missing field.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 19.580450534820557,
+      "prompt_chars": 16255
+    },
+    {
+      "task_id": "debug_001_1bugs_554lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 554,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_record_cache | BUG: The code references undefined variables 'items' and 'elapsed' which are not passed as arguments or defined within the function scope, causing a NameError at runtime. | FIX: Replace 'items' with 'data' (the function argument) and remove or define 'elapsed' (e.g., use a timestamp parameter or remove the 'time' key from the stats dictionary).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 21.93554425239563,
+      "prompt_chars": 15365
+    },
+    {
+      "task_id": "debug_002_1bugs_585lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 585,
+      "expected_bugs": [
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_record_analytics | BUG: Duplicate field 'timestamp' in the required_fields list (appears twice instead of a unique third field like 'status' or 'id') | FIX: Change `required_fields = ['timestamp', 'timestamp', 'status']` to `required_fields = ['timestamp', 'id', 'status']` (or another appropriate unique field).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 51.94732666015625,
+      "prompt_chars": 15596
+    },
+    {
+      "task_id": "debug_003_1bugs_595lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 595,
+      "expected_bugs": [
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean, resulting in an incorrect value. | FIX: Remove the `- 1` from the return statement so it returns `sum(values) / len(values)`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 18.705986738204956,
+      "prompt_chars": 15881
+    },
+    {
+      "task_id": "debug_004_1bugs_1472lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1472,
+      "expected_bugs": [
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: matrix_multiply | BUG: Incorrect matrix indexing in the inner loop where `b[j][k]` is used instead of `b[k][j]`, causing the multiplication to access the wrong elements of the second matrix. | FIX: Change `b[j][k]` to `b[k][j]` in the line `result[i][j] += a[i][k] * b[j][k]`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 40.64477062225342,
+      "prompt_chars": 39655
+    },
+    {
+      "task_id": "debug_005_1bugs_1446lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1446,
+      "expected_bugs": [
+        "lru_cache"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: The function validates a variable named `event_data` which is not defined as a parameter or local variable; the parameter is named `data`. | FIX: Change `event_data` to `data` in the isinstance check.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 87.15624713897705,
+      "prompt_chars": 38892
+    },
+    {
+      "task_id": "debug_006_1bugs_1353lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1353,
+      "expected_bugs": [
+        "calculate_median"
+      ],
+      "predicted": "FUNCTION: process_response_api | BUG: Variable 'event_data' is used in the isinstance check but is not defined within the function scope (undefined variable); it should likely be 'data' or passed as an argument. | FIX: Replace 'event_data' with 'data' in the isinstance check and type error message.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_median",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 24.940605878829956,
+      "prompt_chars": 36024
+    },
+    {
+      "task_id": "debug_007_1bugs_1409lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1409,
+      "expected_bugs": [
+        "dijkstra"
+      ],
+      "predicted": "FUNCTION: process_request_db | BUG: The code references `user_data` which is not defined as a parameter or local variable in the function scope | FIX: Change `user_data` to `data` (or add `user_data = data` at the start)",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 38.322575092315674,
+      "prompt_chars": 37582
+    }
+  ]
+}

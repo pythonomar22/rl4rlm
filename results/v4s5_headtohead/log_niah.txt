@@ -1,0 +1,96 @@
+2026-03-10 21:22:58,917 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-10 21:23:03,209 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-10 21:23:13,767 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session cf88905c-db37-5ed7-bbf6-846716a0de29
+2026-03-10 21:23:13,767 scaffold.llm_query INFO: Loading from state checkpoint: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-10 21:23:34,269 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model cf88905c-db37-5ed7-bbf6-846716a0de29:train:0
+2026-03-10 21:24:01,132 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-10 21:24:01,133 scaffold.llm_query INFO: TinkerModel ready in 57.9s
+2026-03-10 21:24:01,133 eval INFO: Model loaded in 62.2s
+2026-03-10 21:24:01,134 eval INFO: 
+============================================================
+2026-03-10 21:24:01,134 eval INFO: Running benchmark: niah
+2026-03-10 21:24:01,134 eval INFO: ============================================================
+NIAH:   0%|          | 0/20 [00:00<?, ?it/s]2026-03-10 21:24:01,147 eval INFO: 
+Task: niah_10000_5000_0.1 | Q: Who is the key contact person? | Expected: BRAVO-42
+2026-03-10 21:26:08,716 eval INFO:   Score: 1.0 | Answer: BRAVO-42 | 127.6s
+NIAH:   5%|▌         | 1/20 [02:07<40:23, 127.57s/it]2026-03-10 21:26:08,717 eval INFO: 
+Task: niah_10001_5000_0.2 | Q: What is the budget total? | Expected: CHARLIE-19
+2026-03-10 21:26:28,712 eval INFO:   Score: 1.0 | Answer: CHARLIE-19 | 20.0s
+NIAH:  10%|█         | 2/20 [02:27<19:17, 64.29s/it] 2026-03-10 21:26:28,713 eval INFO: 
+Task: niah_10002_5000_0.5 | Q: What is the critical deadline? | Expected: HOTEL-256
+2026-03-10 21:26:49,910 eval INFO:   Score: 1.0 | Answer: HOTEL-256 | 21.2s
+NIAH:  15%|█▌        | 3/20 [02:48<12:38, 44.61s/it]2026-03-10 21:26:49,910 eval INFO: 
+Task: niah_10003_5000_0.8 | Q: What is the project codename? | Expected: ALPHA-7
+2026-03-10 21:27:10,797 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 20.9s
+NIAH:  20%|██        | 4/20 [03:09<09:24, 35.25s/it]2026-03-10 21:27:10,816 eval INFO: 
+Task: niah_10004_5000_0.9 | Q: What is the assigned location? | Expected: Sector 9 North Wing
+2026-03-10 21:27:32,020 eval INFO:   Score: 1.0 | Answer: Sector 9 North Wing | 21.2s
+NIAH:  25%|██▌       | 5/20 [03:30<07:32, 30.19s/it]2026-03-10 21:27:32,021 eval INFO: 
+Task: niah_10005_10000_0.1 | Q: What is the assigned location? | Expected: CHARLIE-19
+2026-03-10 21:28:01,608 eval INFO:   Score: 1.0 | Answer: CHARLIE-19 | 29.6s
+NIAH:  30%|███       | 6/20 [04:00<06:59, 29.98s/it]2026-03-10 21:28:01,608 eval INFO: 
+Task: niah_10006_10000_0.2 | Q: What is the project codename? | Expected: BRAVO-42
+2026-03-10 21:29:30,679 eval INFO:   Score: 1.0 | Answer: BRAVO-42 | 89.1s
+NIAH:  35%|███▌      | 7/20 [05:29<10:40, 49.30s/it]2026-03-10 21:29:30,680 eval INFO: 
+Task: niah_10007_10000_0.5 | Q: Who is the key contact person? | Expected: JULIET-99
+2026-03-10 21:29:59,547 eval INFO:   Score: 1.0 | Answer: JULIET-99 | 28.9s
+NIAH:  40%|████      | 8/20 [05:58<08:33, 42.80s/it]2026-03-10 21:29:59,548 eval INFO: 
+Task: niah_10008_10000_0.8 | Q: When is the meeting scheduled? | Expected: Professor James Chen
+2026-03-10 21:30:20,533 eval INFO:   Score: 0.0 | Answer: Not found | 21.0s
+NIAH:  45%|████▌     | 9/20 [06:19<06:35, 35.98s/it]2026-03-10 21:30:20,533 eval INFO: 
+Task: niah_10009_10000_0.9 | Q: What is the budget total? | Expected: GOLF-77
+2026-03-10 21:30:43,529 eval INFO:   Score: 1.0 | Answer: GOLF-77 | 23.0s
+NIAH:  50%|█████     | 10/20 [06:42<05:19, 31.97s/it]2026-03-10 21:30:43,530 eval INFO: 
+Task: niah_10010_20000_0.1 | Q: Who is the key contact person? | Expected: ALPHA-7
+2026-03-10 21:31:16,452 eval INFO:   Score: 1.0 | Answer: ALPHA-7 | 32.9s
+NIAH:  55%|█████▌    | 11/20 [07:15<04:50, 32.26s/it]2026-03-10 21:31:16,455 eval INFO: 
+Task: niah_10011_20000_0.2 | Q: When is the meeting scheduled? | Expected: $850,000
+2026-03-10 21:31:44,181 eval INFO:   Score: 0.0 | Answer: Not found | 27.7s
+NIAH:  60%|██████    | 12/20 [07:43<04:07, 30.88s/it]2026-03-10 21:31:44,182 eval INFO: 
+Task: niah_10012_20000_0.5 | Q: What is the assigned location? | Expected: January 22 2026
+2026-03-10 21:32:13,825 eval INFO:   Score: 1.0 | Answer: January 22 2026 | 29.6s
+NIAH:  65%|██████▌   | 13/20 [08:12<03:33, 30.51s/it]2026-03-10 21:32:13,826 eval INFO: 
+Task: niah_10013_20000_0.8 | Q: What is the budget total? | Expected: Agent Sarah Miller
+2026-03-10 21:32:44,410 eval INFO:   Score: 1.0 | Answer: Agent Sarah Miller | 30.6s
+NIAH:  70%|███████   | 14/20 [08:43<03:03, 30.53s/it]2026-03-10 21:32:44,410 eval INFO: 
+Task: niah_10014_20000_0.9 | Q: What is the critical deadline? | Expected: GOLF-77
+2026-03-10 21:33:39,998 eval INFO:   Score: 1.0 | Answer: GOLF-77 | 55.6s
+NIAH:  75%|███████▌  | 15/20 [09:38<03:10, 38.08s/it]2026-03-10 21:33:39,999 eval INFO: 
+Task: niah_10015_50000_0.1 | Q: When is the meeting scheduled? | Expected: HOTEL-256
+2026-03-10 21:34:36,179 eval INFO:   Score: 1.0 | Answer: HOTEL-256 | 56.2s
+NIAH:  80%|████████  | 16/20 [10:35<02:54, 43.53s/it]2026-03-10 21:34:36,180 eval INFO: 
+Task: niah_10016_50000_0.2 | Q: What is the assigned location? | Expected: March 15 2025
+2026-03-10 21:35:18,689 eval INFO:   Score: 1.0 | Answer: March 15 2025 | 42.5s
+NIAH:  85%|████████▌ | 17/20 [11:17<02:09, 43.22s/it]2026-03-10 21:35:18,689 eval INFO: 
+Task: niah_10017_50000_0.5 | Q: What is the critical deadline? | Expected: Dr. Elena Rodriguez
+2026-03-10 21:36:17,012 eval INFO:   Score: 1.0 | Answer: Dr. Elena Rodriguez | 58.3s
+NIAH:  90%|█████████ | 18/20 [12:15<01:35, 47.76s/it]2026-03-10 21:36:17,012 eval INFO: 
+Task: niah_10018_50000_0.8 | Q: What is the project codename? | Expected: ECHO-365
+2026-03-10 21:37:37,631 eval INFO:   Score: 1.0 | Answer: ECHO-365 | 80.6s
+NIAH:  95%|█████████▌| 19/20 [13:36<00:57, 57.63s/it]2026-03-10 21:37:37,632 eval INFO: 
+Task: niah_10019_50000_0.9 | Q: What is the assigned location? | Expected: Professor James Chen
+2026-03-10 21:39:26,808 eval INFO:   Score: 0.0 | Answer: Not found | 109.2s
+NIAH: 100%|██████████| 20/20 [15:25<00:00, 73.11s/it]NIAH: 100%|██████████| 20/20 [15:25<00:00, 46.28s/it]
+2026-03-10 21:39:26,809 eval INFO: 
+--- niah Results ---
+2026-03-10 21:39:26,810 eval INFO: Accuracy/Recall: 85.0%
+2026-03-10 21:39:26,810 eval INFO: Tasks: 20
+2026-03-10 21:39:26,810 eval INFO: By doc length:
+2026-03-10 21:39:26,810 eval INFO:   10K: 80.0%
+2026-03-10 21:39:26,810 eval INFO:   20K: 80.0%
+2026-03-10 21:39:26,810 eval INFO:   50K: 80.0%
+2026-03-10 21:39:26,810 eval INFO:   5K: 100.0%
+2026-03-10 21:39:26,810 eval INFO: By needle position:
+2026-03-10 21:39:26,810 eval INFO:   0.10: 100.0%
+2026-03-10 21:39:26,810 eval INFO:   0.25: 75.0%
+2026-03-10 21:39:26,810 eval INFO:   0.50: 100.0%
+2026-03-10 21:39:26,810 eval INFO:   0.75: 75.0%
+2026-03-10 21:39:26,810 eval INFO:   0.90: 75.0%
+2026-03-10 21:39:26,836 eval INFO: 
+============================================================
+2026-03-10 21:39:26,836 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-10 21:39:26,836 eval INFO: ============================================================
+2026-03-10 21:39:26,836 eval INFO:   niah: 85.0% (20 tasks)
+2026-03-10 21:39:26,836 eval INFO: Total time: 925.7s
+2026-03-10 21:39:26,836 eval INFO: Model stats: {'root_calls': 20, 'sub_calls': 36, 'total_input_tokens': 103251, 'total_output_tokens': 2907, 'total_time': 924.4622304439545}
+2026-03-10 21:39:26,836 eval INFO: Results saved to: results/v4s5_headtohead/20260310_212258

@@ -1,0 +1,70 @@
+2026-03-11 01:11:05,298 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-11 01:11:10,261 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-11 01:11:17,860 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session 8f2d6f5b-7e73-5919-ace3-6b9c2b2a108e
+2026-03-11 01:11:17,861 scaffold.llm_query INFO: Loading from state checkpoint: tinker://2e48210b-f605-566d-86c6-f8c3c0f8a95f:train:0/weights/state-0005
+2026-03-11 01:11:36,137 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model 8f2d6f5b-7e73-5919-ace3-6b9c2b2a108e:train:0
+2026-03-11 01:11:45,649 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://2e48210b-f605-566d-86c6-f8c3c0f8a95f:train:0/weights/state-0005
+2026-03-11 01:11:45,650 scaffold.llm_query INFO: TinkerModel ready in 35.4s
+2026-03-11 01:11:45,650 eval INFO: Model loaded in 40.4s
+2026-03-11 01:11:45,650 eval INFO: 
+============================================================
+2026-03-11 01:11:45,650 eval INFO: Running benchmark: hard_niah
+2026-03-11 01:11:45,650 eval INFO: ============================================================
+HardNIAH:   0%|          | 0/15 [00:00<?, ?it/s]2026-03-11 01:11:45,697 eval INFO: 
+Task: hard_niah_boundary_0 | boundary | 50060 chars
+2026-03-11 01:12:20,735 eval INFO:   Score: 1.0 (exact) | Expected: OVERRIDE-444-CP | Got: OVERRIDE-444-CP
+HardNIAH:   7%|▋         | 1/15 [00:35<08:10, 35.04s/it]2026-03-11 01:12:20,736 eval INFO: 
+Task: hard_niah_distractor_1 | distractor | 30113 chars
+2026-03-11 01:12:48,457 eval INFO:   Score: 1.0 (exact) | Expected: March 15 2026 | Got: March 15 2026
+HardNIAH:  13%|█▎        | 2/15 [01:02<06:39, 30.73s/it]2026-03-11 01:12:48,459 eval INFO: 
+Task: hard_niah_boundary_2 | boundary | 50066 chars
+2026-03-11 01:13:22,624 eval INFO:   Score: 0.0 (none) | Expected: WIT-92812 | Got: 92812
+HardNIAH:  20%|██        | 3/15 [01:36<06:27, 32.30s/it]2026-03-11 01:13:22,625 eval INFO: 
+Task: hard_niah_extreme_3 | extreme_length | 500066 chars
+2026-03-11 01:17:21,687 eval INFO:   Score: 1.0 (exact) | Expected: NEXUS-PRIME-7742 | Got: NEXUS-PRIME-7742
+HardNIAH:  27%|██▋       | 4/15 [05:35<20:53, 113.93s/it]2026-03-11 01:17:21,692 eval INFO: 
+Task: hard_niah_extreme_4 | extreme_length | 200066 chars
+2026-03-11 01:18:54,495 eval INFO:   Score: 1.0 (exact) | Expected: SHADOW-GATE-3319 | Got: SHADOW-GATE-3319
+HardNIAH:  33%|███▎      | 5/15 [07:08<17:43, 106.31s/it]2026-03-11 01:18:54,496 eval INFO: 
+Task: hard_niah_distractor_5 | distractor | 30139 chars
+2026-03-11 01:19:20,273 eval INFO:   Score: 1.0 (exact) | Expected: $4.2 million | Got: $4.2 million
+HardNIAH:  40%|████      | 6/15 [07:34<11:50, 78.93s/it] 2026-03-11 01:19:20,274 eval INFO: 
+Task: hard_niah_distractor_6 | distractor | 100138 chars
+2026-03-11 01:20:12,657 eval INFO:   Score: 1.0 (exact) | Expected: March 15 2026 | Got: March 15 2026
+HardNIAH:  47%|████▋     | 7/15 [08:26<09:22, 70.25s/it]2026-03-11 01:20:12,658 eval INFO: 
+Task: hard_niah_extreme_7 | extreme_length | 1000079 chars
+2026-03-11 01:26:41,099 eval INFO:   Score: 1.0 (exact) | Expected: AUTH-6552-BY55 | Got: AUTH-6552-BY55
+HardNIAH:  53%|█████▎    | 8/15 [14:55<20:00, 171.55s/it]2026-03-11 01:26:41,101 eval INFO: 
+Task: hard_niah_distractor_8 | distractor | 100089 chars
+2026-03-11 01:27:33,216 eval INFO:   Score: 1.0 (exact) | Expected: $7.2 million | Got: $7.2 million
+HardNIAH:  60%|██████    | 9/15 [15:47<13:25, 134.21s/it]2026-03-11 01:27:33,217 eval INFO: 
+Task: hard_niah_boundary_9 | boundary | 50060 chars
+2026-03-11 01:28:06,791 eval INFO:   Score: 1.0 (exact) | Expected: OVERRIDE-922-CM | Got: OVERRIDE-922-CM
+HardNIAH:  67%|██████▋   | 10/15 [16:21<08:35, 103.14s/it]2026-03-11 01:28:06,791 eval INFO: 
+Task: hard_niah_distractor_10 | distractor | 100112 chars
+2026-03-11 01:28:58,781 eval INFO:   Score: 1.0 (exact) | Expected: DELTA-91M | Got: DELTA-91M
+HardNIAH:  73%|███████▎  | 11/15 [17:13<05:49, 87.49s/it] 2026-03-11 01:28:58,781 eval INFO: 
+Task: hard_niah_boundary_11 | boundary | 20060 chars
+2026-03-11 01:29:24,654 eval INFO:   Score: 1.0 (exact) | Expected: OVERRIDE-734-DT | Got: OVERRIDE-734-DT
+HardNIAH:  80%|████████  | 12/15 [17:38<03:26, 68.74s/it]2026-03-11 01:29:24,654 eval INFO: 
+Task: hard_niah_extreme_12 | extreme_length | 1000079 chars
+2026-03-11 01:35:49,520 eval INFO:   Score: 1.0 (exact) | Expected: AUTH-2890-AY13 | Got: AUTH-2890-AY13
+HardNIAH:  87%|████████▋ | 13/15 [24:03<05:29, 164.51s/it]2026-03-11 01:35:49,522 eval INFO: 
+Task: hard_niah_boundary_13 | boundary | 20060 chars
+2026-03-11 01:36:20,871 eval INFO:   Score: 1.0 (exact) | Expected: OVERRIDE-497-AT | Got: OVERRIDE-497-AT
+HardNIAH:  93%|█████████▎| 14/15 [24:35<02:04, 124.29s/it]2026-03-11 01:36:20,872 eval INFO: 
+Task: hard_niah_boundary_14 | boundary | 20060 chars
+2026-03-11 01:36:50,051 eval INFO:   Score: 1.0 (exact) | Expected: OVERRIDE-227-CR | Got: OVERRIDE-227-CR
+HardNIAH: 100%|██████████| 15/15 [25:04<00:00, 95.62s/it] HardNIAH: 100%|██████████| 15/15 [25:04<00:00, 100.29s/it]
+2026-03-11 01:36:50,052 eval INFO: 
+--- hard_niah Results ---
+2026-03-11 01:36:50,052 eval INFO: Accuracy/Recall: 93.3%
+2026-03-11 01:36:50,052 eval INFO: Tasks: 15
+2026-03-11 01:36:50,080 eval INFO: 
+============================================================
+2026-03-11 01:36:50,081 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-11 01:36:50,081 eval INFO: ============================================================
+2026-03-11 01:36:50,081 eval INFO:   hard_niah: 93.3% (15 tasks)
+2026-03-11 01:36:50,081 eval INFO: Total time: 1504.4s
+2026-03-11 01:36:50,081 eval INFO: Model stats: {'root_calls': 15, 'sub_calls': 189, 'total_input_tokens': 589010, 'total_output_tokens': 2741, 'total_time': 1500.087328195572}
+2026-03-11 01:36:50,081 eval INFO: Results saved to: results/v7s5_headtohead/20260311_011105

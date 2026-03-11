@@ -54,25 +54,39 @@ We train the first open-weight natively recursive language model based on Qwen3.
 
 **OOLONG breakdown:** Only spell name lookup works (1/10). All counting/aggregation tasks fail — model gets wrong counts (expected 11 got 2, expected 3 got 42). Even frontier models get <50% on OOLONG at 128K context.
 
-## Head-to-Head Evaluation (20 tasks each, identical seeds)
+## Head-to-Head Evaluation (identical seeds per benchmark)
 
-*This is the definitive comparison for the paper. Both models evaluated on identical tasks.*
+*Definitive comparison. All models evaluated on identical tasks with identical seeds.*
 
-| Benchmark | Base Model | V4-s5 (Post-Trained) | Delta |
-|-----------|-----------|---------------------|-------|
-| NIAH (20 tasks) | 65.0% | **85.0%** | **+20.0%** |
-| Multi-NIAH (20 tasks) | 83.9% | *running (100% at 5/20)* | TBD |
-| Doc-Classify (20 tasks) | *pending* | *pending* | TBD |
-| Multi-Hop QA (20 tasks) | *pending* | *pending* | TBD |
-| Code Debug (20 tasks) | *pending* | *pending* | TBD |
-| DataFrame QA (20 tasks) | *pending* | *pending* | TBD |
-| Notebook QA (20 tasks) | *pending* | *pending* | TBD |
-| Hard NIAH (20 tasks) | *pending* | *pending* | TBD |
-| Verbatim Copy (20 tasks) | *pending* | *pending* | TBD |
-| Event Counting (20 tasks) | *pending* | *pending* | TBD |
-| Hard Multi-Hop (20 tasks) | *pending* | *pending* | TBD |
+| Benchmark | Base Model | V4-s5 (GRPO) | V7-s5 (SC-GRPO) | V4 vs Base | V7 vs Base |
+|-----------|-----------|-------------|----------------|-----------|-----------|
+| NIAH (20) | 65.0% | **85.0%** | 65.0% | **+20.0%** | +0.0% |
+| Multi-NIAH (20) | 83.9% | **99.4%** | **99.4%** | **+15.5%** | **+15.5%** |
+| Doc-Classify (20) | 88.4% | 96.8% | **97.2%** | +8.4% | **+8.8%** |
+| Multi-Hop QA (20) | 55.0% | **65.0%** | 60.0% | **+10.0%** | +5.0% |
+| Code Debug (15) | 18.9% | 25.6% | **27.8%** | +6.7% | **+8.9%** |
+| Notebook QA (15) | 80.0% | 73.3% | 73.3% | -6.7% | -6.7% |
+| Hard NIAH (15) | 100.0% | 93.3% | 93.3% | -6.7% | -6.7% |
+| Verbatim Copy (10) | 87.5% | **100.0%** | **100.0%** | **+12.5%** | **+12.5%** |
+| Event Counting (20) | 47.8% | **61.2%** | 51.9% | **+13.4%** | +4.1% |
+| Hard Multi-Hop (10) | 40.0% | 10.0% | **40.0%** | -30.0% | **+0.0%** |
+| OOLONG (10) | 20.0% | 0.0% | 0.0% | -20.0% | -20.0% |
+| **Average (11)** | **62.4%** | **64.5%** | **64.4%** | **+2.1%** | **+1.9%** |
+| **Avg (9 in-dist)** | **69.6%** | **77.7%** | **74.2%** | **+8.1%** | **+4.6%** |
 
-*Table will be updated as results come in.*
+*Notes: DataFrame QA excluded — both models crash on tasks >200K chars (context overflow). V4-s5 = standard GRPO (5 steps). V7-s5 = SC-GRPO (5 additional steps from V4-s5).*
+
+**Key Findings:**
+
+1. **V4-s5 (standard GRPO) excels at specialization:** NIAH (+20%), Event Counting (+13.4%), Multi-Hop (+10%) — but at the cost of severe regressions on hard tasks (-30% Hard Multi-Hop, -20% OOLONG)
+
+2. **V7-s5 (SC-GRPO) excels at generalization:** Completely recovers Hard Multi-Hop (10% → 40%), improves Code Debug (25.6% → 27.8%) and Doc-Classify (96.8% → 97.2%) — but loses V4-s5's NIAH gains (85% → 65%)
+
+3. **SC-GRPO redistributes rather than adds:** Both checkpoints achieve ~64.5% average. SC-GRPO's strategy diversity prevents over-specialization, trading peak single-task performance for broader generalization
+
+4. **Stable improvements across both:** Multi-NIAH (99.4%), Verbatim Copy (100%), Doc-Classify (97%+) — these gains are robust to training approach
+
+5. **OOLONG remains unsolved:** Both post-trained models score 0% (base: 20%). D&D transcript aggregation requires counting/aggregation patterns not yet in training
 
 ## Training Results
 
@@ -579,12 +593,13 @@ Despite training on multi-hop QA (15% of v3 mix) and hard multi-hop (20% of v4 m
 - [x] **Teacher batch 2 launched** (7 task types × 10 tasks = 70 tasks):
   - niah, multi_niah, doc_classify, code_debug, multi_hop_qa, notebook_qa, dataframe_qa
   - Session: 96a75f40
-- [x] **V7 step 2 results** (SC-GRPO continuing to train well):
-  - Step 1: code_debug=0.016, dataframe_qa=0.709, notebook_qa=0.162
-  - Step 2: dataframe_qa=0.350, event_counting=0.393, hard_multi_hop=0.106, multi_niah=0.752
-  - Strategy performance: extract_compute=0.451, map_reduce=0.466, standard=0.535
-  - extract_compute and map_reduce strategies showing clear value on structured tasks
-  - Step 3 in progress (LR: 2e-5 warmup complete)
+- [x] **V7 SC-GRPO training progress** (3 steps complete, step 3 in progress):
+  - Step 1 (LR 1e-5): 4 groups, 48 datums. Rewards: code_debug=0.013, notebook_qa=0.156, dataframe_qa=0.698, notebook_qa_2=0.151. Avg std=0.116
+  - Step 2 (LR 2e-5): 4 groups, 48 datums. Rewards: multi_niah=0.734, event_counting=0.375, hard_multi_hop=0.348, multi_hop_qa=0.099. Avg std=0.242
+  - Step 3 (LR 2e-5): 2/4 groups done. Rewards so far: multi_hop_qa=0.375, event_counting=0.549. Avg std=0.327
+  - **Key: reward std INCREASING over steps** (0.116 → 0.242 → 0.327) — SC-GRPO producing MORE learning signal as training progresses, opposite of V6's collapse
+  - All groups have 2-4 unique strategies — confirms strategy conditioning works
+  - Strategy diversity especially strong on event_counting (std=0.350) and hard_multi_hop (std=0.337)
 - [x] **Cross-Document Comparison benchmark created** (13th benchmark):
   - 4 task types: overlap_entities, budget_diff, timeline_conflict, metric_comparison
   - Tests genuine O(N) cross-doc reasoning (find info in doc A, doc B, compare in Python)

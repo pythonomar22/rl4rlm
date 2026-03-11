@@ -1,0 +1,65 @@
+2026-03-10 23:38:04,713 eval INFO: Loading model: Qwen/Qwen3.5-35B-A3B (backend=tinker)
+2026-03-10 23:38:08,479 scaffold.llm_query INFO: Creating TinkerModel for Qwen/Qwen3.5-35B-A3B...
+2026-03-10 23:38:15,128 tinker.lib.public_interfaces.service_client INFO: ServiceClient initialized for session 000081cb-d060-517b-b40d-a613ec1fea6b
+2026-03-10 23:38:15,128 scaffold.llm_query INFO: Loading from state checkpoint: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-10 23:38:28,540 tinker.lib.public_interfaces.service_client INFO: TrainingClient initialized for model 000081cb-d060-517b-b40d-a613ec1fea6b:train:0
+2026-03-10 23:38:34,630 scaffold.llm_query INFO: Loaded fine-tuned model from state: tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005
+2026-03-10 23:38:34,630 scaffold.llm_query INFO: TinkerModel ready in 26.2s
+2026-03-10 23:38:34,630 eval INFO: Model loaded in 29.9s
+2026-03-10 23:38:34,630 eval INFO: 
+============================================================
+2026-03-10 23:38:34,632 eval INFO: Running benchmark: oolong
+2026-03-10 23:38:34,632 eval INFO: ============================================================
+OOLONG:   0%|          | 0/10 [00:00<?, ?it/s]2026-03-10 23:38:48,284 eval INFO: 
+Task: oolong_000_singledoc_rolls | singledoc_rolls | 152,518 chars
+2026-03-10 23:38:48,284 eval INFO:   Q: Number of rolls of natural value 13 in this episode?
+2026-03-10 23:40:30,959 eval INFO:   Score: 0.0 (none) | Expected: 2 | Got: 1
+OOLONG:  10%|█         | 1/10 [01:42<15:24, 102.68s/it]2026-03-10 23:40:30,961 eval INFO: 
+Task: oolong_001_singledoc_rolls | singledoc_rolls | 152,527 chars
+2026-03-10 23:40:30,961 eval INFO:   Q: Total number of rolls by the character Fjord in this episode?
+2026-03-10 23:42:21,161 eval INFO:   Score: 0.0 (none) | Expected: 11 | Got: 31
+OOLONG:  20%|██        | 2/10 [03:32<14:16, 107.10s/it]2026-03-10 23:42:21,162 eval INFO: 
+Task: oolong_002_singledoc_spells | singledoc_spells | 152,531 chars
+2026-03-10 23:42:21,163 eval INFO:   Q: How many spells were cast by the character Caleb in this episode?
+2026-03-10 23:43:45,755 eval INFO:   Score: 0.0 (none) | Expected: 3 | Got: 11
+OOLONG:  30%|███       | 3/10 [04:57<11:17, 96.82s/it] 2026-03-10 23:43:45,756 eval INFO: 
+Task: oolong_003_singledoc_rolls | singledoc_rolls | 152,520 chars
+2026-03-10 23:43:45,756 eval INFO:   Q: What is the count of Nat1s (natural rolls of value 1)?
+2026-03-10 23:45:25,643 eval INFO:   Score: 0.0 (none) | Expected: 4 | Got: 3
+OOLONG:  40%|████      | 4/10 [06:37<09:48, 98.03s/it]2026-03-10 23:45:25,644 eval INFO: 
+Task: oolong_004_singledoc_rolls | singledoc_rolls | 152,522 chars
+2026-03-10 23:45:25,644 eval INFO:   Q: What is the count of Nat20s (natural rolls of value 20)?
+2026-03-10 23:47:04,251 eval INFO:   Score: 0.0 (none) | Expected: 3 | Got: 8
+OOLONG:  50%|█████     | 5/10 [08:15<08:11, 98.24s/it]2026-03-10 23:47:04,252 eval INFO: 
+Task: oolong_005_singledoc_rolls | singledoc_rolls | 152,554 chars
+2026-03-10 23:47:04,252 eval INFO:   Q: In this episode, what percentage of rolls were of value 4? round to the nearest integer.
+2026-03-10 23:49:10,612 eval INFO:   Score: 0.0 (none) | Expected: 1 | Got: 6
+OOLONG:  60%|██████    | 6/10 [10:22<07:11, 107.80s/it]2026-03-10 23:49:10,612 eval INFO: 
+Task: oolong_006_singledoc_spells | singledoc_spells | 152,511 chars
+2026-03-10 23:49:10,612 eval INFO:   Q: What is the first spell cast in this episode?
+2026-03-10 23:51:17,669 eval INFO:   Score: 0.0 (none) | Expected: Detect Magic | Got: Thaumaturgy
+OOLONG:  70%|███████   | 7/10 [12:29<05:42, 114.10s/it]2026-03-10 23:51:17,670 eval INFO: 
+Task: oolong_007_singledoc_rolls | singledoc_rolls | 152,525 chars
+2026-03-10 23:51:17,670 eval INFO:   Q: Total number of rolls by the player Travis in this episode?
+2026-03-10 23:52:48,442 eval INFO:   Score: 0.0 (none) | Expected: 11 | Got: 21
+OOLONG:  80%|████████  | 8/10 [14:00<03:33, 106.67s/it]2026-03-10 23:52:48,443 eval INFO: 
+Task: oolong_008_singledoc_spells | singledoc_spells | 152,524 chars
+2026-03-10 23:52:48,443 eval INFO:   Q: How many Thaumaturgy spells were cast during this episode?
+2026-03-10 23:54:37,794 eval INFO:   Score: 0.0 (none) | Expected: 2 | Got: 3
+OOLONG:  90%|█████████ | 9/10 [15:49<01:47, 107.51s/it]2026-03-10 23:54:37,795 eval INFO: 
+Task: oolong_009_singledoc_spells | singledoc_spells | 152,620 chars
+2026-03-10 23:54:37,795 eval INFO:   Q: What is the last spell cast by each character in this episode? Return a comma separated list and ret
+2026-03-10 23:56:52,353 eval INFO:   Score: 0.0 (none) | Expected: Chromatic Orb, Hex, Cure Wounds, Blood Curse of the Eyeless | Got: 1: Liam - Summon Frumpkin, 2: Laura - Guiding Bolt, 3: Liam 
+OOLONG: 100%|██████████| 10/10 [18:04<00:00, 115.86s/it]OOLONG: 100%|██████████| 10/10 [18:04<00:00, 108.41s/it]
+2026-03-10 23:56:52,423 eval INFO: 
+--- oolong Results ---
+2026-03-10 23:56:52,423 eval INFO: Accuracy/Recall: 0.0%
+2026-03-10 23:56:52,423 eval INFO: Tasks: 10
+2026-03-10 23:56:52,549 eval INFO: 
+============================================================
+2026-03-10 23:56:52,550 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-10 23:56:52,550 eval INFO: ============================================================
+2026-03-10 23:56:52,550 eval INFO:   oolong: 0.0% (10 tasks)
+2026-03-10 23:56:52,550 eval INFO: Total time: 1097.8s
+2026-03-10 23:56:52,550 eval INFO: Model stats: {'root_calls': 10, 'sub_calls': 90, 'total_input_tokens': 475744, 'total_output_tokens': 4152, 'total_time': 1079.4578754901886}
+2026-03-10 23:56:52,551 eval INFO: Results saved to: results/v4s5_headtohead/20260310_233804

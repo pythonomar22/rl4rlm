@@ -1,0 +1,402 @@
+{
+  "benchmark": "code_debug",
+  "accuracy": 0.22222222222222224,
+  "n_tasks": 15,
+  "per_task": [
+    {
+      "task_id": "debug_000_1bugs_599lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 599,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_payment_notifications | BUG: The required_fields list contains a duplicate 'timestamp' key instead of a distinct field like 'amount' or 'id', which is a logical error in defining validation requirements. | FIX: Change the second 'timestamp' in the required_fields list to a unique required field such as 'amount'.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 30.049203872680664,
+      "prompt_chars": 16255
+    },
+    {
+      "task_id": "debug_001_1bugs_554lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 554,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_record_cache | BUG: Uses undefined variable 'items' instead of the function parameter 'data' | FIX: Replace 'items' with 'data' in the logger and stats dictionary.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 38.22234511375427,
+      "prompt_chars": 15365
+    },
+    {
+      "task_id": "debug_002_1bugs_585lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 585,
+      "expected_bugs": [
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_record_analytics | BUG: Duplicate field name 'status' in the required_fields list | FIX: Change the second 'status' to a unique field name like 'priority' or 'category'",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 42.651220083236694,
+      "prompt_chars": 15596
+    },
+    {
+      "task_id": "debug_003_1bugs_595lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 595,
+      "expected_bugs": [
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean, which is mathematically incorrect for an arithmetic mean. | FIX: Remove the \"- 1\" from the return statement so it returns `sum(values) / len(values)`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 53.1055691242218,
+      "prompt_chars": 15881
+    },
+    {
+      "task_id": "debug_004_1bugs_1472lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1472,
+      "expected_bugs": [
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: matrix_multiply | BUG: Wrong index used for matrix B (uses b[j][k] instead of b[k][j]) | FIX: Change b[j][k] to b[k][j] in the inner loop",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 51.102867603302,
+      "prompt_chars": 39655
+    },
+    {
+      "task_id": "debug_005_1bugs_1446lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1446,
+      "expected_bugs": [
+        "lru_cache"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: The function uses the variable `event_data` in the `isinstance` check and `TypeError` message, but the function argument is named `data`. This causes a `NameError` because `event_data` is undefined. | FIX: Replace `event_data` with `data` in both the `isinstance` check and the f-string message.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 67.35992741584778,
+      "prompt_chars": 38892
+    },
+    {
+      "task_id": "debug_006_1bugs_1353lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1353,
+      "expected_bugs": [
+        "calculate_median"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: Missing return statement after initializing the config dictionary, causing the function to implicitly return None instead of the expected result. | FIX: Add `return config` after the config dictionary definition.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_median",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 138.59251523017883,
+      "prompt_chars": 36024
+    },
+    {
+      "task_id": "debug_007_1bugs_1409lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1409,
+      "expected_bugs": [
+        "dijkstra"
+      ],
+      "predicted": "FUNCTION: process_event_billing | BUG: Missing return statement after the cache lookup | FIX: Add 'return None' or appropriate default return after the conditional block",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 118.54059648513794,
+      "prompt_chars": 37582
+    },
+    {
+      "task_id": "debug_008_2bugs_1418lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1418,
+      "expected_bugs": [
+        "binary_search",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: binary_search | BUG: The update logic for `left` when the target is greater than the middle element is incorrect (`left = mid`), which causes an infinite loop if the target is not found and the range reduces to a single element. | FIX: Change `left = mid` to `left = mid + 1`.\nFUNCTION: process_order_api (in core_15.py) | BUG: The `required_fields` list contains a duplicate entry ('status' appears twice) and is missing 'timestamp' or other expected fields, indicating a logic error in field definition. | FIX: Correct the `required_fields` list to include unique, necessary fields (e.g., `['status', 'timestamp', 'id']`).",
+      "score": 0.5,
+      "found": 1,
+      "total": 2,
+      "details": [
+        {
+          "function": "binary_search",
+          "found": true
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 162.912944316864,
+      "prompt_chars": 37848
+    },
+    {
+      "task_id": "debug_009_2bugs_1329lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1329,
+      "expected_bugs": [
+        "count_words",
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_response_cache | BUG: The function references an undefined variable `items` in the logger call and stats dictionary, instead of the function argument `data`. | FIX: Replace `items` with `data` in `len(items)` and `stats = {'count': len(data), ...}`.\nFUNCTION: process_record_notifications | BUG: The `required_fields` list contains a duplicate 'timestamp' entry and is missing a unique third field (likely 'id' or 'value'), which is inconsistent with other similar validation blocks in the codebase. | FIX: Change `required_fields = ['timestamp', 'timestamp', 'status']` to `required_fields = ['timestamp', 'status', 'id']` (or appropriate unique field).",
+      "score": 0.0,
+      "found": 0,
+      "total": 2,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        },
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 241.55230927467346,
+      "prompt_chars": 35495
+    },
+    {
+      "task_id": "debug_010_2bugs_1445lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1445,
+      "expected_bugs": [
+        "calculate_mean",
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_user_db | BUG: Variable 'payment_data' is used but not defined in the function scope (parameter is 'data') | FIX: Change 'payment_data' to 'data'\nFUNCTION: process_response_auth | BUG: Variable 'items' is used in logger and stats but not defined (should be 'data') | FIX: Change 'items' to 'data'",
+      "score": 0.0,
+      "found": 0,
+      "total": 2,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": false
+        },
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 126.30859088897705,
+      "prompt_chars": 37809
+    },
+    {
+      "task_id": "debug_011_2bugs_1455lines",
+      "n_bugs": 2,
+      "n_functions": 40,
+      "total_lines": 1455,
+      "expected_bugs": [
+        "lru_cache",
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: process_response_notifications | BUG: Uses undefined variables 'items' and 'elapsed' instead of function arguments 'data' and a calculated time. | FIX: Replace 'items' with 'data' and calculate 'elapsed' time (e.g., using time.time()).\nFUNCTION: matrix_multiply | BUG: Incorrectly accesses element `b[j][k]` instead of `b[k][j]` when computing the dot product for matrix multiplication. | FIX: Change `b[j][k]` to `b[k][j]` in the inner loop.",
+      "score": 0.5,
+      "found": 1,
+      "total": 2,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        },
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 219.38503432273865,
+      "prompt_chars": 38445
+    },
+    {
+      "task_id": "debug_012_3bugs_2201lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2201,
+      "expected_bugs": [
+        "binary_search",
+        "lru_cache",
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: stats.py | BUG: The calculate_mean function incorrectly subtracts 1 from the calculated average, returning (sum/len) - 1 instead of the true mean. | FIX: Remove the `- 1` from the return statement so it returns `sum(values) / len(values)`.\nFUNCTION: cache.py | BUG: The LRU cache implementation uses `self.order.pop()` without an index, which removes the last element (LIFO), but the logic intends to remove the oldest element (FIFO) based on the `pop(0)` requirement for a queue-like order list, or it fails to correctly track the \"oldest\" if `pop()` is used on a list where the oldest is at index 0. Specifically, `self.order.pop()` removes the most recently added item, which is the opposite of the Least Recently Used eviction policy. | FIX: Change `self.order.pop()` to `self.order.pop(0)` to correctly remove the oldest item from the front of the list.\nFUNCTION: middleware_42.py | BUG: The function `process_config_notifications` references undefined variables `items`, `logger`, and `elapsed` in its log and stats logic. | FIX: Replace `items` with `data`, ensure `logger` is imported or passed, and define `elapsed` or remove the logic if not available. (Corrected: `logger.info(f'Processed {len(data)} session')` and define `elapsed`).",
+      "score": 0.3333333333333333,
+      "found": 1,
+      "total": 3,
+      "details": [
+        {
+          "function": "binary_search",
+          "found": false
+        },
+        {
+          "function": "lru_cache",
+          "found": false
+        },
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 4,
+      "total_time": 334.0043087005615,
+      "prompt_chars": 58888
+    },
+    {
+      "task_id": "debug_013_3bugs_2241lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2241,
+      "expected_bugs": [
+        "dijkstra",
+        "validate_email",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: process_session_db | BUG: References undefined variable 'self' | FIX: Remove 'self.' references or convert to a class method\nFUNCTION: process_session_analytics | BUG: References undefined variable 'record_data' | FIX: Change 'record_data' to 'data'\nFUNCTION: process_event_notifications | BUG: Duplicate field in 'required_fields' list ('timestamp' appears twice) | FIX: Change the second 'timestamp' to the correct required field (e.g., 'status' or 'amount')",
+      "score": 0.0,
+      "found": 0,
+      "total": 3,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        },
+        {
+          "function": "validate_email",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 110.45059180259705,
+      "prompt_chars": 60165
+    },
+    {
+      "task_id": "debug_014_3bugs_2294lines",
+      "n_bugs": 3,
+      "n_functions": 61,
+      "total_lines": 2294,
+      "expected_bugs": [
+        "matrix_multiply",
+        "dijkstra",
+        "calculate_std"
+      ],
+      "predicted": "FUNCTION: process_request_notifications | BUG: Undefined variable 'items' used in len() and stats dict | FIX: Change 'items' to 'data' since 'items' is not defined in the function scope.\nFUNCTION: process_request_notifications | BUG: Undefined variable 'elapsed' used in stats dict | FIX: Define 'elapsed' (e.g., calculate time difference) or remove it from the stats dictionary.\nFUNCTION: process_record_cache | BUG: Undefined variable 'items' used in len() and stats dict | FIX: Change 'items' to 'data' since 'items' is not defined in the function scope.",
+      "score": 0.0,
+      "found": 0,
+      "total": 3,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": false
+        },
+        {
+          "function": "dijkstra",
+          "found": false
+        },
+        {
+          "function": "calculate_std",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 5,
+      "total_time": 438.1767945289612,
+      "prompt_chars": 61133
+    }
+  ]
+}

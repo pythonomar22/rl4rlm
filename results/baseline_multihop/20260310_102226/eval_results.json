@@ -1,0 +1,127 @@
+{
+  "benchmark": "multi_hop_qa",
+  "accuracy": 0.5,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "multihop_3hop_0",
+      "n_hops": 3,
+      "expected": "quantum computing",
+      "predicted": "quantum computing",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 8.208876371383667,
+      "prompt_chars": 50136
+    },
+    {
+      "task_id": "multihop_3hop_1",
+      "n_hops": 3,
+      "expected": "$4.2 million",
+      "predicted": "$4.2 million",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 6.222363471984863,
+      "prompt_chars": 10114
+    },
+    {
+      "task_id": "multihop_2hop_2",
+      "n_hops": 2,
+      "expected": "next-generation sustainability solutions",
+      "predicted": "Based on the text provided, **there is no information** regarding a project led by Patrick Anderson or its focus. While the text contains multiple contradictory statements, the majority of the content explicitly states that the name \"Patrick Anderson\" does not appear in the provided document, which consists only of generic administrative and operational updates. Therefore, the focus of such a project cannot be determined from the given information.",
+      "score": 0.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 114.8199462890625,
+      "prompt_chars": 100086
+    },
+    {
+      "task_id": "multihop_3hop_3",
+      "n_hops": 3,
+      "expected": "$4.2 million",
+      "predicted": "$4.2 million",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 98.88668370246887,
+      "prompt_chars": 20104
+    },
+    {
+      "task_id": "multihop_3hop_4",
+      "n_hops": 3,
+      "expected": "$4.2 million",
+      "predicted": "Not found",
+      "score": 0.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 55.98819875717163,
+      "prompt_chars": 50094
+    },
+    {
+      "task_id": "multihop_3hop_5",
+      "n_hops": 3,
+      "expected": "$4.2 million",
+      "predicted": "Not found",
+      "score": 0.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 2,
+      "total_time": 249.39034414291382,
+      "prompt_chars": 100120
+    },
+    {
+      "task_id": "multihop_2hop_6",
+      "n_hops": 2,
+      "expected": "next-generation sustainability solutions",
+      "predicted": "Project Horizon focuses on developing next-generation sustainability solutions.",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 36.118375062942505,
+      "prompt_chars": 20078
+    },
+    {
+      "task_id": "multihop_2hop_7",
+      "n_hops": 2,
+      "expected": "Berlin branch",
+      "predicted": "Based on the document provided, there is **no information** regarding the name of the head of Quality Assurance or their previous employer.\n\nThe document mentions that \"Quality assurance protocols were updated according to new standards,\" but it does not contain any biographical details, employee names, or employment history for any specific individual. Therefore, the previous employer cannot be identified from this text.",
+      "score": 0.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 41.72036051750183,
+      "prompt_chars": 100104
+    },
+    {
+      "task_id": "multihop_2hop_8",
+      "n_hops": 2,
+      "expected": "next-generation sustainability solutions",
+      "predicted": "Not found",
+      "score": 0.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 7.963601589202881,
+      "prompt_chars": 50076
+    },
+    {
+      "task_id": "multihop_2hop_9",
+      "n_hops": 2,
+      "expected": "Seoul branch",
+      "predicted": "Seoul branch",
+      "score": 1.0,
+      "partial": false,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 12.158218622207642,
+      "prompt_chars": 20114
+    }
+  ]
+}

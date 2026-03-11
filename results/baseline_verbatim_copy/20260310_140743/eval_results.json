@@ -1,0 +1,117 @@
+{
+  "benchmark": "verbatim_copy",
+  "accuracy": 0.9,
+  "n_tasks": 10,
+  "per_task": [
+    {
+      "task_id": "verbatim_000_10000",
+      "expected_length": 620,
+      "predicted": "MEMORANDUM \u2014 Reference MEM-6738-Z. From: Desmond Whitfield. To: Lucien Nakamura. Date: December 24, 2026. Subject: Budget Reallocation for Northern Analytics Unit. Following the review conducted on December 24, 2026, it has been determined that an amount of $725,736.59 shall be transferred from the general operating fund to the Northern Analytics Unit effective immediately. All department heads are required to acknowledge receipt of this memorandum and confirm compliance with the updated allocation schedule within five business days. Failure to comply will result in a mandatory audit of departmental expenditures.",
+      "score": 1.0,
+      "target_position": 0.6061392857129192,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 12.919517517089844,
+      "doc_length": 10002
+    },
+    {
+      "task_id": "verbatim_001_20000",
+      "expected_length": 560,
+      "predicted": "International partnership\nTECHNICAL SPECIFICATION SPEC-30897 (Revision 8.3.54). Material: surgical-grade stainless steel 316L. Operating temperature range: -12 C to 382 C. Dimensional tolerance: plus or minus 0.005 mm. Unit weight: 666.83 grams. Maximum operating pressure: 202 kPa. The component shall undergo thermal cycling testing for a minimum of 500 cycles before acceptance. All units must be individually serialized and traceable to the original material batch. Non-conforming units shall be quarantined and reported to the quality engineering team within 24 hours of detection.",
+      "score": 1.0,
+      "target_position": 0.5478893124583768,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 12.110736608505249,
+      "doc_length": 20002
+    },
+    {
+      "task_id": "verbatim_002_50000",
+      "expected_length": 587,
+      "predicted": "LETTER \u2014 Reference LTR-8485. Dear Prof. Lucien Sorensen, I am writing on behalf of Thornfield Research Consortium to formally invite your participation in our upcoming 3-year collaborative research program on quantum error correction. The program is funded by a $270,361 grant and will commence in the autumn semester. Your expertise, as demonstrated in your recent publications, would be invaluable to the consortium. Please respond by the end of the month to confirm your interest. Yours sincerely, Dr. Ingrid Okonkwo, Director of Research Partnerships, Thornfield Research Consortium.",
+      "score": 1.0,
+      "target_position": 0.14700513115278238,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 16.751172304153442,
+      "doc_length": 50002
+    },
+    {
+      "task_id": "verbatim_003_100000",
+      "expected_length": 566,
+      "predicted": "TECHNICAL SPECIFICATION SPEC-94711 (Revision 3.0.6). Material: titanium-reinforced carbon fiber composite. Operating temperature range: -28 C to 193 C. Dimensional tolerance: plus or minus 0.001 mm. Unit weight: 179.40 grams. Maximum operating pressure: 426 kPa. The component shall undergo thermal cycling testing for a minimum of 500 cycles before acceptance. All units must be individually serialized and traceable to the original material batch. Non-conforming units shall be quarantined and reported to the quality engineering team within 24 hours of detection.",
+      "score": 1.0,
+      "target_position": 0.8277854949372675,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 18.026087522506714,
+      "doc_length": 100002
+    },
+    {
+      "task_id": "verbatim_004_10000",
+      "expected_length": 608,
+      "predicted": "The paragraph containing 'MEM-2862-X' was not found in the provided document.",
+      "score": 0.0,
+      "target_position": 0.41396260669079743,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 7.611256837844849,
+      "doc_length": 10002
+    },
+    {
+      "task_id": "verbatim_005_20000",
+      "expected_length": 563,
+      "predicted": "RESEARCH SUMMARY \u2014 STUDY-CHM-7770. Principal investigator: Dr. Lucien Ashworth. A randomized controlled trial with N=1302 participants conducted over 33 weeks demonstrated a statistically significant improvement in cardiovascular endurance of 37.0% (p=0.017). The intervention group showed consistent gains across all measured time points. Secondary endpoints including participant adherence and adverse event frequency were within acceptable thresholds. The authors recommend a follow-up study with an expanded cohort to confirm generalizability of the findings.",
+      "score": 1.0,
+      "target_position": 0.5902902811402185,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 12.58203387260437,
+      "doc_length": 20002
+    },
+    {
+      "task_id": "verbatim_006_50000",
+      "expected_length": 577,
+      "predicted": "LEGAL NOTICE \u2014 CASE-2020-73312. In the matter of Lucien Whitfield v. Apex Manufacturing Group, filed on April 4, 2025 before Hon. Amara Lindqvist. The plaintiff alleges breach of contractual obligations under Section 4(b) of the original agreement dated twelve months prior to filing. Damages sought: $22,271,153.00. The defendant is hereby notified that a preliminary hearing has been scheduled and all relevant documentation must be submitted to the court clerk no later than thirty calendar days from the date of this notice. Counsel for both parties are required to attend.",
+      "score": 1.0,
+      "target_position": 0.16283782394463187,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 13.070645570755005,
+      "doc_length": 50002
+    },
+    {
+      "task_id": "verbatim_007_100000",
+      "expected_length": 608,
+      "predicted": "MEMORANDUM \u2014 Reference MEM-1581-C. From: Lucien Mbeki. To: Marcus Okonkwo. Date: June 4, 2024. Subject: Budget Reallocation for Western Regional Division. Following the review conducted on June 4, 2024, it has been determined that an amount of $909,739.40 shall be transferred from the general operating fund to the Western Regional Division effective immediately. All department heads are required to acknowledge receipt of this memorandum and confirm compliance with the updated allocation schedule within five business days. Failure to comply will result in a mandatory audit of departmental expenditures.",
+      "score": 1.0,
+      "target_position": 0.28728020020348055,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 13.260715961456299,
+      "doc_length": 100002
+    },
+    {
+      "task_id": "verbatim_008_10000",
+      "expected_length": 572,
+      "predicted": "LEGAL NOTICE \u2014 CASE-2025-30840. In the matter of Fiona Kowalski v. Centurion Logistics Corp, filed on May 1, 2025 before Hon. Amara Sorensen. The plaintiff alleges breach of contractual obligations under Section 4(b) of the original agreement dated twelve months prior to filing. Damages sought: $35,678,348.00. The defendant is hereby notified that a preliminary hearing has been scheduled and all relevant documentation must be submitted to the court clerk no later than thirty calendar days from the date of this notice. Counsel for both parties are required to attend.",
+      "score": 1.0,
+      "target_position": 0.6682772553096088,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 26.779651641845703,
+      "doc_length": 10002
+    },
+    {
+      "task_id": "verbatim_009_20000",
+      "expected_length": 574,
+      "predicted": "LEGAL NOTICE \u2014 CASE-2021-16556. In the matter of Yuki Nakamura v. Redstone Ventures Partners, filed on August 12, 2024 before Hon. Lucien Mbeki. The plaintiff alleges breach of contractual obligations under Section 4(b) of the original agreement dated twelve months prior to filing. Damages sought: $5,748,704.00. The defendant is hereby notified that a preliminary hearing has been scheduled and all relevant documentation must be submitted to the court clerk no later than thirty calendar days from the date of this notice. Counsel for both parties are required to attend.",
+      "score": 1.0,
+      "target_position": 0.3057608176893961,
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 12.76563811302185,
+      "doc_length": 20002
+    }
+  ]
+}

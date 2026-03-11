@@ -1,0 +1,191 @@
+{
+  "benchmark": "code_debug",
+  "accuracy": 0.25,
+  "n_tasks": 8,
+  "per_task": [
+    {
+      "task_id": "debug_000_1bugs_599lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 599,
+      "expected_bugs": [
+        "count_words"
+      ],
+      "predicted": "FUNCTION: process_payment_notifications | BUG: The 'required_fields' list contains a duplicate entry 'timestamp' instead of a distinct field like 'value' or 'id', which is likely a copy-paste error causing validation logic to be incomplete or incorrect. | FIX: Change `required_fields = ['timestamp', 'timestamp', 'status']` to `required_fields = ['timestamp', 'value', 'status']` (or another appropriate distinct field like 'id' or 'amount' depending on context).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "count_words",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 4,
+      "total_time": 226.6394488811493,
+      "prompt_chars": 16255
+    },
+    {
+      "task_id": "debug_001_1bugs_554lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 554,
+      "expected_bugs": [
+        "flatten_list"
+      ],
+      "predicted": "FUNCTION: process_response_billing | BUG: The function references a variable `order_data` which is not defined in its scope (the argument is named `data`). This will raise a `NameError` at runtime. | FIX: Change `order_data` to `data` in the `isinstance` check and the error message.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "flatten_list",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 11.171228647232056,
+      "prompt_chars": 15365
+    },
+    {
+      "task_id": "debug_002_1bugs_585lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 585,
+      "expected_bugs": [
+        "validate_email"
+      ],
+      "predicted": "FUNCTION: process_request_scheduler | BUG: The code references undefined variables `items` and `elapsed` instead of using the function arguments `data` and a calculated time value. | FIX: Change `len(items)` to `len(data)` and replace `elapsed` with a valid metric (e.g., `time.time() - start_time` or a passed argument).",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "validate_email",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 153.03114914894104,
+      "prompt_chars": 15596
+    },
+    {
+      "task_id": "debug_003_1bugs_595lines",
+      "n_bugs": 1,
+      "n_functions": 19,
+      "total_lines": 595,
+      "expected_bugs": [
+        "calculate_mean"
+      ],
+      "predicted": "FUNCTION: calculate_mean | BUG: The function subtracts 1 from the calculated mean, which is mathematically incorrect for an arithmetic mean. | FIX: Remove the `- 1` so the return statement is `return sum(values) / len(values)`",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_mean",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 25.962377548217773,
+      "prompt_chars": 15881
+    },
+    {
+      "task_id": "debug_004_1bugs_1472lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1472,
+      "expected_bugs": [
+        "matrix_multiply"
+      ],
+      "predicted": "FUNCTION: matrix_multiply | BUG: The inner loop incorrectly accesses the second matrix using b[j][k] instead of b[k][j], causing a dimension mismatch error and incorrect calculation. | FIX: Change b[j][k] to b[k][j] in the line `result[i][j] += a[i][k] * b[k][j]`.",
+      "score": 1.0,
+      "found": 1,
+      "total": 1,
+      "details": [
+        {
+          "function": "matrix_multiply",
+          "found": true
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 45.8928964138031,
+      "prompt_chars": 39655
+    },
+    {
+      "task_id": "debug_005_1bugs_1446lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1446,
+      "expected_bugs": [
+        "lru_cache"
+      ],
+      "predicted": "[\"FUNCTION: process_request_scheduler | BUG: The function checks for a variable named `event_data` which is not defined in the function scope or passed as an argument. The function argument is named `data`. | FIX: Change `event_data` to `data` in the `isinstance` check and the error message: `if not isinstance(data, dict): raise TypeError(f'Expected dict, got {type(data)}')`\"]",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "lru_cache",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 3,
+      "total_time": 79.87061142921448,
+      "prompt_chars": 38892
+    },
+    {
+      "task_id": "debug_006_1bugs_1353lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1353,
+      "expected_bugs": [
+        "calculate_median"
+      ],
+      "predicted": "FUNCTION: process_request_cache | BUG: The function definition is incomplete and missing its closing parenthesis and return statement, causing a syntax error. | FIX: Add `):` to close the function definition and include a valid return statement or body before the next function definition.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "calculate_median",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 24.446276426315308,
+      "prompt_chars": 36024
+    },
+    {
+      "task_id": "debug_007_1bugs_1409lines",
+      "n_bugs": 1,
+      "n_functions": 39,
+      "total_lines": 1409,
+      "expected_bugs": [
+        "dijkstra"
+      ],
+      "predicted": "FUNCTION: process_event_api | BUG: The function is defined but the code snippet ends abruptly with `resu`, leaving the variable assignment incomplete and causing a syntax error. | FIX: Complete the variable assignment (e.g., `result = []` or similar) and ensure the function body is logically closed with a `return` statement.",
+      "score": 0.0,
+      "found": 0,
+      "total": 1,
+      "details": [
+        {
+          "function": "dijkstra",
+          "found": false
+        }
+      ],
+      "terminated": true,
+      "num_turns": 1,
+      "total_time": 30.463862419128418,
+      "prompt_chars": 37582
+    }
+  ]
+}

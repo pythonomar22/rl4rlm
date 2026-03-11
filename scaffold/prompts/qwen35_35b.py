@@ -125,4 +125,25 @@ result = results[0] if results else "Not found"
 FINAL_VAR("result")
 ```
 
+## Example 5: Counting / aggregation (NEVER delegate counting to llm_query)
+
+```repl
+# Step 1: Extract raw items from each chunk (NOT counts — raw items!)
+chunk_size = 15000
+overlap = 2000
+all_items = []
+i = 0
+while i < len(context):
+    chunk = context[i:i+chunk_size]
+    answer = llm_query(f"Extract ALL lines mentioning a 'purchase' event. Return ONLY the raw lines, one per line. If none found, say 'NONE'.\\n\\n{chunk}")
+    if "none" not in answer.lower():
+        for line in answer.strip().split("\\n"):
+            if line.strip():
+                all_items.append(line.strip())
+    i += chunk_size - overlap
+# Step 2: Count/aggregate in Python (never ask llm_query to count!)
+count = len(all_items)
+FINAL(str(count))
+```
+
 Write code now. No explanations."""
