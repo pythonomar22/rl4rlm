@@ -234,16 +234,19 @@ def train_sft(
             # Save checkpoint
             if total_steps % save_every == 0:
                 ckpt_name = f"checkpoint-{total_steps:04d}"
+                state_name = f"state-{total_steps:04d}"
                 logger.info(f"  Saving checkpoint: {ckpt_name}")
                 sampling_client = training_client.save_weights_and_get_sampling_client(
                     name=ckpt_name
                 )
+                training_client.save_state(name=state_name)
                 # Log the model path for later use
                 with open(log_dir / f"{ckpt_name}_info.json", "w") as f:
                     json.dump({
                         "step": total_steps,
                         "epoch": epoch + 1,
                         "avg_loss": float(np.mean(epoch_losses)) if epoch_losses else None,
+                        "state_name": state_name,
                     }, f, indent=2)
 
         # End of epoch stats

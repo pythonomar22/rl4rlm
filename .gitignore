@@ -1,6 +1,10 @@
 data/
+results/
 icmltemplate/
-results/__pycache__/
+__pycache__/
 *.pyc
 .env
 *.log
+*.tar.gz
+.venv/
+.claude/

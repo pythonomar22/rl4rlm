@@ -113,7 +113,7 @@ class TinkerModel:
 
         # Create sampling client
         self.service_client = tinker.ServiceClient()
-        if model_path and "/weights/state-" in model_path:
+        if model_path and ("/weights/state-" in model_path or "/weights/final-state" in model_path):
             # State checkpoint — must load via training client
             logger.info(f"Loading from state checkpoint: {model_path}")
             tc = self.service_client.create_training_client_from_state(model_path)
@@ -332,7 +332,7 @@ class HybridTinkerModel:
         self._tinker = tinker
 
         # Root model: fine-tuned checkpoint
-        if model_path and "/weights/state-" in model_path:
+        if model_path and ("/weights/state-" in model_path or "/weights/final-state" in model_path):
             logger.info(f"Loading root model from state: {model_path}")
             tc = self.service_client.create_training_client_from_state(model_path)
             self.root_sampling_client = tc.save_weights_and_get_sampling_client(
