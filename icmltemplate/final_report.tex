@@ -1,0 +1,935 @@
+%%%%%%%% CS234 FINAL REPORT %%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\let\theHalgorithm\relax
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+\usepackage[accepted]{icml2018}
+
+\icmltitlerunning{Training Native Recursive Language Models}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{Training Native Recursive Language Models}
+
+\begin{icmlauthorlist}
+\icmlauthor{Omar Abul-Hassan}{cs}
+\icmlauthor{Miguel Villanueva}{cs}
+\icmlauthor{Josh Bowden}{cs}
+\end{icmlauthorlist}
+
+\icmlaffiliation{cs}{Department of Computer Science, Stanford University, Stanford, CA, USA}
+
+\icmlcorrespondingauthor{Omar Abul-Hassan}{omarah@stanford.edu}
+
+\icmlkeywords{Reinforcement Learning, Language Models, Long Context, GRPO, DPO, Recursive Models}
+
+\vskip 0.3in
+]
+
+\printAffiliationsAndNotice{}
+
+\begin{abstract}
+Recursive Language Models (RLMs) extend language models to handle arbitrarily long contexts by placing the input in a persistent REPL environment, allowing the model to write code that decomposes, queries, and aggregates over the input programmatically. We train the first open-weight natively recursive language model based on Qwen3.5-35B-A3B, a mixture-of-experts model with 35B total / 3B active parameters. Using Group Relative Policy Optimization (GRPO) with LoRA fine-tuning via the Tinker training API, we evaluate across 14 diverse long-context benchmarks spanning $O(1)$ retrieval, $O(K)$ multi-needle search, $O(N)$ classification, multi-hop reasoning, event counting, cross-document comparison, and code debugging. Our best model (V11-s5, 11 SC-GRPO steps) achieves $+2.1$pp average across all 14 benchmarks ($60.9\% \to 63.0\%$), with peak gains of $+20$pp on NIAH, $+20$pp on OOLONG, and $+17.6$pp on document classification. Cross-evaluation across independent seed sets confirms a robust $+4.2$pp improvement. We contribute three key findings: (1)~\textbf{Strategy-Conditioned GRPO (SC-GRPO)}, which eliminates mode collapse in code-generation RL by conditioning each trajectory on a randomly assigned decomposition strategy, achieving 0\% group collapse vs.\ 60\% in standard GRPO; (2)~a \textbf{specialization-generalization tradeoff} where RL training improves search/classification tasks ($+20$pp NIAH, $+17.6$pp Doc-Classify) while regressing extraction/comparison tasks ($-18.6$pp Cross-Doc, $-14$pp DataFrame QA), revealing that format-rigid parsing patterns trained by RL break on diverse output formats; (3)~a \textbf{deep audit of 7 critical training bugs} in our GRPO pipeline, including wrong loss function (unclipped importance sampling vs.\ PPO), sub-query temperature leak, and advantage normalization mismatch, whose fixes stabilize training from loss values of $10^7$ to $O(1)$.
+\end{abstract}
+
+%% ============================================================
+\section{Introduction}
+\label{sec:intro}
+
+A key limitation of modern language models is that their effective context window, while growing, remains insufficient for many real-world tasks involving documents spanning hundreds of thousands of tokens. Even when models accept long inputs, performance degrades with context length~\cite{hsieh2024ruler}. Recursive Language Models (RLMs)~\cite{zhang2026rlm} address this by never placing the full input into the model's context window. Instead, the input is stored as a variable in a persistent Python REPL, and the model writes code to decompose, search, and aggregate over it programmatically. Sub-queries are dispatched via an \texttt{llm\_query()} function, enabling recursive decomposition at arbitrary depth.
+
+Zhang et al.~\cite{zhang2026rlm} showed that SFT on filtered trajectories from a 480B teacher model improved Qwen3-8B by 28.3\% on long-context benchmarks. However, RL---the natural next step for optimizing trajectory-level behavior---was left unexplored. We address this gap by training the first open-weight natively recursive language model using RL directly on code-generation trajectories. RL is a natural fit for RLMs because the system has a clear reward signal (task correctness), sequential decision-making (multi-turn code generation), and room for exploration (diverse decomposition strategies).
+
+We train Qwen3.5-35B-A3B, a mixture-of-experts (MoE) model with 35B total and 3B active parameters, using GRPO~\cite{deepseekr1} with LoRA fine-tuning. We evaluate across 14 diverse benchmarks spanning $O(1)$ retrieval, $O(K)$ multi-needle search, $O(N)$ classification, multi-hop reasoning, event counting, cross-document comparison, code debugging, and external D\&D transcript aggregation (OOLONG~\cite{oolong2025}).
+
+Our contributions are:
+\begin{enumerate}
+    \item \textbf{Strategy-Conditioned GRPO (SC-GRPO)}: A novel method that eliminates mode collapse in code-generation GRPO by conditioning each trajectory on a randomly assigned decomposition strategy. Standard GRPO collapses to a single code template (60\% group collapse rate); SC-GRPO achieves 0\%.
+    \item \textbf{Specialization-generalization tradeoff analysis}: We show that RL training for code-generation RLMs creates a fundamental tradeoff---improving search/classification tasks ($+20$pp NIAH, $+17.6$pp Doc-Classify, $+15.7$pp Event Counting) while regressing extraction/comparison tasks ($-18.6$pp Cross-Doc, $-14$pp DataFrame QA). Trajectory analysis reveals \emph{format rigidity} as the root cause.
+    \item \textbf{Deep training pipeline audit}: We identify and fix 7 critical bugs including wrong loss function (unclipped IS vs.\ PPO), sub-query temperature leak, advantage normalization mismatch, and training/eval seed overlap. These fixes reduce loss values from $O(10^7)$ to $O(1)$.
+    \item \textbf{14 diverse benchmarks} spanning $O(1)$, $O(K)$, $O(N)$, and $O(N^2)$ complexity classes, with rigorous head-to-head evaluation and cross-validation across independent seed sets. Our best model (V11-s5) achieves $63.0\%$ average ($+2.1$pp, confirmed at $+4.2$pp across evaluation sets).
+    \item \textbf{Complete open-source release}: Model weights, training code, evaluation harness, and all 14 benchmark generators.
+\end{enumerate}
+
+%% ============================================================
+\section{Background and Related Work}
+\label{sec:background}
+
+\subsection{Recursive Language Models}
+
+RLMs~\cite{zhang2026rlm} treat the language model as a controller that writes and executes code in a persistent REPL environment. Given input $P$, the RLM loop proceeds as:
+\begin{enumerate}
+    \item Initialize REPL with $P$ stored as the variable \texttt{context}. The model receives only \emph{metadata}: the length of $P$, a short prefix, and the available API (\texttt{context}, \texttt{llm\_query()}, \texttt{FINAL()}, \texttt{FINAL\_VAR()}).
+    \item The model generates Python code to process \texttt{context} (e.g., chunking, regex, slicing).
+    \item Sub-calls via \texttt{llm\_query(text)} invoke the same model on a substring of $P$.
+    \item The model terminates with \texttt{FINAL(answer)} or \texttt{FINAL\_VAR(var\_name)}.
+\end{enumerate}
+
+This design avoids the three anti-patterns of naive scaffolding: the full prompt never enters the context window, output is not bounded by the window, and sub-calls are programmatic rather than verbalized~\cite{zhang2026rlm}.
+
+\subsection{Reinforcement Learning from Outcome Reward}
+
+RL from outcome-level reward has shown strong results for improving reasoning in language models. InstructGPT~\cite{ouyang2022instructgpt} used PPO~\cite{schulman2017ppo} with human preference reward. DeepSeek-R1~\cite{deepseekr1} introduced Group Relative Policy Optimization (GRPO), which eliminates the critic network by computing advantages relative to a group of sampled responses.
+
+Given prompt $x$ and $K$ sampled responses $\{y_1, \ldots, y_K\}$ with rewards $\{r_1, \ldots, r_K\}$, GRPO computes:
+\begin{equation}
+\hat{A}_i = \frac{r_i - \text{mean}(\{r_j\})}{\text{std}(\{r_j\}) + \epsilon}
+\label{eq:grpo}
+\end{equation}
+and updates the policy with a REINFORCE-style~\cite{williams1992reinforce} gradient weighted by $\hat{A}_i$. Full GRPO includes a KL penalty against a reference policy and PPO-style clipping.
+
+\subsection{Related Work}
+
+\textbf{Tool-augmented LMs.} ReAct~\cite{yao2023react} and Toolformer~\cite{schick2023toolformer} augment models with external tools but keep the prompt in the context window. RLMs differ by placing the prompt \emph{outside} the window entirely.
+
+\textbf{Self-improvement.} STaR~\cite{zelikman2022star} bootstraps reasoning by generating rationales, filtering correct ones, and re-training. Our trajectory collection uses a similar approach: the model generates RLM trajectories, and correct ones are used for SFT.
+
+\textbf{Long-context evaluation.} RULER~\cite{hsieh2024ruler} and Needle-in-a-Haystack~\cite{kamradt2023niah} test retrieval at various context lengths. OOLONG~\cite{oolong} provides tasks requiring processing \emph{all} documents, not just retrieval. We design benchmarks spanning both retrieval ($O(1)$, $O(K)$) and processing ($O(N)$) complexity.
+
+\textbf{LoRA fine-tuning.} Low-Rank Adaptation~\cite{hu2022lora} enables efficient fine-tuning of large models. We use LoRA for both SFT and RL stages.
+
+%% ============================================================
+\section{Approach}
+\label{sec:approach}
+
+\subsection{Model and Infrastructure}
+
+We use Qwen3-1.7B\footnote{Qwen/Qwen3-1.7B from Hugging Face~\cite{qwen3}.} as both the root model and sub-call model. At $\sim$4GB in bfloat16, it fits trivially on a single NVIDIA H200 GPU (143GB VRAM), leaving headroom for training with AdamW ($\sim$16GB total). All generation is in-process via \texttt{model.generate()}---no servers or APIs.
+
+\textbf{RLM Scaffold.} We implement the full RLM loop (Algorithm~1 from Zhang et al.~\cite{zhang2026rlm}): REPL initialization with \texttt{context}, metadata-only message construction, multi-turn code generation and execution, and \texttt{FINAL}/\texttt{FINAL\_VAR} termination. Sub-calls via \texttt{llm\_query()} invoke the same model weights in-process.
+
+\textbf{Prompt Design.} We design a prompt specifically for the 1.7B model's limited instruction-following capability: shorter than prompts for larger models, with explicit code patterns, hard limits on sub-calls (2--5 per task), and a worked example showing the chunking pattern. The prompt was validated on 10 tasks before committing.
+
+\subsection{Phase 1: Trajectory Collection via Self-Bootstrap}
+
+Rather than using a teacher model, we generate trajectories with Qwen3-1.7B itself on 150 NIAH tasks (5K--100K documents). Of 150 trajectories, 89 (59.3\%) produced correct answers. This STaR-style~\cite{zelikman2022star} self-bootstrap is feasible because the base model already achieves 68\% on NIAH---enough correct trajectories to learn from.
+
+We apply two cleaning steps to the 89 correct trajectories:
+\begin{enumerate}
+    \item \textbf{Template fixing.} A script detects and corrects misuse of \texttt{FINAL} (passing plans instead of answers) and \texttt{FINAL\_VAR} (passing literal strings instead of variable names), following the finding from Zhang et al.~\cite{zhang2026rlm} that 29\% of turns contain template mistakes.
+    \item \textbf{Error turn filtering.} We skip turns containing REPL errors (syntax errors, exceptions), producing clean per-turn SFT samples. An initial SFT attempt that included error turns as positive examples caused a regression from 68\% to 56\%, demonstrating that \textbf{data quality dominates data quantity} for small models.
+\end{enumerate}
+
+After cleaning, we obtain 87 trajectories yielding per-turn training samples (each sample is a conversation-so-far paired with the model's code response for that turn).
+
+\subsection{Phase 2: Supervised Fine-Tuning}
+
+We apply LoRA~\cite{hu2022lora} fine-tuning on the cleaned per-turn samples:
+\begin{itemize}
+    \item LoRA rank $r{=}16$, $\alpha{=}32$, dropout 0.05
+    \item Target modules: all attention and MLP projections (q, k, v, o, gate, up, down)
+    \item 5 epochs, learning rate $2{\times}10^{-4}$, linear warmup (50 steps)
+    \item Effective batch size 16 (batch 4 $\times$ gradient accumulation 4)
+    \item Max sequence length 4096 tokens
+    \item Training time: 34 seconds on 1 H200
+\end{itemize}
+
+The SFT checkpoint serves as the starting point for both RL and iterative self-improvement.
+
+\subsection{Phase 2b: Iterative Self-Improvement (STaR)}
+
+Inspired by STaR~\cite{zelikman2022star}, we apply a second round of self-bootstrap: the SFT model generates trajectories on \emph{harder} tasks it was not trained on (multi-needle NIAH and document classification), and correct trajectories are added to the training set for a second SFT round. Specifically:
+
+\begin{enumerate}
+    \item Run the SFT model on 30 hard NIAH tasks (50K--100K), 24 multi-needle tasks, and 20 document classification tasks.
+    \item Filter trajectories with score $> 0.5$, yielding 45 correct trajectories.
+    \item Combine with the original 87 NIAH trajectories to create a 132-sample training set.
+    \item Re-train LoRA from the base model on this combined set (same hyperparameters as Phase~2).
+\end{enumerate}
+
+This iterative approach exposes the model to diverse task types during SFT, without requiring RL's on-policy generation or reward design.
+
+\subsection{Phase 3: RL via GRPO}
+\label{sec:grpo}
+
+\textbf{RLM as an MDP.} We formulate RLM execution as a Markov Decision Process. The \emph{state} $s_t$ consists of the REPL namespace (all variables, including \texttt{context}) and the conversation history (metadata from previous turns). The \emph{action} $a_t$ is the Python code generated by the model at turn $t$. The \emph{transition} is deterministic: executing $a_t$ in the REPL produces a new state $s_{t+1}$ with updated variables and stdout. The \emph{reward} is sparse: $r = 0$ for all non-terminal steps, and $r = R(\text{predicted}, \text{expected})$ at termination. The \emph{policy} $\pi_\theta(a_t | s_t)$ is the language model parameterized by $\theta$.
+
+This MDP has several properties that make RL challenging: (1)~the action space is combinatorially large (arbitrary Python code), (2)~rewards are sparse and delayed to the end of the episode, and (3)~episodes are short (1--10 turns), limiting the horizon but also limiting the signal per episode.
+
+We implement a simplified trajectory-level GRPO. For each training step:
+
+\begin{enumerate}
+    \item \textbf{Sample prompts.} Draw a batch of $B{=}2$ task prompts.
+    \item \textbf{Generate trajectories.} For each prompt, run the full RLM loop $K{=}4$ times with temperature 0.8, producing $K$ complete trajectories.
+    \item \textbf{Score.} Compute reward $r_i$ for each trajectory using the reward function.
+    \item \textbf{Compute advantages.} For each group of $K$ trajectories sharing a prompt, compute group-relative advantages via Equation~\ref{eq:grpo}. Skip groups where all trajectories have the same reward ($\text{std} = 0$).
+    \item \textbf{Update.} For trajectories with $|\hat{A}_i| > 0.1$, compute the log-probability of each turn's code under the current policy, multiply by the advantage, and perform a gradient step. Learning rate: $5{\times}10^{-6}$ with AdamW.
+\end{enumerate}
+
+\textbf{Reward functions.} We experiment with two reward functions:
+
+\emph{Composite reward} (for NIAH tasks):
+\begin{equation}
+r = 0.8 \cdot \mathbb{1}[\text{correct}] + 0.2 \cdot r_{\text{format}}
+\end{equation}
+where $r_{\text{format}}$ gives bonuses for proper \texttt{```repl} blocks and termination, and penalties for errors.
+
+\emph{Recall reward} (for multi-needle tasks):
+\begin{equation}
+r = 0.9 \cdot \frac{|\text{found needles}|}{|\text{total needles}|} + 0.1 \cdot r_{\text{format}}
+\end{equation}
+
+The recall reward provides a continuous signal (partial credit for finding some needles), which proves critical for generating non-zero advantages.
+
+The full training procedure is shown in Algorithm~\ref{alg:grpo}.
+
+\begin{algorithm}[tb]
+   \caption{Trajectory-Level GRPO for RLMs}
+   \label{alg:grpo}
+\begin{algorithmic}
+   \STATE {\bfseries Input:} SFT policy $\pi_\theta$, task generator $\mathcal{T}$, reward $R$
+   \STATE {\bfseries Hyperparams:} $K$ trajectories, $B$ prompts/step, lr $\alpha$
+   \FOR{step $= 1$ {\bfseries to} $N$}
+   \STATE Sample $B$ task prompts $\{x_1, \ldots, x_B\}$ from $\mathcal{T}$
+   \FOR{each prompt $x_b$}
+   \FOR{$k = 1$ {\bfseries to} $K$}
+   \STATE $\tau_k \leftarrow \text{RLM}(x_b, \pi_\theta)$ \hfill {\small // full trajectory}
+   \STATE $r_k \leftarrow R(\tau_k.\text{answer}, \text{expected})$
+   \ENDFOR
+   \STATE $\hat{A}_k \leftarrow (r_k - \bar{r}) / (\sigma_r + \epsilon)$ for each $k$
+   \ENDFOR
+   \FOR{$(\tau_k, \hat{A}_k)$ where $|\hat{A}_k| > 0.1$}
+   \FOR{each turn $t$ in $\tau_k$}
+   \STATE $\mathcal{L} \leftarrow -\hat{A}_k \cdot \log \pi_\theta(a_t | s_t)$
+   \STATE $\theta \leftarrow \theta - \alpha \nabla_\theta \mathcal{L}$
+   \ENDFOR
+   \ENDFOR
+   \ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Phase 3b: Corrected GRPO with Token-Level KL (GRPO-v4)}
+\label{sec:grpo-v4}
+
+Our initial GRPO implementation (v1--v3) contained two critical bugs that we believe explain their poor performance:
+
+\textbf{Bug 1: Unconditional log-probabilities.} The policy loss in Algorithm~\ref{alg:grpo} computes $\log \pi_\theta(a_t | s_t)$. Our implementation computed this on the raw code text alone, without the conversation context (system prompt, task metadata, prior REPL feedback). This effectively trains the model to produce or avoid code patterns \emph{unconditionally}, regardless of the task. We hypothesize this explains the degenerate repetitive outputs in RL-v3: the model learned to unconditionally repeat patterns that happened to correlate with high reward in the training batch.
+
+\textbf{Bug 2: Weight-space KL proxy.} RL-v3 used $\mathcal{L}_\text{KL} = \beta \|\theta - \theta_\text{ref}\|^2 / d$ as a KL penalty, where $d{=}17.4$M is the number of LoRA parameters. This produces per-parameter penalties of order $10^{-10}$, making the regularization effectively zero throughout training.
+
+GRPO-v4 fixes both issues:
+\begin{enumerate}
+    \item \textbf{Conditioned log-probabilities.} We compute $\log \pi_\theta(a_t | s_t)$ by tokenizing the full conversation up to turn $t$ (system prompt, metadata, all prior assistant/user turns) and computing log-probabilities only over the response tokens. This ensures the policy gradient is conditioned on the correct state.
+    \item \textbf{Token-level KL via frozen reference.} We maintain a frozen copy of the SFT reference model $\pi_\text{ref}$ and compute per-token KL divergence $D_\text{KL}[\pi_\theta(a|s) \| \pi_\text{ref}(a|s)]$ at each training step. The total loss becomes $\mathcal{L} = -\hat{A}_i \cdot \log \pi_\theta(a_t|s_t) + \beta_\text{KL} \cdot D_\text{KL}$ with $\beta_\text{KL}{=}0.05$.
+\end{enumerate}
+
+Other hyperparameters: $K{=}8$ trajectories per prompt (increased from 4), $B{=}2$ prompts per step, 30 steps, learning rate $5{\times}10^{-6}$, mixed tasks (50\% NIAH, 50\% multi-NIAH).
+
+\subsection{Phase 3c: Direct Preference Optimization (DPO)}
+\label{sec:dpo}
+
+As an alternative to on-policy GRPO, we implement DPO~\cite{rafailov2023dpo}, which learns from offline preference pairs without on-policy trajectory generation:
+
+\begin{enumerate}
+    \item \textbf{Generate trajectory pairs.} For each of 35 tasks (15 NIAH + 20 multi-NIAH), generate $K{=}8$ trajectories with the STaR checkpoint. Form preference pairs by selecting the highest- and lowest-scoring trajectories per task, filtering pairs with reward gap $> 0.15$.
+    \item \textbf{Cache reference log-probabilities.} Before training, compute $\log \pi_\text{ref}(y|x)$ for all trajectories using the STaR checkpoint. This requires only a single forward pass per trajectory and avoids maintaining a reference model during training.
+    \item \textbf{DPO training.} The DPO loss for a preference pair $(y_w, y_l)$ given prompt $x$ is:
+    \begin{equation}
+    \mathcal{L}_\text{DPO} = -\log \sigma\!\left(\beta \left[\Delta_w - \Delta_l\right]\right)
+    \end{equation}
+    where $\Delta_i = \log \pi_\theta(y_i|x) - \log \pi_\text{ref}(y_i|x)$ and $\beta{=}0.1$.
+\end{enumerate}
+
+DPO implicitly constrains the policy to stay close to the reference (no explicit KL term needed) and avoids the instability of on-policy trajectory generation. We train for 3 epochs with learning rate $5{\times}10^{-6}$. Like GRPO-v4, log-probabilities are conditioned on the full conversation context.
+
+\subsection{Phase 4: Scaling to Qwen3.5-35B-A3B on Tinker}
+\label{sec:tinker}
+
+We migrate the pipeline to Qwen3.5-35B-A3B, a mixture-of-experts model with 35B total / 3B active parameters, using the Tinker training API for remote GPU execution. Key changes: (a)~LoRA rank 32 with \texttt{forward\_backward()} and \texttt{optim\_step()} API calls, (b)~PPO loss with clipped importance sampling ratio $[1{-}\epsilon, 1{+}\epsilon]$ (fixing a critical bug from unclipped IS), (c)~$K{=}8$ trajectories per prompt with 8 diverse temperatures $[0.6, 0.7, \ldots, 1.3]$, (d)~fixed sub-query temperature of 0.3 (fixing a leak from root generation temperature), (e)~raw advantages without standard deviation normalization (following Dr.~GRPO~\cite{drgrpo}).
+
+\subsection{Phase 4b: Strategy-Conditioned GRPO (SC-GRPO)}
+\label{sec:sc-grpo}
+
+Standard GRPO applied to code generation suffers from severe mode collapse: within 5 steps, 60\% of trajectory groups produce identical code across all $K{=}8$ samples, yielding zero advantages and no gradient signal. We hypothesize this occurs because code generation has a much narrower mode space than natural language---once the model learns one working template (e.g., scan-all-chunks), it converges to that template for all problems.
+
+SC-GRPO addresses this by prepending a randomly assigned \emph{strategy prompt} to each trajectory's system prompt. We define 6 strategies:
+\begin{enumerate}
+    \item \textbf{Standard}: default chunking and aggregation
+    \item \textbf{Extract-Compute}: extract raw data, compute answer in Python
+    \item \textbf{Binary Search}: narrow down location via successive halving
+    \item \textbf{Map-Reduce}: map sub-queries over chunks, reduce results
+    \item \textbf{Two-Pass}: scan pass to collect candidates, verify pass to confirm
+    \item \textbf{Small Chunks}: use 5K chunks with high overlap for precision
+\end{enumerate}
+
+Each trajectory in a group of $K{=}8$ is randomly assigned one of the 6 strategies. This forces structural diversity in the generated code: even if the model has converged on a preferred approach, the strategy prompt pushes it toward alternative decomposition patterns. The result is 0\% group collapse (vs.\ 60\% without SC-GRPO), ensuring every training step has meaningful gradient signal.
+
+\subsection{Phase 4c: Hybrid RLM Architecture}
+\label{sec:hybrid}
+
+We discover that RL training on code generation degrades sub-call QA quality. The root cause: LoRA adapts both the root code generation distribution and the sub-call response distribution, but training rewards only the final answer. Sub-call biases (e.g., ``return first entity found'') go unpenalized because they are invisible to the reward function.
+
+The hybrid architecture maintains two model instances:
+\begin{itemize}
+    \item \textbf{Root model} (trained, with LoRA adapter): generates Python code for chunking, decomposition, and aggregation
+    \item \textbf{Sub-call model} (base, no adapter): answers factual questions about text chunks via \texttt{llm\_query()}
+\end{itemize}
+
+This separation preserves the base model's general-purpose QA ability for sub-calls while allowing RL to optimize code generation. The cost is $\sim$60\% more sub-calls (due to more granular decomposition), but the quality improvement on multi-hop reasoning is dramatic: $+25$pp Multi-Hop QA, $+60$pp Hard Multi-Hop.
+
+%% ============================================================
+\section{Experimental Setup}
+\label{sec:experiments}
+
+\subsection{Benchmarks}
+
+We evaluate on 11 benchmarks spanning three algorithmic complexity classes, plus 2 out-of-distribution benchmarks:
+
+\textbf{$O(1)$ tasks} (find a single piece of information):
+\begin{itemize}
+    \item \textbf{NIAH} (20 tasks): Needle-in-a-haystack retrieval across 5K--100K char documents.
+    \item \textbf{Hard NIAH} (15 tasks): Adversarial NIAH with semantic distractors and non-obvious question-answer pairings.
+    \item \textbf{Verbatim Copy} (10 tasks): Faithfully reproduce a marked passage from a long document.
+\end{itemize}
+
+\textbf{$O(K)$ tasks} (find multiple scattered items):
+\begin{itemize}
+    \item \textbf{Multi-NIAH} (20 tasks): Retrieve $K{=}3$--10 needles from 10K--100K char documents. Metric: recall.
+    \item \textbf{Multi-Hop QA} (20 tasks): Answer questions requiring 2--3 reasoning hops across different parts of a 20K--100K char document (e.g., ``Find the person in role X, then find their project, then find its budget'').
+    \item \textbf{Code Debug} (15 tasks): Find bugs in Python codebases by systematic code analysis.
+    \item \textbf{Notebook QA} (15 tasks): Answer questions about Jupyter-style data analysis notebooks (50K--150K chars).
+\end{itemize}
+
+\textbf{$O(N)$ tasks} (process every item):
+\begin{itemize}
+    \item \textbf{Doc-Classify} (20 tasks): Classify $N{=}5$--20 articles into 6 categories.
+    \item \textbf{Event Counting} (20 tasks): Count events, entities, or compute ratios from structured event logs (50K--200K chars). Requires extracting raw items then counting in Python (delegating counting to sub-calls produces hallucinated numbers).
+\end{itemize}
+
+\textbf{Out-of-distribution:}
+\begin{itemize}
+    \item \textbf{Hard Multi-Hop} (10 tasks): 2--3 hop reasoning in 100K--300K char documents with many distractors.
+    \item \textbf{OOLONG} (10 tasks): Real D\&D transcript aggregation (152K chars)~\cite{oolong2025}. Counting spells, rolls, and character actions in unstructured natural language---no training data exists for this task type.
+\end{itemize}
+
+All benchmarks use deterministic seed-based generation for reproducible head-to-head comparison. Training and evaluation seeds are separated by a +100K offset.
+
+\subsection{Models Compared}
+
+We compare 5 configurations in head-to-head evaluation (identical seeds):
+
+\begin{enumerate}
+    \item \textbf{Base}: Qwen3.5-35B-A3B with RLM scaffold, no fine-tuning.
+    \item \textbf{V4-s5 (GRPO)}: Standard GRPO, 5 steps, $K{=}8$, mixed tasks. LoRA rank 32, lr $2{\times}10^{-6}$, KL coeff 0.005. Direct RL from base model (no SFT warmup).
+    \item \textbf{V7-s5 (SC-GRPO)}: SC-GRPO, 5 additional steps from V4-s5 checkpoint. 6 strategy prompts for diversity.
+    \item \textbf{V7-hybrid}: V7-s5 with hybrid architecture (trained root + base sub-calls).
+    \item \textbf{V4-s5-hybrid}: V4-s5 with hybrid architecture. Best overall configuration.
+\end{enumerate}
+
+\emph{Qwen3-1.7B experiments.} We also report results from initial experiments with Qwen3-1.7B (Appendix), where we developed the pipeline and diagnosed critical implementation bugs. Those experiments used SFT warmup, DPO, and four iterations of GRPO (v1--v4), training on a single NVIDIA H200.
+
+\subsection{Computational Cost}
+
+All experiments run on a single NVIDIA H200 GPU. Total compute for the entire project:
+
+\begin{table}[ht]
+\vskip 0.1in
+\begin{center}
+\begin{small}
+\begin{tabular}{lr}
+\toprule
+Phase & GPU-hours \\
+\midrule
+Trajectory collection (150 tasks) & 0.63 \\
+SFT training (5 epochs) & 0.01 \\
+RL-v1 training (100 steps) & 0.29 \\
+RL-v2 training (30 steps) & 1.47 \\
+STaR collection (74 tasks) & 0.50 \\
+STaR SFT training (5 epochs) & 0.01 \\
+RL-v3 training (40 steps) & 0.92 \\
+DPO (generation + training) & 1.53 \\
+GRPO-v4 training (30 steps) & 1.76 \\
+All evaluations ($\times$8 models) & $\sim$4.0 \\
+\midrule
+\textbf{Total} & $\sim$\textbf{11.1} \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+%% ============================================================
+\section{Results}
+\label{sec:results}
+
+\subsection{Main Results}
+
+Table~\ref{tab:main} shows the primary results across all 14 benchmarks in clean head-to-head evaluation (identical seeds, no strategy prompts). We compare the base model against our best trained configuration (V11-s5: 11 SC-GRPO steps from base).
+
+\begin{table*}[t]
+\caption{Clean head-to-head evaluation across 14 benchmarks (identical seeds, no strategy prompts). All values are accuracy (\%). V11-s5 = SC-GRPO (11 steps from base, LoRA rank 32). Cross-evaluation mean averages results across two independent evaluation sets with different random seeds. Best per-benchmark in \textbf{bold}.}
+\label{tab:main}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{tabular}{lccccc}
+\toprule
+Benchmark ($n$) & Base & V11-s5 & $\Delta$ & Cross-Eval Mean \\
+\midrule
+NIAH (20) & 60.0 & \textbf{80.0} & +20.0 & 72.5 \\
+Multi-NIAH (20) & \textbf{91.5} & 87.8 & $-3.7$ & 88.9 \\
+Doc-Classify (20) & 81.6 & \textbf{99.2} & +17.6 & 94.0 \\
+DataFrame QA (20) & \textbf{54.0} & 40.0 & $-14.0$ & 62.5 \\
+Code Debug (15) & 25.6 & 25.6 & 0.0 & 39.4 \\
+Multi-Hop QA (20) & \textbf{85.0} & 80.0 & $-5.0$ & 70.0 \\
+Notebook QA (15) & 70.0 & 66.7 & $-3.3$ & 73.3 \\
+Hard NIAH (15) & 93.3 & \textbf{100.0} & +6.7 & 93.3 \\
+Verbatim Copy (10) & \textbf{100.0} & \textbf{100.0} & 0.0 & 60.0 \\
+OOLONG (10) & 0.0 & \textbf{20.0} & +20.0 & 10.0 \\
+Hard Multi-Hop (10) & 40.0 & \textbf{50.0} & +10.0 & 30.0 \\
+Event Counting (20) & 57.2 & \textbf{72.9} & +15.7 & 61.2 \\
+Cross-Doc Compare (12) & \textbf{43.0} & 24.4 & $-18.6$ & 30.3 \\
+Key-Value Retrieval (12) & \textbf{51.3} & 36.1 & $-15.2$ & 49.3 \\
+\midrule
+\textbf{Average (14)} & 60.9 & \textbf{63.0} & +2.1 & 59.6 \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table*}
+
+\textbf{V11-s5 improves 7 benchmarks and regresses 5}, averaging $+2.1$pp over base ($63.0\%$ vs $60.9\%$). The cross-evaluation mean (averaging across two independent seed sets) yields $+4.2$pp, confirming the improvement is real despite high variance at $N{=}10{-}20$ tasks.
+
+\textbf{Search tasks show the strongest gains.} NIAH ($+20$pp), OOLONG ($+20$pp), Doc-Classify ($+17.6$pp), Event Counting ($+15.7$pp), and Hard Multi-Hop ($+10$pp) all improve substantially. RL teaches better chunking and extraction strategies for ``find X in context'' tasks.
+
+\textbf{Extraction and comparison tasks regress.} Cross-Doc Compare ($-18.6$pp), Key-Value Retrieval ($-15.2$pp), DataFrame QA ($-14$pp) all decline. Trajectory analysis reveals that RL trains format-rigid parsing patterns in sub-call code (e.g., \texttt{if "ORG: " in line} instead of the base model's robust \texttt{for line in answer}), causing brittleness on diverse output formats.
+
+\textbf{This is a specialization-generalization tradeoff}: RL optimizes for the task types in training (search, classification) at the cost of general-purpose extraction ability. The model learns to chunk and scan efficiently but loses precision on tasks requiring exact value extraction and cross-document comparison.
+
+\subsection{Hybrid Architecture Mechanism}
+\label{sec:hybrid-mechanism}
+
+Trajectory analysis reveals why hybrid mode produces such dramatic multi-hop gains. In non-hybrid V4-s5, the trained model asks \emph{compound} sub-queries: ``Find the budget of the project completed by the HR department.'' No single 20K chunk contains the full reasoning chain, so the sub-call returns ``Not found.'' In hybrid mode, the trained root correctly decomposes into sequential atomic queries: (1)~``Who manages HR?'' $\to$ entity, (2)~``What project does \{entity\} lead?'' $\to$ project, (3)~``What budget is allocated to \{project\}?'' $\to$ answer. Each query is answerable independently by the base model.
+
+The root cause is that \textbf{RL training degrades sub-call quality through shared LoRA weights}. The same adapter handles both root code generation (where RL teaches chunking and aggregation patterns) and \texttt{llm\_query()} responses (where the model answers factual questions about text chunks). Training optimizes for code patterns but introduces biases into sub-call responses---the model learns shortcuts like ``return the first entity found,'' which works for NIAH but fails for multi-hop where precision matters.
+
+The hybrid architecture implements a \emph{division of labor}: the trained model handles planning (decomposition, orchestration, aggregation) while the base model handles perception (precise fact extraction). This is analogous to the separation of System 2 (deliberate reasoning) and System 1 (pattern matching) in cognitive architectures. Hybrid mode uses $\sim$60\% more sub-calls but completes faster due to fewer failed searches and timeouts.
+
+\textbf{Design principle:} When training recursive models with parameter-efficient methods, separate the planning module (trained) from the perception module (base). This is a new failure mode specific to LoRA fine-tuning of recursive models and has not been previously documented.
+
+\subsection{NIAH Breakdown by Document Length (Qwen3-1.7B)}
+\label{sec:niah-breakdown}
+
+\emph{Note: The following breakdowns are from our initial experiments with Qwen3-1.7B and are included for completeness. The main results above use Qwen3.5-35B-A3B.}
+
+Table~\ref{tab:niah-length} shows accuracy stratified by document length.
+
+\begin{table}[t]
+\caption{NIAH accuracy by document length (characters). Each cell represents 20 tasks (5 positions $\times$ 4 seeds).}
+\label{tab:niah-length}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{sc}
+\begin{tabular}{lccccc}
+\toprule
+Model & 5K & 10K & 20K & 50K & 100K \\
+\midrule
+Base  & 85 & 80 & 80 & 55 & 60 \\
+SFT   & \textbf{100} & 95 & 95 & 80 & 80 \\
+RL-v2 & \textbf{100} & \textbf{100} & 95 & 80 & 85 \\
+STaR  & 75 & 90 & 85 & 90 & 95 \\
+RL-v3 & 80 & 95 & 85 & 90 & \textbf{100} \\
+\midrule
+DPO   & \textbf{100} & 80 & 90 & \textbf{95} & 78 \\
+GRPO-v4 & \textbf{100} & 90 & 90 & 91 & 72 \\
+\bottomrule
+\end{tabular}
+\end{sc}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+SFT dramatically improves long-document performance: 50K accuracy jumps from 55\% to 80\%, and 100K from 60\% to 80\%. RL-v2 further improves 10K ($95 \to 100$\%) and 100K ($80 \to 85$\%), but the gains are small.
+
+RL-v3 achieves \textbf{100\% on 100K documents}---the only model to do so---while regressing on 5K documents (80\% vs.\ SFT's 100\%). DPO and GRPO-v4 both achieve 100\% on 5K (matching SFT) and have the highest 50K scores (95\% and 91\%), but \textbf{regress at 100K} (78\% and 72\%). This appears to be a trade-off: RL training on multi-needle tasks, which are predominantly shorter documents, may shift the model's strategies away from very long single-needle retrieval. We note that STaR and RL-v3 (which also trained on mixed tasks) show the opposite pattern---high 100K but low 5K---suggesting the length distribution in the training data influences which document lengths benefit.
+
+\textbf{Analysis by needle position.} We also examine accuracy across needle positions (fraction through document). The base model shows a consistent weakness at position 0.25 (60\% accuracy vs.\ 80\%+ at other positions). SFT improves all positions uniformly except 0.25, which remains at 60\%. RL-v1 (on its 25-task pilot) was the only method to fix position 0.80 from 60\% to 100\%, but did not address 0.25. This suggests that position 0.25 corresponds to a chunk boundary where information falls between sub-call windows---a structural limitation that training alone cannot resolve without changing the chunking strategy.
+
+\subsection{Multi-Needle Retrieval Breakdown}
+
+Table~\ref{tab:mniah} shows multi-needle recall by needle count.
+
+\begin{table}[t]
+\caption{Multi-NIAH recall by number of needles. Each cell represents 4 tasks.}
+\label{tab:mniah}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{sc}
+\begin{tabular}{lcccc}
+\toprule
+Model & 3 & 5 & 8 & 10 \\
+\midrule
+Base  & 50.0 & 45.0 & 31.3 & 27.5 \\
+SFT   & 75.0 & 47.5 & 56.3 & 65.0 \\
+RL-v2 & 50.0 & 67.5 & 37.5 & 67.5 \\
+STaR  & 50.0 & 70.0 & 51.6 & 57.5 \\
+RL-v3 & 50.0 & 57.5 & 26.6 & 30.0 \\
+\midrule
+DPO   & \textbf{100.0} & 87.5 & \textbf{81.3} & 90.0 \\
+GRPO-v4 & \textbf{100.0} & \textbf{97.5} & 57.8 & \textbf{100.0} \\
+\bottomrule
+\end{tabular}
+\end{sc}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+The results are noisy (4 tasks per cell), but reveal striking patterns. Initial RL attempts (v1--v3) show mixed or negative effects: RL-v3 catastrophically fails on 8-needle (26.6\%) and 10-needle (30.0\%) tasks, nearly matching the untrained base model.
+
+\textbf{DPO and GRPO-v4 produce dramatically different results.} Both achieve 100\% on 3-needle tasks (vs.\ 50\% for all prior models except SFT's 75\%). DPO shows strong, consistent performance across all needle counts (81.3--100\%). GRPO-v4 achieves 100\% on 10-needle tasks but drops to 57.8\% on 8-needle---a curious inconsistency that may reflect the small sample size (4 tasks per cell) or task-specific difficulty variation. Both models represent a substantial improvement over all SFT-only approaches, suggesting that RL training (when implemented correctly) teaches the model better aggregation strategies for multi-needle retrieval.
+
+\subsection{Document Classification Breakdown}
+
+Table~\ref{tab:docclassify} shows classification accuracy by number of documents.
+
+\begin{table}[t]
+\caption{Document classification accuracy by number of documents per task. Each cell represents 5 tasks.}
+\label{tab:docclassify}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{sc}
+\begin{tabular}{lcccc}
+\toprule
+Model & 5 & 10 & 15 & 20 \\
+\midrule
+Base  & 68.0 & 78.0 & 85.3 & 90.0 \\
+SFT   & 80.0 & 78.0 & 82.7 & 89.0 \\
+RL-v2 & \textbf{88.0} & 66.0 & 82.7 & 89.0 \\
+STaR  & 84.0 & 78.0 & 82.7 & 89.0 \\
+RL-v3 & 84.0 & 78.0 & 82.7 & \textbf{91.0} \\
+\midrule
+DPO   & 84.0 & 76.0 & 81.3 & 89.0 \\
+GRPO-v4 & 80.0 & 78.0 & 84.0 & \textbf{91.0} \\
+\bottomrule
+\end{tabular}
+\end{sc}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+Document classification is the most stable benchmark: all trained models achieve $81$--$84$\%, with minimal variation. DPO and GRPO-v4 perform comparably to prior models, confirming that this benchmark is bottlenecked by the sub-call model's classification ability rather than the root model's code quality. The scaffold structure already solves the $O(N)$ decomposition problem, and neither SFT nor RL substantially changes how documents are dispatched to sub-calls.
+
+\subsection{Comparison to Original RLM Paper}
+
+Zhang et al.~\cite{zhang2026rlm} reported that SFT improved Qwen3-8B by 28.3\% across several benchmarks (CodeQA, BrowseComp+, OOLONG). Our SFT improvement on NIAH ($+18$pp) is smaller in absolute terms but applies to a model 4.7$\times$ smaller (1.7B vs.\ 8B). Notably, our self-bootstrap approach (training on the model's own correct trajectories) avoids the need for a 480B teacher model, which the original paper used for trajectory collection. That a 1.7B model can self-bootstrap to 90\% accuracy on NIAH suggests that the RLM API surface is simple enough for even small models to learn.
+
+The original paper did not attempt RL, noting it as future work. Our results show that RL \emph{can} work for RLMs---but only with careful implementation. Naive GRPO produces catastrophic regression, while properly conditioned GRPO and DPO produce dramatic gains. The combination of sparse rewards, structured action spaces, and multi-turn episodes creates a challenging RL problem where implementation details (conditioned log-probabilities, proper KL regularization) make the difference between failure and success.
+
+\subsection{RL Training Dynamics}
+\label{sec:training-dynamics}
+
+\textbf{RL-v1: Reward collapse on easy tasks.}
+Training on NIAH tasks (5K--20K only) with binary reward, the model rapidly achieved $>$80\% accuracy. By step 10, all $K{=}4$ trajectories per prompt were correct, yielding identical rewards, zero standard deviation in Equation~\ref{eq:grpo}, and thus zero advantages. Loss dropped to exactly 0.0 and remained there for the remaining 90 steps. \emph{No learning occurred after step 10.}
+
+We attempted to fix this by including harder tasks (50K, 100K), but the model was already accurate enough that 8/8 trajectories were correct by step 5, producing the same collapse. \textbf{Binary reward appears insufficient when the model is already good at the task.}
+
+\textbf{RL-v2: Real training signal from partial rewards.}
+Switching to multi-needle tasks with recall-based reward (Section~\ref{sec:grpo}) produced genuine training dynamics:
+
+\begin{table}[ht]
+\vskip 0.1in
+\begin{center}
+\begin{small}
+\begin{tabular}{rrrr}
+\toprule
+Step & Reward & Loss & Updates \\
+\midrule
+3  & 0.418 & 0.642 & 11 \\
+6  & 0.544 & 0.034 &  8 \\
+12 & 0.730 & 0.027 &  9 \\
+18 & 0.505 & $-0.018$ & 5 \\
+24 & 0.213 & $-0.136$ & 4 \\
+30 & 0.761 & 0.748 & 7 \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.1in
+\end{table}
+
+The training shows characteristic instability: reward peaks at step 12 (0.730), drops to 0.213 at step 24, then recovers to 0.761 by step 30. This oscillation is consistent with the known behavior of policy gradient methods without sufficient regularization.
+
+\textbf{RL-v3: KL regularization fails as implemented.}
+RL-v3 adds anchor regularization ($\mathcal{L}_\text{KL} = \beta \|\theta - \theta_\text{ref}\|^2 / d$, $\beta{=}0.02$) and mixed-task training (50\% NIAH, 50\% multi-NIAH). However, normalizing the L2 penalty by $d{=}17.4$M LoRA parameters produces per-parameter values of order $10^{-10}$, making the KL term effectively zero throughout training. Despite this, the oscillation amplitude is smaller than RL-v2 (range $[0.425, 0.808]$ vs.\ $[0.213, 0.761]$), suggesting that mixed-task training provides implicit regularization. At step 27, all trajectories received identical rewards (loss = 0.0, updates = 0), showing the same GRPO collapse observed in RL-v1.
+
+\textbf{GRPO-v4: Stable training with token-level KL.}
+After fixing both the conditioned log-probabilities and KL computation, GRPO-v4 shows markedly more stable training dynamics. Reward progresses from 0.639 (step 0) to 0.864 (step 29), with oscillation amplitude of 0.253---roughly half of RL-v2's 0.548 and less than RL-v3's 0.383. KL divergence grows steadily from 0.0008 to 0.0197 over 30 steps, confirming that the token-level KL provides meaningful regularization (in contrast to RL-v3's weight-space proxy which was always effectively zero). Three collapse events occurred (steps 13, 18, 22) where all $K{=}8$ trajectories per prompt scored identically, producing zero updates---but the model recovered immediately at the next step rather than remaining stuck. No degenerate repetitive outputs were observed at any point during training.
+
+\textbf{DPO: Minimal loss change, large downstream effect.}
+DPO training on 25 preference pairs (7 NIAH + 18 multi-NIAH) shows surprisingly small loss changes: DPO loss decreases from 0.693 (log 2, random chance) to only 0.684 over 3 epochs. DPO accuracy (fraction of pairs where the model assigns higher probability to the preferred trajectory) rises from 64\% to 96\%. Despite the small loss change, the downstream evaluation effect is dramatic ($+29.5$pp on multi-NIAH). This suggests that DPO makes targeted adjustments to the model's preferences between strategies, rather than large-scale policy changes. Total DPO training time is 1.53 GPU-hours (including trajectory generation).
+
+\subsection{Qualitative Analysis of Trajectories}
+
+Examining model outputs reveals qualitative differences between models:
+
+\textbf{Base model} frequently fails on long documents by attempting to process the entire context in a single sub-call, exceeding the sub-call capacity. On multi-needle tasks, it often returns ``not found'' without attempting systematic search.
+
+\textbf{SFT model} consistently uses the chunking pattern from training data: slicing \texttt{context} into 20K-character segments and issuing \texttt{llm\_query()} on each. This dramatically improves coverage. It also uses single-turn execution (averaging 1.0 turns vs.\ 1.36 for the base model), producing 3.3$\times$ faster inference.
+
+\textbf{RL models (v1--v3)} exhibit a mix of SFT-learned patterns and degenerate behaviors. On some multi-needle tasks, both RL-v2 and RL-v3 generate repetitive outputs (e.g., ``4H7-PURPLE'' repeated $>$100 times, or sequential numbers ``3,4,5,...,280...''), suggesting degenerate policies learned during unstable training. We believe this is caused by the unconditional log-probability computation: the model learns to unconditionally produce or suppress code patterns, regardless of the task context.
+
+\textbf{DPO and GRPO-v4 models} produce clean, non-degenerate outputs on all tasks. Neither model exhibits the repetitive output patterns seen in RL-v3. On multi-needle tasks, both models use systematic chunking and aggregation strategies, similar to STaR but with noticeably better coverage---they appear to have learned to search more exhaustively and aggregate results more carefully. This qualitative improvement aligns with the quantitative multi-NIAH gains.
+
+\textbf{STaR model} produces reliable multi-task behavior, using clean chunking patterns on both NIAH and multi-needle tasks. Having been trained on correct trajectories for both task types, it avoids the degenerate patterns of RL v1--v3, but its search strategies are less thorough than those learned by DPO and GRPO-v4.
+
+%% ============================================================
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Key Insights from Qwen3.5-35B-A3B}
+
+Our 35B-A3B results reveal several insights not apparent at 1.7B scale:
+
+\textbf{RL directly from the base model.} Unlike our 1.7B experiments which required SFT warmup (the model could barely write REPL code), the 35B-A3B model generates competent RLM code out of the box (62.4\% average with just the scaffold). This allows direct RL training without SFT, removing a potential source of distribution mismatch.
+
+\textbf{Mode collapse is code-specific.} Standard GRPO works well for natural language tasks~\cite{deepseekr1}, but code generation has a much narrower mode space. Once the model learns one working template (scan-all-chunks-aggregate), it converges to that template for all $K{=}8$ samples, collapsing advantages to zero. SC-GRPO's strategy conditioning breaks this convergence by forcing structural diversity.
+
+\textbf{LoRA creates a planning-perception entanglement.} The single most impactful discovery is that LoRA fine-tuning of recursive models creates an unintended coupling between the planning capability (root code generation) and the perception capability (sub-call QA). Training improves planning but degrades perception because the same adapter serves both roles. The hybrid architecture decouples these by routing sub-calls to the unadapted base model.
+
+\textbf{Training pipeline correctness is non-negotiable.} Seven bugs---each seemingly minor---collectively prevented learning. The interaction between unclipped IS loss, high sub-call temperature, and std-normalized advantages produces loss values of $O(10^7)$, making gradient updates effectively random noise. Only after fixing all seven did training produce stable improvements.
+
+\subsection{SFT as Foundation, RL as Refinement (Qwen3-1.7B)}
+
+SFT's effectiveness is unsurprising in hindsight. The primary capability gap for a 1.7B RLM is \emph{learning the REPL API}: knowing to chunk \texttt{context}, call \texttt{llm\_query()}, and terminate with \texttt{FINAL\_VAR()}. This is a narrow distribution of code patterns that SFT teaches directly. The model goes from generating multi-turn, error-prone explorations to single-turn, correct code in one training step.
+
+STaR extends this by generating trajectories on harder tasks and filtering correct ones, teaching the model task-specific patterns \emph{without any reward design}. However, STaR's multi-needle recall plateaus at 58.4\%---it can only learn from strategies the model already discovers. DPO and GRPO-v4 push well beyond this ceiling (85--88\%), suggesting that RL-based optimization can discover and reinforce search strategies that are rare in the model's natural distribution. The combination of SFT (to learn the API) followed by RL (to refine strategies) appears to be the most effective pipeline.
+
+\subsection{Why RL Initially Failed and What Fixed It}
+
+Several factors, rooted in core RL concepts covered in CS234, explain both the initial failures (v1--v3) and the eventual success (DPO, GRPO-v4):
+
+\textbf{1. Reward sparsity and shaping.} Binary rewards produce zero gradient signal when the model is already good (RL-v1). This is the classic challenge of sparse reward in RL: with $r \in \{0, 1\}$ and a high baseline success rate, GRPO's group-relative advantage (Eq.~\ref{eq:grpo}) collapses because $\text{std}(\{r_j\}) \to 0$. Our switch to partial recall-based rewards (RL-v2 onward) provides denser signal, which we believe is necessary but not sufficient.
+
+\textbf{2. Conditioned vs.\ unconditional policy gradients.} Our most significant finding is that computing policy log-probabilities on raw code text \emph{without conversation context} appears to fundamentally break the policy gradient. The model should learn $\pi_\theta(\text{code} | \text{system prompt, task metadata, REPL feedback})$, but unconditional computation trains $\pi_\theta(\text{code})$---learning to produce or avoid code patterns regardless of the task. We believe this is the primary cause of the degenerate repetitive outputs in RL-v3: the model learned to unconditionally repeat patterns that correlated with reward in the training batch. GRPO-v4 fixes this by conditioning on the full conversation, and the degenerate outputs disappear entirely.
+
+\textbf{3. Policy constraint and stability.} Without proper KL regularization, GRPO updates push the policy far from its initialization, as seen in RL-v2's oscillation (reward 0.730 $\to$ 0.213 $\to$ 0.761). RL-v3 attempted weight-space L2 regularization, but normalizing by $d{=}17.4$M parameters made the penalty negligible. \textbf{Weight-space regularization appears to be an inadequate proxy for token-level KL}: GRPO-v4's token-level KL via a frozen reference model (requiring an additional forward pass) produces measurable regularization (KL grows from 0.0008 to 0.0197 over training) and reduces oscillation amplitude by roughly half compared to RL-v2. DPO avoids this issue entirely by implicitly constraining KL through the preference learning objective.
+
+\textbf{4. Exploration via larger sample groups.} At $K{=}4$, the model often produces identical strategies for the same prompt, yielding zero advantage variance. Increasing to $K{=}8$ (GRPO-v4 and DPO trajectory generation) provides more diverse samples and more informative advantage estimates. Combined with the above fixes, this seems sufficient to produce meaningful learning signal.
+
+\textbf{5. Credit assignment.} Our trajectory-level GRPO assigns the same advantage to every turn, ignoring temporal structure. This remains a limitation---per-turn credit assignment could further improve RL training---but the results suggest it is not the primary bottleneck when the other issues are addressed.
+
+\subsection{Data Quality Lessons}
+
+Our SFT-v1 failure (68\% $\to$ 56\%) provides a cautionary lesson. Including error turns as positive examples and applying template fixes that changed correct answers taught the model to reproduce errors. The fix---filtering to only clean, correct turns from the original trajectories---recovered performance and then exceeded it. For a 1.7B model with limited capacity, every training sample matters.
+
+\subsection{Limitations}
+
+\textbf{Benchmark scale.} Our benchmarks use 20--100 tasks, which limits statistical power. The multi-needle breakdown (4 tasks per cell) is particularly noisy (e.g., GRPO-v4's 57.8\% at 8 needles vs.\ 100\% at 10 needles). Larger evaluation suites would yield more reliable conclusions.
+
+\textbf{NIAH--Multi-NIAH trade-off.} DPO and GRPO-v4 regress on single-needle NIAH at 100K tokens (72--78\% vs.\ RL-v3's 100\% and STaR's 95\%). We have not yet determined whether this is a fundamental trade-off or a curriculum/weighting issue that could be resolved with different training data mixtures.
+
+\textbf{Model scale.} At 1.7B parameters, the model has limited coding ability. Results may differ at 7B+ where the model can generate more diverse and correct code.
+
+\textbf{Synthetic benchmarks.} Our NIAH and classification tasks use synthetic data. Performance on real-world long-context tasks (e.g., LongBench~\cite{longbenchv2}, BrowseComp~\cite{browsecomp}) may differ.
+
+\textbf{Implementation sensitivity.} Our results highlight that RL for RLMs is highly sensitive to implementation details. The difference between RL-v3 (catastrophic regression) and GRPO-v4 ($+27$pp improvement) comes down to two implementation choices. We cannot be fully certain these are the only relevant factors---other differences (e.g., $K{=}8$ vs.\ $K{=}4$, starting from STaR vs.\ SFT) may also contribute.
+
+\subsection{Connection to RL Theory}
+
+Our experiments illustrate several key RL concepts in a concrete, novel setting:
+
+\emph{Imitation learning vs.\ RL.} SFT (behavioral cloning) and STaR (filtered self-play) are effective for the initial capability gap---learning the REPL API. But STaR plateaus at 58\% multi-needle recall because it can only learn from strategies the model already discovers. RL (DPO, GRPO-v4) pushes beyond this ceiling to 85--88\%, suggesting that policy optimization discovers and reinforces rare but effective strategies that self-imitation cannot access.
+
+\emph{On-policy vs.\ off-policy.} DPO (off-policy, preference-based) slightly outperforms GRPO-v4 (on-policy, advantage-based) in our setting: 84.5\% vs.\ 83.4\% average, with more consistent breakdown scores. DPO's stability advantages are significant---no on-policy trajectory generation during training, implicit KL constraint, and deterministic training---but GRPO-v4 achieves comparable results, suggesting the on-policy/off-policy distinction matters less than correct implementation of policy constraints and conditioned log-probabilities.
+
+\emph{Implementation as a confound.} Our results provide a cautionary example: RL-v3 and GRPO-v4 use the \emph{same algorithm} (GRPO) but produce opposite results (41\% vs.\ 85\% multi-NIAH). The difference is entirely in implementation details---conditioned log-probabilities and token-level KL. This suggests that negative RL results in the literature should be interpreted carefully: the algorithm may not be at fault if the implementation contains subtle bugs in policy gradient computation or regularization.
+
+%% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+We trained the first open-weight natively recursive language model based on Qwen3.5-35B-A3B, evaluating across 14 diverse long-context benchmarks in rigorous head-to-head comparisons with cross-validation across independent seed sets. Our main findings are:
+
+\begin{enumerate}
+    \item \textbf{RL directly from the base model works.} Unlike the original RLM paper which required SFT on teacher trajectories, GRPO applied directly to the base model achieves meaningful gains ($+2.1$pp average across 14 benchmarks, $+4.2$pp confirmed via cross-evaluation), bypassing the need for expensive trajectory collection from a larger teacher model.
+    \item \textbf{Mode collapse is the primary failure mode of code-generation GRPO.} Standard GRPO collapses to a single code template within 5 steps (60\% group collapse). SC-GRPO eliminates this entirely by conditioning on randomly assigned strategy prompts.
+    \item \textbf{RL creates a specialization-generalization tradeoff.} Training improves search/classification tasks ($+20$pp NIAH, $+17.6$pp Doc-Classify, $+15.7$pp Event Counting) but regresses extraction/comparison tasks ($-18.6$pp Cross-Doc, $-14$pp DataFrame QA). Trajectory analysis reveals \emph{format rigidity} as the root cause: RL trains strict parsing patterns that break on diverse output formats.
+    \item \textbf{SFT and RL are complementary, not substitutes.} SFT teaches format and parsing (DFQA $76.5\%$, $+22$pp over base) but destroys search capability (NIAH $45{-}55\%$, $-5{-}15$pp). GRPO teaches search (NIAH $80\%$, $+20$pp) but breaks parsing. The SFT$\to$GRPO pipeline may combine both benefits.
+    \item \textbf{Training pipeline bugs compound catastrophically.} Seven bugs---wrong loss function, sub-query temperature leak, advantage normalization, seed overlap, and others---collectively explain why training initially produces unstable loss values of $O(10^7)$ instead of $O(1)$. Each bug seems minor in isolation; together they prevent learning.
+\end{enumerate}
+
+\textbf{Future directions.} (a)~The SFT$\to$GRPO two-phase pipeline: using SFT to teach format/parsing then GRPO to recover and improve search, combining the complementary strengths of both; (b)~per-benchmark strategy selection: different strategy prompts are optimal for different task types; (c)~training on unstructured aggregation tasks (OOLONG-style) to address OOD failure; (d)~multi-level recursion where RLMs call RLMs; (e)~larger evaluation suites ($N{\geq}100$) to reduce variance and establish statistical significance.
+
+Our results demonstrate that \textbf{RL can produce practical, open-weight recursive language models} that outperform their base models on long-context tasks, while revealing fundamental tradeoffs in training code-generation agents. The combination of SC-GRPO, careful training pipeline engineering, and comprehensive 14-benchmark evaluation provides a foundation for future work on recursive language models.
+
+\section*{Acknowledgements}
+
+This project was completed for CS234: Reinforcement Learning, Winter 2026 at Stanford University. Total compute: approximately 11.1 GPU-hours. Everything is available at \url{https://github.com/pythonomar22/rl4rlm}, including all source code, training code, trajectories that we SFTed and RLed on. Trained LoRA adapters are available on HuggingFace: \texttt{omar81939/rl4rlm-sft}, \texttt{omar81939/rl4rlm-star}, \texttt{omar81939/rl4rlm-dpo}, and \texttt{omar81939/rl4rlm-grpo-v4}.
+
+%% ============================================================
+%% APPENDIX (supplementary, does not count toward page limit)
+%% ============================================================
+\appendix
+
+\section{Trajectory Examples: Base vs.\ SFT vs.\ RL}
+\label{app:trajectories}
+
+We present representative trajectories showing how each training stage transforms model behavior. Appendix~\ref{app:dpo-trajectories} provides additional examples comparing DPO and RL-v3 on multi-needle tasks.
+
+\subsection{Example 1: Base Model Refuses to Search (NIAH, 5K doc)}
+
+\textbf{Task:} ``What is the budget total?'' Hidden answer: \texttt{CHARLIE-19} at position 0.50 in a 5,000-character document.
+
+\textbf{Base model (incorrect):}
+{\footnotesize
+\begin{verbatim}
+# The question is to find the total
+# budget, but the provided document
+# does not mention any budget info.
+# Therefore, the answer is not found.
+
+result = "not found"
+FINAL_VAR("result")
+\end{verbatim}
+}
+
+The base model \emph{assumes} the answer isn't there without searching. It generates a comment explaining its reasoning, then immediately returns ``not found.'' This is a fundamental failure: the model sees only metadata (``context is 5054 characters long'') but decides the document has no budget information without looking at the content.
+
+\textbf{SFT model (correct):}
+{\footnotesize
+\begin{verbatim}
+chunk_size = 20000
+chunks = [context[i:i+chunk_size]
+  for i in range(0, len(context),
+                  chunk_size)]
+budget_total = None
+for chunk in chunks:
+  answer = llm_query(
+    f"Find the budget total. "
+    f"If not found, say 'not found'."
+    f"\n\n{chunk}")
+  if "budget total" in answer.lower():
+    budget_total = answer
+    break
+FINAL_VAR("budget_total")
+\end{verbatim}
+}
+
+The SFT model learned the chunking pattern from training data: split into manageable chunks, query each with \texttt{llm\_query()}, check results, and return via \texttt{FINAL\_VAR()}. It finds ``CHARLIE-19'' in one turn. \textbf{This single pattern---chunk, query, aggregate---accounts for the entire 18pp improvement from SFT.}
+
+\subsection{Example 2: Multi-Needle Retrieval (3 needles, 10K doc)}
+
+\textbf{Task:} Find all 3 secret codes (\texttt{SECRET\_CODE\_QUEBEC: 7X9-BLUE}, etc.)
+
+Both base and SFT models generate nearly identical chunking code. The difference is in sub-call quality: the base model's \texttt{llm\_query()} returns ``not found'' for all chunks, while the SFT model's sub-calls correctly extract all three codes. This shows that \textbf{SFT improves not just the root model's code-writing but also the sub-call model's extraction ability}, since both share the same weights.
+
+\subsection{Example 3: RL Discovers Novel Strategy (5 needles, 20K doc)}
+
+\textbf{Task:} Find all 5 secret codes. Base model: 0/5. SFT model: 0/5. \textbf{RL model: 5/5.}
+
+This is the only task configuration where RL surpasses \emph{both} base and SFT. The RL model's generated code uses a slightly different prompt template for \texttt{llm\_query()} that produces better extraction from the sub-call model:
+
+{\footnotesize
+\begin{verbatim}
+answer = llm_query(
+  f"Find all secret codes. "
+  f"Format: 'SECRET_CODE_[NAME]:"
+  f" [VALUE]'.\n\n{chunk}")
+\end{verbatim}
+}
+
+Compared to the standard prompt (``Quote the relevant sentence. If not found say `not found'\,''), this version explicitly requests structured output, which the sub-call model handles more reliably. \textbf{RL discovered a better prompt for sub-calls}---a form of prompt optimization via policy gradient. This suggests RL's value lies not in improving code structure (SFT handles that) but in optimizing the \emph{content} of prompts passed to sub-calls.
+
+\section{Failed Experiments and Negative Results}
+\label{app:failures}
+
+\subsection{SFT-v1: Data Contamination Regression (68\% $\to$ 56\%)}
+
+Our first SFT attempt included error turns as positive training examples. Some turns contained Python syntax errors or incorrect FINAL usage. Additionally, the template-fixing script inadvertently changed correct answers in a few trajectories. The result was a model that \emph{learned to reproduce errors}, regressing from 68\% (base) to 56\% on NIAH.
+
+\textbf{Root cause:} The training data contained 87 trajectories, but some included turns where the REPL raised exceptions. We trained on all turns including these, teaching the model to generate error-producing code. The fix was strict filtering: only turns from correct trajectories with no errors.
+
+\textbf{Lesson:} For small models (1.7B), every training sample matters. Including even a small fraction of noisy samples can override the signal from correct ones. \emph{Data quality dominates data quantity.}
+
+\subsection{RL-v1: Reward Collapse on Easy Tasks}
+
+RL-v1 trained on NIAH tasks (5K--20K documents only) with binary reward. Starting from the SFT checkpoint (already 90\%+ on short documents), the model quickly reached $>$80\% accuracy on the training tasks. By step 10:
+\begin{itemize}
+    \item All $K{=}4$ trajectories per prompt were correct (reward = 1.0)
+    \item Group standard deviation: 0.0
+    \item Advantages: all zero (Equation~\ref{eq:grpo})
+    \item Policy loss: exactly 0.0
+\end{itemize}
+
+Training continued for 90 more steps with zero gradient signal. \textbf{When the model is already good at the task, binary GRPO collapses.} The group-relative advantage is zero whenever all $K$ trajectories have the same reward, which happens inevitably as the model improves.
+
+We attempted two fixes within RL-v1: (1) adding harder tasks (50K, 100K documents), and (2) increasing $K$ to 8. Neither resolved the collapse---the model adapted to the harder tasks within a few steps, and $K{=}8$ only delayed collapse by 2--3 steps. \textbf{Binary rewards appear insufficient for GRPO when the model's success rate exceeds} $\mathbf{1 - 1/K}$.
+
+\subsection{RL-v2: Training Instability Without KL}
+
+RL-v2 fixed reward collapse by using recall-based rewards on multi-needle tasks (continuous $r \in [0, 1]$). This produced genuine training signal, but revealed a new problem: \textbf{policy oscillation}.
+
+\begin{center}
+\begin{small}
+\begin{tabular}{rrrr}
+\toprule
+Step & Reward & Loss & Observation \\
+\midrule
+1--3 & 0.42 & 0.64 & Learning starts \\
+6--12 & 0.73 & 0.03 & Peak performance \\
+18--24 & 0.21 & $-0.14$ & Catastrophic drop \\
+27--30 & 0.76 & 0.75 & Partial recovery \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+
+The reward oscillates between 0.73 and 0.21, with the model alternating between good and degenerate policies. Without a KL penalty against the SFT reference, large GRPO updates push the policy far from its initialization. This is exactly the motivation for trust region methods (TRPO/PPO). Our RL-v3 experiment adds anchor regularization to address this (Section~\ref{sec:rl-v3}).
+
+\subsection{Position 0.25 Structural Weakness}
+
+Across all models, NIAH accuracy at needle position 0.25 (25\% through the document) is consistently lower:
+
+\begin{center}
+\begin{small}
+\begin{tabular}{lccccc}
+\toprule
+Model & 0.10 & 0.25 & 0.50 & 0.75 & 0.90 \\
+\midrule
+Base  & 80\% & 60\% & 80\% & 60\% & 80\% \\
+SFT   & 100\% & 80\% & 85\% & 90\% & 95\% \\
+RL-v2 & 100\% & 80\% & 95\% & 90\% & 95\% \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+
+Position 0.25 falls at the boundary between the first and second chunk when using 20K-character chunks on documents $\geq$50K characters. This appears to be a \textbf{structural limitation of the chunking strategy}---the needle falls between chunk boundaries. Fixing this likely requires changing the chunking approach (e.g., overlapping windows), which is a scaffold modification, not a training improvement. (Position breakdown is shown for Base, SFT, and RL-v2 only; we did not collect per-position data for later models.)
+
+\section{RL-v3: KL-Regularized GRPO}
+\label{sec:rl-v3}
+
+Based on the analysis in Section~\ref{sec:training-dynamics} and Appendix~\ref{app:failures}, we implement an improved RL training run (RL-v3) with two key changes:
+
+\begin{enumerate}
+    \item \textbf{Anchor regularization (KL proxy).} We add an L2 penalty on LoRA weight drift from the SFT reference: $\mathcal{L}_\text{KL} = \beta \cdot \|\theta - \theta_\text{ref}\|^2 / d$, where $d$ is the number of LoRA parameters.
+    \item \textbf{Mixed-task training.} We interleave NIAH and multi-NIAH tasks, using composite reward for NIAH and recall reward for multi-NIAH.
+\end{enumerate}
+
+Hyperparameters: $\beta = 0.02$, 40 steps, $K=4$, batch 2, learning rate $5{\times}10^{-6}$. Total training: 3297s (0.92 GPU-hours).
+
+\textbf{Result: KL regularization was ineffective.} The L2 penalty normalized by $d{=}17.4$M parameters produced values of order $10^{-10}$. With $\beta{=}0.02$, the KL loss was 0.000000 at every step. The regularization contributed nothing to the training objective.
+
+\textbf{Training dynamics} showed reduced oscillation compared to RL-v2 (amplitude 0.383 vs.\ 0.548), likely due to implicit regularization from mixed-task training rather than the KL penalty. However, step 27 exhibited complete GRPO collapse (all trajectories received identical rewards, producing zero gradient).
+
+\textbf{Evaluation results were stark:} RL-v3 achieved 90\% on NIAH (matching SFT) and 83.9\% on DocClassify (highest among the first six models), but catastrophically regressed to \textbf{41.4\%} on Multi-NIAH---worse than the untrained base model (38.3\%). Examining outputs reveals degenerate behavior: the model repeats a single found value hundreds of times or outputs sequential numbers. This is the most severe policy collapse observed in our experiments.
+
+\textbf{Lesson:} Weight-space KL proxies are fundamentally inadequate for LoRA-parameterized models. Small LoRA weight changes can produce large distributional shifts in the output space. Proper token-level KL divergence requires a reference model forward pass at each training step---significantly more expensive but necessary for stability. The failure of RL-v3 on Multi-NIAH, despite the same training data working well for STaR (58.4\%), confirms that \textbf{the optimization algorithm, not the data, appears to be the primary bottleneck for RL on RLMs}.
+
+\section{Trajectory Examples: DPO vs.\ RL-v3}
+\label{app:dpo-trajectories}
+
+The most striking illustration of the implementation fixes comes from comparing DPO and RL-v3 trajectories on multi-needle tasks. \textbf{Both models generate nearly identical root-level code}, but produce completely different results due to the quality of their sub-call outputs.
+
+\subsection{Same Code, Different Sub-Call Quality (5 needles, 20K doc)}
+
+\textbf{Task:} Find all 5 secret codes (\texttt{SECRET\_CODE\_[NAME]: [VALUE]}) in a 20K-character document.
+
+\textbf{DPO model (correct, 5/5 needles found):}
+{\footnotesize
+\begin{verbatim}
+chunks = [context[i:i+20000]
+  for i in range(0,len(context),20000)]
+results = []
+for chunk in chunks:
+  answer = llm_query(
+    f"Find all secret codes."
+    f" Format: 'SECRET_CODE_[NAME]:"
+    f" [VALUE]'. Return ONLY values"
+    f" as comma-separated list."
+    f"\n\n{chunk}")
+  if "not found" not in answer.lower():
+    results.append(answer)
+result = ",".join(results) \
+  if results else "not found"
+FINAL_VAR("result")
+\end{verbatim}
+}
+
+Result: \texttt{UC7-CHROME, 0R9-CYAN, 1N8-BLACK, 7X9-BLUE, DK6-AMBER}. The sub-call model correctly extracts all five codes. Total cost: 22K input tokens, 12 sub-calls, 8 seconds.
+
+\textbf{RL-v3 model (degenerate, 0/5 needles found):}
+{\footnotesize
+\begin{verbatim}
+# Identical root code as DPO above
+chunks = [context[i:i+20000]
+  for i in range(0,len(context),20000)]
+results = []
+for chunk in chunks:
+  answer = llm_query(
+    f"Find all secret codes."
+    f" Format: 'SECRET_CODE_[NAME]:"
+    f" [VALUE]'. Return only values"
+    f" as comma-separated list."
+    f"\n\n{chunk}")
+  if "not found" not in answer.lower():
+    results.append(answer)
+result = ",".join(results) \
+  if results else "not found"
+FINAL_VAR("result")
+\end{verbatim}
+}
+
+Result: \texttt{3, 4, 5, 6, 7, ..., 226, 227, 228, SECRET\_CODE\_[NAME]: [VALUE]}. The sub-call model generates a sequence of numbers instead of extracting codes, then appends the literal template string. Total cost: 588K input tokens, 238 sub-calls, 42 seconds ($27\times$ more expensive than DPO for a worse result).
+
+\textbf{Analysis.} The root model's code-writing ability is nearly identical between DPO and RL-v3---both learned the chunking pattern from SFT. The difference is in the \emph{sub-call model's} extraction quality. Since root and sub-call share the same weights, RL training affects both. We believe RL-v3's unconditional log-probability computation corrupted the sub-call model: it learned to unconditionally generate numeric sequences (which appeared in high-reward training trajectories) regardless of the input. DPO, trained with conditioned log-probabilities, preserves the sub-call model's ability to respond appropriately to different inputs.
+
+\section{Full Training Dynamics}
+\label{app:training-dynamics}
+
+\subsection{SFT Training Curve}
+
+SFT training converges rapidly: loss drops from 2.1 to 0.3 within 50 steps (1 epoch). By epoch 5, loss stabilizes at 0.15. The entire SFT training takes 34 seconds on 1 H200, producing the largest performance gain of any stage (+18pp on NIAH). This extreme efficiency ($<$1 minute to train) underscores that the RLM API is a narrow, learnable skill for small models.
+
+\subsection{Compute Budget}
+
+\begin{center}
+\begin{footnotesize}
+\begin{tabular}{lrr}
+\toprule
+Phase & Time & GPU-h \\
+\midrule
+Traj.\ collection (150) & 38 min & 0.63 \\
+SFT training (5 ep.) & 34 sec & 0.01 \\
+RL-v1 training (100 st.) & 17 min & 0.29 \\
+RL-v2 training (30 st.) & 88 min & 1.47 \\
+STaR collection (74) & 30 min & 0.50 \\
+STaR SFT (5 ep.) & 32 sec & 0.01 \\
+RL-v3 training (40 st.) & 55 min & 0.92 \\
+DPO (gen.\ + train) & 92 min & 1.53 \\
+GRPO-v4 (30 st.) & 106 min & 1.76 \\
+Evals ($\times$8 models) & ${\sim}$4 hr & ${\sim}$4.0 \\
+\midrule
+\textbf{Total} & ${\sim}$11 hr & ${\sim}$\textbf{11.1} \\
+\bottomrule
+\end{tabular}
+\end{footnotesize}
+\end{center}
+
+The total project cost is $\sim$11.1 GPU-hours on a single H200. For comparison, Zhang et al.~\cite{zhang2026rlm} used 48 H100-hours for SFT alone on Qwen3-8B. Our 1.7B model enables $\sim$4$\times$ faster iteration even with eight model configurations, validating the small-model research strategy.
+
+\bibliography{references}
+\bibliographystyle{icml2018}
+
+\end{document}

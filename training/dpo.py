@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 """
+
+DEPRECATED: This script was written for local GPU training (Qwen3-1.7B on 8xH200).
+For Tinker API training, use the corresponding *_tinker.py version instead.
 DPO (Direct Preference Optimization) training for RLM.
 
 Approach:

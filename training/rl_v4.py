@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 """
+
+DEPRECATED: This script was written for local GPU training (Qwen3-1.7B on 8xH200).
+For Tinker API training, use the corresponding *_tinker.py version instead.
 GRPO-v4: Proper Group Relative Policy Optimization for RLM.
 
 Fixes over previous GRPO (rl.py):

@@ -1,6 +1,6 @@
 data/
 results/
-icmltemplate/
+checkpoints/
 __pycache__/
 *.pyc
 .env

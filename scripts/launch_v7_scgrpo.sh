@@ -10,7 +10,12 @@
 # Usage: bash scripts/launch_v7_scgrpo.sh <model-path>
 # Example: bash scripts/launch_v7_scgrpo.sh "tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005"
 
-MODEL_PATH="${1:-tinker://74615872-6b0b-50ba-bcbc-7c0b6a92abe3:train:0/weights/state-0005}"
+if [ -z "$1" ]; then
+    echo "Usage: bash scripts/launch_v7_scgrpo.sh <model-path>"
+    echo "  model-path: tinker:// path to base or checkpoint state"
+    exit 1
+fi
+MODEL_PATH="$1"
 
 echo "Launching GRPO V7 (SC-GRPO) training"
 echo "  Model path: $MODEL_PATH"

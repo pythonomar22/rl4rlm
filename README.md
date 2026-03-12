@@ -1,173 +1,150 @@
-# Reinforcement Learning for Recursive Language Models
+# RLM-Qwen3.5-35B: A Natively Recursive Language Model
 
-Training [Recursive Language Models](https://arxiv.org/abs/2502.14155) (RLMs) via reinforcement learning. We train Qwen3-1.7B to solve long-context tasks by writing Python code in a REPL, decomposing inputs programmatically via `llm_query()` sub-calls.
+Training [Recursive Language Models](https://arxiv.org/abs/2502.14155) (RLMs) via reinforcement learning. We train **Qwen3.5-35B-A3B** (MoE, 35B total / 3B active) to solve long-context tasks by writing Python code in a persistent REPL, recursively decomposing inputs via `llm_query()` sub-calls.
 
-**Key result:** RL (DPO, GRPO) improves multi-needle retrieval from 58% to 88% over SFT — but only after fixing two subtle implementation bugs. Naive GRPO catastrophically regresses to 41%.
+## Key Results
 
-## Results
+| Benchmark (N) | Base | RLM-V11 | Delta |
+|----------------|------|---------|-------|
+| NIAH (20) | 60.0% | **80.0%** | +20.0 |
+| Multi-NIAH (20) | 91.5% | 87.8% | -3.7 |
+| Doc-Classify (20) | 81.6% | **99.2%** | +17.6 |
+| DataFrame QA (20) | **54.0%** | 40.0% | -14.0 |
+| Code Debug (15) | 25.6% | 25.6% | 0.0 |
+| Multi-Hop QA (20) | 85.0% | 80.0% | -5.0 |
+| Notebook QA (15) | 70.0% | 66.7% | -3.3 |
+| Hard NIAH (15) | 93.3% | **100.0%** | +6.7 |
+| Verbatim Copy (10) | 100.0% | 100.0% | 0.0 |
+| OOLONG (10) | 0.0% | **20.0%** | +20.0 |
+| Hard Multi-Hop (10) | 40.0% | **50.0%** | +10.0 |
+| Event Counting (20) | 57.2% | **72.9%** | +15.7 |
+| Cross-Doc Compare (12) | 43.0% | 24.4% | -18.6 |
+| Key-Value Retrieval (12) | 51.3% | 36.1% | -15.2 |
+| **Average (14)** | **60.9%** | **63.0%** | **+2.1** |
 
-| Model | NIAH (100) | Multi-NIAH (24) | DocCls (20) | Avg |
-|-------|-----------|----------------|------------|-----|
-| Base (Qwen3-1.7B) | 72.0 | 38.3 | 80.3 | 63.5 |
-| SFT | 90.0 | 57.9 | 82.4 | 76.8 |
-| STaR (iterative SFT) | 87.0 | 58.4 | 83.4 | 76.3 |
-| RL-v3 (buggy GRPO) | 90.0 | 41.4 | 83.9 | 71.8 |
-| **DPO** | 83.0 | **87.9** | 82.6 | **84.5** |
-| **GRPO-v4** | 82.0 | 85.1 | 83.2 | 83.4 |
+**RLM-V11**: GRPO RL training (11 steps from base, LoRA rank 32).
+Trained on Tinker API. Evaluated on 14 diverse benchmarks spanning search, extraction, comparison, and counting.
 
-Total compute: ~11 GPU-hours on a single H200.
+### Key Findings
+
+1. **+20pp on needle-in-haystack search** (NIAH 60% -> 80%, OOLONG 0% -> 20%) — RL teaches better chunking and extraction strategies.
+
+2. **Specialization-generalization tradeoff** — RL improves search/classification tasks but regresses structured extraction (DataFrame QA -14pp, Cross-Doc -19pp). Training teaches format-rigid parsing that breaks on diverse output formats.
+
+3. **Strategy-Conditioned GRPO (SC-GRPO)** — novel training method that assigns random strategy prompts per trajectory, eliminating mode collapse (0% degenerate outputs vs 60% with standard GRPO).
+
+4. **Strategy amplification** — RL training's primary value is making models responsive to prompt-level strategy guidance. Strategy prompts alone provide +5.5pp average, while training alone provides +0.9pp — but training enables strategy-specific gains impossible without it.
 
 ## What is an RLM?
 
-An RLM places the full input in a Python REPL as the variable `context`, then the model writes code to decompose, search, and aggregate over it. The model never sees the full input in its context window — it interacts with it programmatically:
+The full input **never enters the LLM's context window**. Instead:
+1. Input stored as `context` variable in a Python REPL
+2. LLM sees only metadata (length, prefix, available functions)
+3. LLM writes code: chunk context, call `llm_query()` on chunks, aggregate
+4. `llm_query(text)` invokes a fresh LLM call on a substring — the recursive call
+5. LLM calls `FINAL(answer)` when done
+
+This lets a model with a 32K context window process **millions of tokens** with no degradation.
 
 ```python
 # Model generates code like this:
-chunk_size = 20000
-chunks = [context[i:i+chunk_size] for i in range(0, len(context), chunk_size)]
+chunk_size = 15000
+overlap = 2000
 results = []
-for chunk in chunks:
-    answer = llm_query(f"Find the secret code in:\n{chunk}")
+for i in range(0, len(context), chunk_size - overlap):
+    chunk = context[i:i + chunk_size]
+    answer = llm_query(f"Find the secret code in this text:\n{chunk}")
     if "not found" not in answer.lower():
         results.append(answer)
-FINAL_VAR("results")
-```
-
-## Why RL Failed (and What Fixed It)
-
-Our initial GRPO implementations (v1-v3) all failed. We traced the failures to two bugs:
-
-1. **Unconditional log-probabilities.** Policy loss was computed on raw code text without the conversation context (system prompt, task metadata, REPL feedback). This trained the model to produce/avoid code patterns unconditionally, causing degenerate repetitive outputs.
-
-2. **Weight-space KL proxy.** L2 penalty `||θ - θ_ref||² / d` normalized by 17.4M LoRA parameters produced ~zero regularization. Token-level KL via a frozen reference model is needed.
-
-After fixing both — conditioning log-probs on the full conversation and using token-level KL — both DPO and GRPO-v4 produce dramatic improvements with no degenerate outputs.
-
-## Project Structure
-
-```
-scaffold/          # RLM infrastructure
-  repl.py          # Python REPL environment
-  rlm.py           # Main RLM loop
-  llm_query.py     # Sub-call model wrapper
-  prompts/         # System prompts
-
-training/          # Training methods
-  sft.py           # LoRA supervised fine-tuning
-  rl.py            # GRPO v1-v3 (original, buggy)
-  rl_v4.py         # GRPO v4 (fixed: conditioned log-probs + token-level KL)
-  dpo.py           # Direct Preference Optimization
-  logprobs.py      # Shared conditioned log-prob utilities
-  rewards.py       # Reward functions
-
-eval/              # Evaluation
-  run_eval.py      # Evaluation harness
-  benchmarks/      # NIAH, Multi-NIAH, Document Classification
-
-scripts/           # Data collection & analysis
-  collect_trajectories.py   # Self-bootstrap trajectory collection
-  collect_star_v2.py        # STaR iterative collection
-  filter_trajectories.py    # Trajectory cleaning
-  fix_templates.py          # Fix FINAL/FINAL_VAR template errors
-  analyze_results.py        # Results analysis
-
-data/              # Checkpoints, trajectories, training data
-  sft/             # All model checkpoints (LoRA adapters)
-  trajectories/    # Raw collected trajectories
-  filtered/        # Cleaned SFT training samples
-
-results/           # Evaluation results (JSON)
-
-ideas/             # Experiment records (hypothesis → results → conclusion)
+FINAL(results[0] if results else "Not found")
 ```
 
 ## Setup
 
 ```bash
-# Requires Python 3.11+, CUDA GPU
+# Requires Python 3.11+
 uv sync
 
-# Or with pip
-pip install -e .
+# Set Tinker API key
+cp .env.example .env
+# Edit .env with your Tinker API key
 ```
 
-Base model: [Qwen/Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B) (downloaded automatically).
+## Project Structure
 
-## Training Pipeline
+```
+scaffold/              # RLM runtime (model-agnostic)
+  repl.py              # Persistent Python REPL with sandboxing
+  rlm.py               # Main RLM loop (Algorithm 1 from the paper)
+  llm_query.py         # Model wrappers (Tinker API)
+  prompts/             # System prompts per model
 
-### 1. Trajectory Collection (self-bootstrap)
+eval/                  # Evaluation harness
+  run_eval.py          # Eval runner (14 benchmarks)
+  benchmarks/          # Benchmark generators (pure Python)
+
+training/              # Training scripts (Tinker API)
+  rl_tinker_v6.py      # GRPO / SC-GRPO training
+  sft_tinker.py        # Supervised fine-tuning
+  dpo_tinker.py        # Direct Preference Optimization
+  rewards.py           # Reward functions
+
+scripts/               # Data pipeline & utilities
+ideas/                 # Experiment notes & research documents
+```
+
+## Training Pipeline (Tinker API)
+
+### 1. Evaluate Base Model
 ```bash
-CUDA_VISIBLE_DEVICES=0 uv run python scripts/collect_trajectories.py \
-  --model Qwen/Qwen3-1.7B --n-tasks 150
+uv run python eval/run_eval.py \
+    --model Qwen/Qwen3.5-35B-A3B \
+    --benchmark all --n-tasks 20 \
+    --experiment-name baseline
 ```
 
-### 2. Filter & Clean
+### 2. GRPO Training (SC-GRPO)
 ```bash
-uv run python scripts/filter_trajectories.py \
-  --input data/trajectories/<run_dir> --output data/filtered/sft_samples.jsonl
+uv run python training/rl_tinker_v6.py \
+    --model Qwen/Qwen3.5-35B-A3B \
+    --steps 10 --K 8 --batch-size 4 --lr 1e-6 \
+    --strategy-conditioning \
+    --experiment-name grpo_v11
 ```
 
-### 3. SFT
+### 3. Evaluate Trained Model
 ```bash
-CUDA_VISIBLE_DEVICES=0 uv run python training/sft.py \
-  --model Qwen/Qwen3-1.7B --data data/filtered/sft_samples.jsonl \
-  --output data/sft/lora_v2
+uv run python eval/run_eval.py \
+    --model Qwen/Qwen3.5-35B-A3B \
+    --model-path "tinker://SESSION:train:0/weights/state-0005" \
+    --benchmark all --n-tasks 20 \
+    --experiment-name eval_v11_s5
 ```
 
-### 4. STaR (iterative SFT on harder tasks)
-```bash
-CUDA_VISIBLE_DEVICES=0 uv run python scripts/collect_star_v2.py \
-  --model data/sft/lora_v2/final --base-model Qwen/Qwen3-1.7B
+## Benchmarks (14 total)
 
-uv run python training/sft.py \
-  --model Qwen/Qwen3-1.7B --data data/filtered/sft_samples_v3_combined.jsonl \
-  --output data/sft/lora_v3
-```
-
-### 5a. DPO
-```bash
-CUDA_VISIBLE_DEVICES=0 uv run python training/dpo.py \
-  --model data/sft/lora_v3/final --base-model Qwen/Qwen3-1.7B \
-  --output data/sft/dpo_v1 --k 8 --beta 0.1 --lr 5e-6 --epochs 3
-```
-
-### 5b. GRPO-v4
-```bash
-CUDA_VISIBLE_DEVICES=0 uv run python training/rl_v4.py \
-  --model data/sft/lora_v3/final --base-model Qwen/Qwen3-1.7B \
-  --output data/sft/rl_v4 --k 8 --kl-coeff 0.05 --steps 30
-```
-
-### Evaluation
-```bash
-CUDA_VISIBLE_DEVICES=0 uv run python eval/run_eval.py \
-  --model data/sft/dpo_v1/final --base-model Qwen/Qwen3-1.7B \
-  --benchmark all --experiment-name eval_dpo_v1
-```
-
-## Checkpoints
-
-All checkpoints are LoRA adapters (67MB each) on top of `Qwen/Qwen3-1.7B`:
-
-| Checkpoint | Description | Avg |
-|-----------|-------------|-----|
-| `data/sft/lora_v2/final` | SFT on 87 self-bootstrap trajectories | 76.8 |
-| `data/sft/lora_v3/final` | STaR (iterative SFT, 132 trajectories) | 76.3 |
-| `data/sft/rl_v3/final` | GRPO-v3 (buggy, degenerate outputs) | 71.8 |
-| `data/sft/dpo_v1/final` | DPO (best model) | **84.5** |
-| `data/sft/rl_v4/final` | GRPO-v4 (fixed) | 83.4 |
-
-## Benchmarks
-
-- **NIAH-100**: Single needle-in-a-haystack retrieval. 5 document lengths (5K-100K chars) x 5 needle positions x 4 seeds.
-- **Multi-NIAH-24**: Retrieve K needles from one document. K in {3, 5, 8, 10}.
-- **DocCls-20**: Classify N documents into 6 categories. N in {5, 10, 15, 20}.
+| Benchmark | Type | Complexity | Description |
+|-----------|------|------------|-------------|
+| NIAH | Search | O(1) | Single needle in 5K-100K chars |
+| Multi-NIAH | Search | O(K) | K=3-10 needles in 10K-100K chars |
+| Hard NIAH | Search | O(1) | Adversarial distractors |
+| Doc-Classify | Classification | O(N) | N=5-20 articles into 6 categories |
+| DataFrame QA | Extraction | O(N) | Tabular data analysis on CSV |
+| Code Debug | Extraction | O(N) | Bug finding in codebases |
+| Multi-Hop QA | Reasoning | O(K) | 2-3 hop cross-reference chains |
+| Hard Multi-Hop | Reasoning | O(K) | 3-5 hop chains across 10+ entities |
+| Notebook QA | Extraction | O(N) | Jupyter notebook analysis |
+| Event Counting | Counting | O(N) | Count/aggregate events in logs |
+| Cross-Doc Compare | Comparison | O(N^2) | Cross-document entity comparison |
+| Key-Value Retrieval | Search | O(1) | Exact key lookup in large maps |
+| Verbatim Copy | Reproduction | O(N) | Faithfully reproduce context segments |
+| OOLONG | External | O(N) | Real D&D transcript aggregation |
 
 ## Citation
 
 ```bibtex
-@misc{omar2026rlrlm,
-  title={Reinforcement Learning for Training Natively Recursive Language Models on Long-Context Tasks},
+@misc{omar2026rlm35b,
+  title={Training Natively Recursive Language Models: Strategy-Conditioned GRPO for Long-Context Code Generation},
   author={Simon Omar},
   year={2026},
   howpublished={CS234 Final Project, Stanford University}
@@ -177,7 +154,10 @@ All checkpoints are LoRA adapters (67MB each) on top of `Qwen/Qwen3-1.7B`:
 ## References
 
 - [Recursive Language Models (Zhang, Kraska, Khattab 2026)](https://arxiv.org/abs/2502.14155)
-- [GRPO / DeepSeek-R1](https://arxiv.org/abs/2501.12948)
-- [DPO (Rafailov et al. 2023)](https://arxiv.org/abs/2305.18290)
-- [STaR (Zelikman et al. 2022)](https://arxiv.org/abs/2203.14465)
-- [LoRA (Hu et al. 2022)](https://arxiv.org/abs/2106.09685)
+- [GRPO / DeepSeek-R1 (Guo et al. 2025)](https://arxiv.org/abs/2501.12948)
+- [Tinker Training API](https://github.com/thinking-machines-lab/tinker-cookbook)
+- [OOLONG Benchmark (Beltagy et al. 2025)](https://arxiv.org/abs/2511.02817)
+
+## License
+
+MIT
