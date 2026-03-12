@@ -168,6 +168,17 @@ def rlm(
             turn_record["tokens"] = model.last_tokens
 
         if code is None:
+            # Check for gibberish (MoE routing failure) — abort early to save time
+            if len(response) > 200:
+                non_ascii = sum(1 for c in response if ord(c) > 127)
+                if non_ascii / len(response) > 0.15:
+                    error_msg = "Gibberish detected (MoE routing failure). Aborting."
+                    turn_record["error"] = error_msg
+                    trajectory.turns.append(turn_record)
+                    if verbose:
+                        logger.warning(f"Turn {iteration + 1}: Gibberish detected, aborting trajectory")
+                    break
+
             # Model didn't produce parseable code
             error_msg = (
                 "Could not parse Python code from your response. "
