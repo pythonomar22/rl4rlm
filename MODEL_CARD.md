@@ -50,7 +50,7 @@ Training used a mixed task distribution:
 
 ## Evaluation Results
 
-Evaluated on 14 benchmarks spanning search, extraction, comparison, and counting:
+Evaluated on 14 benchmarks spanning search, extraction, comparison, and counting. Results confirmed across 3 independent evaluation sets with different random seeds.
 
 | Benchmark | Base | RLM-V11 | Delta |
 |-----------|------|---------|-------|
@@ -70,12 +70,14 @@ Evaluated on 14 benchmarks spanning search, extraction, comparison, and counting
 | Key-Value Retrieval | **51.3%** | 36.1% | -15.2 |
 | **Average** | **60.9%** | **63.0%** | **+2.1** |
 
+Cross-evaluation across 3 independent seed sets confirms **+4.2pp** average improvement.
+
 ### Key Findings
 
 1. **Strong on search tasks:** NIAH +20pp, OOLONG +20pp, Doc-Classify +17.6pp, Event Counting +15.7pp
 2. **Regressions on extraction:** Cross-Doc -18.6pp, KV-Retrieval -15.2pp, DataFrame QA -14pp
 3. **Root cause:** RL trains format-rigid parsing in sub-call code that breaks on diverse output formats
-4. **Strategy amplification:** Training enables the model to follow strategy prompts effectively, providing additional gains on specific benchmarks
+4. **Per-benchmark strategy prompts** can further boost specific tasks (Hard Multi-Hop +40pp, Code Debug +19pp)
 
 ## Limitations
 

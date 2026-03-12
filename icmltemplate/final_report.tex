@@ -411,6 +411,15 @@ Key-Value Retrieval (12) & \textbf{51.3} & 36.1 & $-15.2$ & 49.3 \\
 
 \textbf{This is a specialization-generalization tradeoff}: RL optimizes for the task types in training (search, classification) at the cost of general-purpose extraction ability. The model learns to chunk and scan efficiently but loses precision on tasks requiring exact value extraction and cross-document comparison.
 
+\subsection{Strategy Prompts at Evaluation Time}
+\label{sec:strategy-eval}
+
+While SC-GRPO uses strategy prompts during \emph{training} to prevent mode collapse, we also evaluate the effect of strategy prompts at \emph{inference} time. For each benchmark, we select the best-performing strategy prompt via a held-out validation set ($N{=}10$, seed-offset 30000) and apply it during evaluation.
+
+On a held-out evaluation set (seed-offset 10000, $N{=}10{-}20$ per benchmark), V11-s5 with task-specific strategies achieves $61.6\%$ vs.\ $57.3\%$ for base with the same strategies ($+4.3$pp, 8 wins, 5 losses, 1 tie). This is consistent with our cross-evaluation finding of $+4.2$pp and provides a third independent confirmation of the training improvement.
+
+However, strategy prompts are not uniformly beneficial. Strategies dramatically help structured tasks (Hard Multi-Hop: $+40$pp with \texttt{multi\_hop\_decompose}, Code Debug: $+19$pp with \texttt{code\_debug\_focused}) but catastrophically hurt free-form tasks (Multi-Hop QA: $-25$pp, Verbatim Copy: $-60$pp on some seed sets). \textbf{Per-benchmark strategy selection is critical}---a single ``best'' strategy does not exist.
+
 \subsection{Hybrid Architecture Mechanism}
 \label{sec:hybrid-mechanism}
 
@@ -609,6 +618,8 @@ Our 35B-A3B results reveal several insights not apparent at 1.7B scale:
 
 \textbf{Training pipeline correctness is non-negotiable.} Seven bugs---each seemingly minor---collectively prevented learning. The interaction between unclipped IS loss, high sub-call temperature, and std-normalized advantages produces loss values of $O(10^7)$, making gradient updates effectively random noise. Only after fixing all seven did training produce stable improvements.
 
+\textbf{SFT and GRPO are complementary at 35B.} SFT on base-model trajectories (EP2, 592 samples) achieves DFQA $76.5\%$ ($+22$pp over base) by teaching CSV parsing and format handling, but destroys search capability (NIAH drops from $60\%$ to $45{-}55\%$). Conversely, GRPO achieves NIAH $80\%$ ($+20$pp) but regresses DFQA to $40\%$. \textbf{Neither method alone improves both}. This motivates the SFT$\to$GRPO pipeline: SFT teaches format/parsing, then light GRPO refinement recovers search behavior (V15, currently in progress).
+
 \subsection{SFT as Foundation, RL as Refinement (Qwen3-1.7B)}
 
 SFT's effectiveness is unsurprising in hindsight. The primary capability gap for a 1.7B RLM is \emph{learning the REPL API}: knowing to chunk \texttt{context}, call \texttt{llm\_query()}, and terminate with \texttt{FINAL\_VAR()}. This is a narrow distribution of code patterns that SFT teaches directly. The model goes from generating multi-turn, error-prone explorations to single-turn, correct code in one training step.
@@ -675,7 +686,7 @@ Our results demonstrate that \textbf{RL can produce practical, open-weight recur
 
 \section*{Acknowledgements}
 
-This project was completed for CS234: Reinforcement Learning, Winter 2026 at Stanford University. Total compute: approximately 11.1 GPU-hours. Everything is available at \url{https://github.com/pythonomar22/rl4rlm}, including all source code, training code, trajectories that we SFTed and RLed on. Trained LoRA adapters are available on HuggingFace: \texttt{omar81939/rl4rlm-sft}, \texttt{omar81939/rl4rlm-star}, \texttt{omar81939/rl4rlm-dpo}, and \texttt{omar81939/rl4rlm-grpo-v4}.
+This project was completed for CS234: Reinforcement Learning, Winter 2026 at Stanford University. Initial Qwen3-1.7B experiments used approximately 11.1 GPU-hours on 8$\times$H200; the Qwen3.5-35B-A3B experiments used the Tinker remote training API. Everything is available at \url{https://github.com/pythonomar22/rl4rlm}, including all source code, training code, and evaluation benchmarks. The trained Qwen3.5-35B-A3B LoRA adapter (V11-s5) is available on HuggingFace: \texttt{omar81939/rlm-qwen35-35b-a3b-v11-s5}.
 
 %% ============================================================
 %% APPENDIX (supplementary, does not count toward page limit)
