@@ -180,7 +180,10 @@ TASK_STRATEGY_WEIGHTS = {
     # V10: Regression-targeted strategy weights
     "notebook_qa": {"notebook_sequential": 0.35, "precision_extract": 0.25, "extract_compute": 0.2, "small_chunks": 0.2},
     "dataframe_qa": {"table_preserve": 0.4, "extract_compute": 0.3, "precision_extract": 0.2, "standard": 0.1},
-    "cross_doc_compare": {"cross_doc_separate": 0.4, "two_pass": 0.25, "map_reduce": 0.2, "extract_compute": 0.15},
+    # V10 cross_doc strategy (DEPRECATED — cross_doc_separate hurts metric_comparison subtasks)
+    # "cross_doc_compare": {"cross_doc_separate": 0.4, "two_pass": 0.25, "map_reduce": 0.2, "extract_compute": 0.15},
+    # V11 fix: use generic strategies that let the model discover its own comparison approach
+    "cross_doc_compare": {"standard": 0.3, "two_pass": 0.3, "map_reduce": 0.2, "extract_compute": 0.2},
     "key_value_retrieval": {"lookup_thorough": 0.4, "binary_search": 0.25, "small_chunks": 0.2, "precision_extract": 0.15},
 }
 
@@ -364,6 +367,84 @@ def _compute_code_diversity(trajectories: list[dict]) -> list[float]:
 
 
 # ============================================================================
+# Per-turn credit assignment (V13 NEW)
+# ============================================================================
+
+def compute_per_turn_advantages(trajectory_dict: dict, base_advantage: float) -> list[float]:
+    """Compute per-turn advantage weights that sum to len(turns) * base_advantage.
+
+    Instead of giving every turn the same advantage, weight turns by their contribution:
+    - FINAL turns (produced the answer): 1.5x
+    - Turns with llm_query sub-calls: 1.0x
+    - Setup/print turns: 0.7x
+    - Error turns in successful trajectories: 0.3x
+    - For failed trajectories: timeout turns get 1.5x blame, error turns 1.2x
+    """
+    turns = trajectory_dict.get("turns", [])
+    if not turns:
+        return []
+
+    score = trajectory_dict.get("score", 0)
+    succeeded = score >= 0.5
+
+    raw_weights = []
+    for turn in turns:
+        code = turn.get("parsed_code") or ""
+        has_final = "FINAL(" in code or "FINAL_VAR(" in code
+        has_subcall = "llm_query(" in code
+        has_error = bool(turn.get("error"))
+        has_timeout = "timeout" in str(turn.get("error", "")).lower()
+
+        if succeeded:
+            # Successful trajectory: reward the important turns more
+            if has_final:
+                raw_weights.append(1.5)
+            elif has_error:
+                raw_weights.append(0.3)  # Errors in successful traj = lucky recovery
+            elif has_subcall:
+                raw_weights.append(1.0)
+            else:
+                raw_weights.append(0.7)  # Setup/print turns
+        else:
+            # Failed trajectory: blame the problematic turns more
+            if has_timeout:
+                raw_weights.append(1.5)  # Timeouts are the biggest failure mode
+            elif has_error:
+                raw_weights.append(1.2)
+            elif has_final:
+                raw_weights.append(1.3)  # Wrong FINAL is a key failure point
+            else:
+                raw_weights.append(1.0)
+
+    # Normalize so mean weight = 1.0 (preserves total gradient magnitude)
+    mean_w = sum(raw_weights) / len(raw_weights) if raw_weights else 1.0
+    if mean_w > 0:
+        normalized = [w / mean_w for w in raw_weights]
+    else:
+        normalized = [1.0] * len(raw_weights)
+
+    return [base_advantage * w for w in normalized]
+
+
+def is_gibberish_trajectory(trajectory_dict: dict) -> bool:
+    """Detect trajectories with multilingual gibberish (MoE routing failure).
+
+    Returns True if trajectory contains significant non-ASCII noise.
+    """
+    turns = trajectory_dict.get("turns", [])
+    for turn in turns:
+        code = turn.get("parsed_code") or turn.get("raw_response") or ""
+        if len(code) < 50:
+            continue
+        # Count non-ASCII characters (excluding common symbols)
+        non_ascii = sum(1 for c in code if ord(c) > 127)
+        ratio = non_ascii / len(code) if code else 0
+        if ratio > 0.15:  # More than 15% non-ASCII = gibberish
+            return True
+    return False
+
+
+# ============================================================================
 # Training data conversion
 # ============================================================================
 
@@ -372,6 +453,7 @@ def trajectory_to_training_data(
     advantage: float,
     renderer,
     tokenizer,
+    per_turn_advantages: list[float] | None = None,
 ) -> list[tinker.Datum]:
     """Convert trajectory to cross_entropy training data (fallback when no logprobs)."""
     data = []
@@ -380,6 +462,7 @@ def trajectory_to_training_data(
     if not all_messages:
         return data
 
+    assistant_idx = 0
     for i, msg in enumerate(all_messages):
         if msg["role"] != "assistant":
             continue
@@ -399,11 +482,12 @@ def trajectory_to_training_data(
                 weights_list = list(weights)
             weights_shifted = weights_list[1:len(target_tokens) + 1]
 
-            # V9 FIX: With Dr. GRPO (no std normalization), advantages are raw
-            # (typically -1 to +1). With MaxRL, can be up to ~8.
-            # Clamp to ±3 to prevent gradient explosions while preserving
-            # MaxRL's signal amplification.
-            advantage_weight = max(min(advantage, 3.0), -3.0)
+            # Use per-turn advantage if available, otherwise use uniform advantage
+            if per_turn_advantages is not None and assistant_idx < len(per_turn_advantages):
+                turn_advantage = per_turn_advantages[assistant_idx]
+            else:
+                turn_advantage = advantage
+            advantage_weight = max(min(turn_advantage, 3.0), -3.0)
             weighted = [float(w) * advantage_weight for w in weights_shifted]
 
             datum = tinker.Datum(
@@ -418,8 +502,10 @@ def trajectory_to_training_data(
                 }
             )
             data.append(datum)
+            assistant_idx += 1
         except Exception as e:
             logger.warning(f"Failed to convert turn {i}: {e}")
+            assistant_idx += 1
 
     return data
 
@@ -429,6 +515,7 @@ def trajectory_to_training_data_is(
     advantage: float,
     renderer,
     tokenizer,
+    per_turn_advantages: list[float] | None = None,
 ) -> list[tinker.Datum]:
     """Convert trajectory to importance_sampling Datum format.
 
@@ -449,11 +536,11 @@ def trajectory_to_training_data_is(
         if turn_idx >= len(turns):
             break
         turn = turns[turn_idx]
-        turn_idx += 1
 
         turn_logprobs = turn.get("logprobs")
         turn_tokens = turn.get("tokens")
         if turn_logprobs is None or turn_tokens is None:
+            turn_idx += 1
             continue
 
         try:
@@ -475,6 +562,12 @@ def trajectory_to_training_data_is(
             logprobs_aligned = [0.0] * n_targets
             advantages_aligned = [0.0] * n_targets
 
+            # Use per-turn advantage if available
+            if per_turn_advantages is not None and turn_idx < len(per_turn_advantages):
+                turn_advantage = per_turn_advantages[turn_idx]
+            else:
+                turn_advantage = advantage
+
             resp_start = None
             for j, w in enumerate(weights_shifted):
                 if float(w) > 0:
@@ -485,7 +578,7 @@ def trajectory_to_training_data_is(
                 n_resp = min(len(turn_logprobs), n_targets - resp_start)
                 for j in range(n_resp):
                     logprobs_aligned[resp_start + j] = float(turn_logprobs[j])
-                    advantages_aligned[resp_start + j] = float(advantage)
+                    advantages_aligned[resp_start + j] = float(max(min(turn_advantage, 3.0), -3.0))
 
             datum = tinker.Datum(
                 model_input=input_model_input,
@@ -620,6 +713,52 @@ TASK_DISTRIBUTIONS = {
         ("doc_classify", 0.04),          # +17.2pp, already strong
         ("niah", 0.03),                  # +10pp, already strong
         ("multi_niah", 0.03),            # +4pp, already strong
+    ],
+    # V11: Same as V10 but with cross_doc_separate strategy removed.
+    # Evidence: V9-s5 (no strategy) got 51% on cross_doc, V9-s10/V10-s5 with cross_doc_separate
+    # strategy dropped to 24.2%. The explicit "extract from A, extract from B, compare" pattern
+    # destroys the model's natural integrated comparison ability for metric_comparison subtasks.
+    "v11": [
+        ("cross_doc_compare", 0.20),    # Increased from 18% — more training signal
+        ("key_value_retrieval", 0.14),
+        ("notebook_qa", 0.12),
+        ("dataframe_qa", 0.10),
+        ("event_counting", 0.10),
+        ("hard_multi_hop", 0.08),
+        ("multi_hop_qa", 0.08),
+        ("code_debug", 0.06),
+        ("doc_classify", 0.04),
+        ("niah", 0.04),
+        ("multi_niah", 0.04),
+    ],
+    # V12: Conservative "no-regression" training.
+    # ONLY include tasks where training has PROVEN improvement.
+    # EXCLUDE tasks where training consistently regresses:
+    #   - DFQA: scaling failure (chunk+llm_query breaks at 30t+)
+    #   - Notebook QA: format precision loss (87.0% → 0.870)
+    #   - Cross-Doc: metric_comparison destruction (-67pp)
+    #   - Multi-NIAH: all models regress with low training weight
+    # Goal: beat base on ALL 14 benchmarks (untrained tasks stay at base level).
+    "v12": [
+        ("niah", 0.25),              # +10-20pp consistently
+        ("doc_classify", 0.20),      # +17pp consistently
+        ("event_counting", 0.20),    # +9.2pp (V9-s10)
+        ("hard_multi_hop", 0.15),    # +10pp (V4-s5)
+        ("key_value_retrieval", 0.10),  # +4.8pp (V9-s10)
+        ("multi_hop_qa", 0.10),      # 0pp but safe to include
+    ],
+    # V13: Same conservative distribution as V12 but with improved system prompt,
+    # per-turn credit assignment, gibberish filtering, no KL penalty.
+    # Key hypothesis: the system prompt teaching diverse approaches (Python-direct
+    # for structured data, regex for patterns, multi-turn for complex Qs) will
+    # break the template monoculture and produce better trajectories.
+    "v13": [
+        ("niah", 0.20),              # Reliable improvement
+        ("doc_classify", 0.15),      # Reliable improvement
+        ("event_counting", 0.20),    # High potential with dedup teaching
+        ("hard_multi_hop", 0.20),    # Benefits most from multi-turn credit
+        ("key_value_retrieval", 0.10),  # Needs Python-direct approach
+        ("multi_hop_qa", 0.15),      # Benefits from multi-turn reasoning
     ],
 }
 
@@ -805,6 +944,7 @@ def train_rl_v6(
     clip_low: float = 0.0,
     maxrl: bool = False,
     hybrid_training: bool = False,
+    credit_assignment: bool = False,
 ):
     """Run GRPO RL training V6 on Tinker.
 
@@ -905,8 +1045,10 @@ def train_rl_v6(
     logger.info(f"  Effective LR: {effective_lr:.2e}")
     logger.info(f"  K: {K}, Batch: {batch_size}, Steps: {steps}")
     logger.info(f"  Task type: {task_type}")
-    if task_type in ("mixed_v6", "mixed_v10"):
-        dist_name = "v10" if task_type == "mixed_v10" else "v9"
+    # Map task_type CLI arg to distribution key
+    _TASK_TYPE_TO_DIST = {"mixed_v6": "v9", "mixed_v10": "v10", "mixed_v11": "v11", "mixed_v12": "v12", "mixed_v13": "v13"}
+    if task_type in _TASK_TYPE_TO_DIST:
+        dist_name = _TASK_TYPE_TO_DIST[task_type]
         dist_info = TASK_DISTRIBUTIONS[dist_name]
         logger.info(f"  Task distribution ({dist_name}):")
         for ttype, weight in sorted(dist_info, key=lambda x: -x[1]):
@@ -922,6 +1064,8 @@ def train_rl_v6(
     logger.info(f"  NGRPO virtual reward: {'ON' if ngrpo_virtual_reward else 'OFF'}")
     logger.info(f"  MaxRL advantage: {'ON' if maxrl else 'OFF'}")
     logger.info(f"  Hybrid training: {'ON (trained root + base sub-calls)' if hybrid_training else 'OFF'}")
+    logger.info(f"  Per-turn credit assignment: {'ON' if credit_assignment else 'OFF'}")
+    logger.info(f"  KL penalty: DISABLED (monitoring only)")
     if clip_high > 0 or clip_low > 0:
         logger.info(f"  Asymmetric advantage: clip_high={clip_high}, clip_low={clip_low}")
     logger.info(f"{'='*60}\n")
@@ -964,8 +1108,8 @@ def train_rl_v6(
         logger.info(f"--- Step {step + 1}/{steps} --- (LR: {step_lr:.2e})")
 
         # 1. Sample tasks (V6+: use adaptive scheduler)
-        if task_type in ("mixed_v6", "mixed_v10"):
-            task_dist = "v10" if task_type == "mixed_v10" else "v9"
+        if task_type in _TASK_TYPE_TO_DIST:
+            task_dist = _TASK_TYPE_TO_DIST[task_type]
             tasks = sample_tasks_v6(batch_size, step, scheduler, task_dist=task_dist)
         else:
             # Fall back to V5 task sampling for compatibility
@@ -1063,25 +1207,38 @@ def train_rl_v6(
             for traj, bonus in zip(group["trajectories"], diversity_bonuses):
                 traj["reward"] += bonus
 
-        # 4. KL penalty via reward shaping (V6)
-        # Approximate KL as deviation of mean logprob from reference
-        step_logprobs = []
-        for group in all_groups:
-            for traj in group["trajectories"]:
-                if "mean_logprob" in traj:
-                    step_logprobs.append(traj["mean_logprob"])
-
-        if step_logprobs:
-            current_mean_lp = np.mean(step_logprobs)
-            if ref_mean_logprob is None:
-                ref_mean_logprob = current_mean_lp  # Set reference from first step
-
-            # KL penalty: penalize trajectories that deviate far from reference
+        # 4. KL penalty via reward shaping — DISABLED (V13)
+        # The previous implementation used |mean_logprob - ref_mean_logprob| which is NOT
+        # real KL divergence (missing reference model). Per Dr. GRPO (arXiv:2503.20783) and
+        # DAPO (arXiv:2503.14476), KL penalty is unnecessary for verifiable-reward tasks.
+        # Keeping the code but bypassing it. The PPO clipping in Tinker's loss function
+        # already constrains policy drift.
+        if kl_coeff > 0:
+            # Track logprobs for monitoring (but don't penalize)
+            step_logprobs = []
             for group in all_groups:
                 for traj in group["trajectories"]:
                     if "mean_logprob" in traj:
-                        kl_approx = abs(traj["mean_logprob"] - ref_mean_logprob)
-                        traj["reward"] -= kl_coeff * kl_approx
+                        step_logprobs.append(traj["mean_logprob"])
+            if step_logprobs:
+                current_mean_lp = np.mean(step_logprobs)
+                if ref_mean_logprob is None:
+                    ref_mean_logprob = current_mean_lp
+                logger.info(f"  Logprob drift: {abs(current_mean_lp - ref_mean_logprob):.4f} (monitoring only, no penalty)")
+
+        # 4b. Filter gibberish trajectories (V13 NEW)
+        n_gibberish = 0
+        for group in all_groups:
+            clean_trajs = []
+            for traj in group["trajectories"]:
+                if is_gibberish_trajectory(traj):
+                    n_gibberish += 1
+                    logger.warning(f"  Filtered gibberish trajectory (task={group['task_info']['type']})")
+                else:
+                    clean_trajs.append(traj)
+            group["trajectories"] = clean_trajs
+        if n_gibberish > 0:
+            logger.info(f"  Filtered {n_gibberish} gibberish trajectories")
 
         # 5. Compute advantages (group-relative)
         step_rewards = []
@@ -1116,16 +1273,20 @@ def train_rl_v6(
                         advantage = reward - virtual_mean  # Dr. GRPO: no std normalization
                         # All real completions get negative advantage (pushed away)
                         step_advantages.append(advantage)
+                        # Per-turn credit assignment (V13)
+                        per_turn_advs = compute_per_turn_advantages(traj_dict, advantage) if credit_assignment else None
                         turn_has_logprobs = any(
                             t.get("logprobs") is not None for t in traj_dict.get("turns", [])
                         )
                         if turn_has_logprobs:
                             data = trajectory_to_training_data_is(
-                                traj_dict, advantage, renderer, tokenizer
+                                traj_dict, advantage, renderer, tokenizer,
+                                per_turn_advantages=per_turn_advs
                             )
                         else:
                             data = trajectory_to_training_data(
-                                traj_dict, advantage, renderer, tokenizer
+                                traj_dict, advantage, renderer, tokenizer,
+                                per_turn_advantages=per_turn_advs
                             )
                         training_data.extend(data)
                         n_updates += 1
@@ -1165,17 +1326,20 @@ def train_rl_v6(
 
                 step_advantages.append(advantage)
 
-                # Convert to training data
+                # Convert to training data with per-turn credit (V13)
+                per_turn_advs = compute_per_turn_advantages(traj_dict, advantage) if credit_assignment else None
                 turn_has_logprobs = any(
                     t.get("logprobs") is not None for t in traj_dict.get("turns", [])
                 )
                 if turn_has_logprobs:
                     data = trajectory_to_training_data_is(
-                        traj_dict, advantage, renderer, tokenizer
+                        traj_dict, advantage, renderer, tokenizer,
+                        per_turn_advantages=per_turn_advs
                     )
                 else:
                     data = trajectory_to_training_data(
-                        traj_dict, advantage, renderer, tokenizer
+                        traj_dict, advantage, renderer, tokenizer,
+                        per_turn_advantages=per_turn_advs
                     )
                 training_data.extend(data)
                 n_updates += 1
@@ -1382,6 +1546,8 @@ def main():
                         help="MaxRL: normalize advantages by K_success (arXiv:2602.02710)")
     parser.add_argument("--hybrid-training", action="store_true",
                         help="Use trained root + base sub-calls during trajectory generation")
+    parser.add_argument("--credit-assignment", action="store_true",
+                        help="V13: Per-turn credit assignment (weight FINAL turns higher, error turns lower)")
     args = parser.parse_args()
 
     train_rl_v6(
@@ -1405,6 +1571,7 @@ def main():
         clip_low=args.clip_low,
         maxrl=args.maxrl,
         hybrid_training=args.hybrid_training,
+        credit_assignment=args.credit_assignment,
     )
 
 
