@@ -116,8 +116,35 @@ def init_repl(
             return f"[llm_query not available] prompt was {len(prompt_str)} chars"
         state.namespace["llm_query"] = dummy_llm_query
 
-    # Standard builtins available
-    state.namespace["__builtins__"] = __builtins__
+    # Restricted builtins: allow standard operations but block dangerous ones.
+    # For public release, this prevents the model from executing system commands.
+    import builtins as _builtins
+    _blocked = {"exec", "eval", "compile", "__import__"}
+    _safe_builtins = {k: v for k, v in vars(_builtins).items() if k not in _blocked}
+
+    # Allow __import__ for standard safe modules only
+    _ALLOWED_MODULES = {
+        "re", "math", "statistics", "collections", "itertools", "functools",
+        "json", "csv", "io", "string", "textwrap", "difflib",
+        "datetime", "time", "random", "hashlib", "copy",
+        "operator", "decimal", "fractions",
+        # Data science (used by model for DataFrame QA, etc.)
+        "numpy", "pandas", "sklearn", "scipy",
+        # Other model-used modules
+        "ast", "struct", "bisect", "heapq", "typing",
+    }
+
+    def _safe_import(name, *args, **kwargs):
+        top_level = name.split(".")[0]
+        if top_level not in _ALLOWED_MODULES:
+            raise ImportError(
+                f"Module '{name}' is not allowed in the RLM REPL. "
+                f"Allowed modules: {sorted(_ALLOWED_MODULES)}"
+            )
+        return _builtins.__import__(name, *args, **kwargs)
+
+    _safe_builtins["__import__"] = _safe_import
+    state.namespace["__builtins__"] = _safe_builtins
 
     # Store timeout config
     state.namespace["_timeout"] = timeout
