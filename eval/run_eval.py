@@ -52,7 +52,8 @@ from eval.benchmarks.multi_hop_qa import generate_multi_hop_suite, score_multi_h
 from eval.benchmarks.notebook_qa import generate_notebook_qa_suite, score_notebook_qa
 from eval.benchmarks.hard_niah import generate_hard_niah_suite, score_hard_niah
 from eval.benchmarks.verbatim_copy import generate_verbatim_copy_suite, score_verbatim_copy
-from eval.benchmarks.oolong import load_oolong_tasks, score_oolong
+from eval.benchmarks.oolong import load_oolong_tasks, score_oolong, OolongTask
+from eval.benchmarks.longbench_v2_codeqa import load_longbench_codeqa_tasks, score_longbench_codeqa
 from eval.benchmarks.multi_hop_hard import generate_hard_multi_hop_suite, score_hard_multi_hop
 from eval.benchmarks.event_counting import generate_event_counting_suite, score_event_counting
 from eval.benchmarks.cross_doc_compare import generate_cross_doc_suite, score_cross_doc
@@ -527,22 +528,26 @@ def run_multi_hop_eval(
 def run_oolong_eval(
     model,
     system_prompt: str,
-    n_tasks: int = 10,
+    n_tasks: int = 50,
     max_iterations: int = 12,
-    max_context_chars: int = 200000,
+    context_len: int = 131072,
     verbose: bool = False,
 ) -> dict:
-    """Run OOLONG benchmark (real D&D transcript aggregation tasks)."""
+    """Run OOLONG trec_coarse benchmark (label frequency aggregation tasks).
+
+    Uses oolongbench/oolong-synth dataset, trec_coarse split.
+    Scoring: 0.75^|y-y_hat| for numeric, exact match otherwise.
+    """
     tasks = load_oolong_tasks(
         n_tasks=n_tasks,
-        max_context_chars=max_context_chars,
+        context_len=context_len,
     )
 
     results = []
     trajectories = []
 
     for task in tqdm(tasks, desc="OOLONG"):
-        logger.info(f"\nTask: {task.task_id} | {task.question_type} | {task.context_length:,} chars")
+        logger.info(f"\nTask: {task.task_id} | {task.task_type} | {task.answer_type}")
         logger.info(f"  Q: {task.question[:100]}")
 
         traj = safe_rlm(
@@ -553,11 +558,85 @@ def run_oolong_eval(
             verbose=verbose,
         )
 
-        scores = score_oolong(traj.answer, task.expected_answer)
+        scores = score_oolong(traj.answer, task.expected_answer, task.answer_type)
 
         result = {
             "task_id": task.task_id,
-            "question_type": task.question_type,
+            "task_type": task.task_type,
+            "answer_type": task.answer_type,
+            "expected": task.expected_answer,
+            "predicted": traj.answer,
+            "score": scores["score"],
+            "match_type": scores["match_type"],
+            "terminated": traj.terminated,
+            "num_turns": len(traj.turns),
+            "total_time": traj.total_time,
+            "context_length": task.context_length,
+        }
+        results.append(result)
+        trajectories.append(trajectory_to_dict(traj))
+
+        logger.info(
+            f"  Score: {scores['score']:.2f} ({scores['match_type']}) | "
+            f"Expected: {task.expected_answer[:60]} | Got: {str(traj.answer)[:60]}"
+        )
+
+    avg_score = sum(r["score"] for r in results) / len(results) if results else 0
+
+    by_type = {}
+    for r in results:
+        by_type.setdefault(r["task_type"], []).append(r["score"])
+    by_type_avg = {k: sum(v) / len(v) for k, v in by_type.items()}
+
+    return {
+        "benchmark": "oolong",
+        "accuracy": avg_score,
+        "score": avg_score,
+        "n_tasks": len(results),
+        "by_task_type": by_type_avg,
+        "results": results,
+        "trajectories": trajectories,
+    }
+
+
+def run_longbench_codeqa_eval(
+    model,
+    system_prompt: str,
+    n_tasks: int = 50,
+    max_iterations: int = 12,
+    max_context_chars: int | None = None,
+    verbose: bool = False,
+) -> dict:
+    """Run LongBench-v2 Code Repository Understanding benchmark.
+
+    50 multiple-choice questions about code repositories (100K-16M char contexts).
+    Scoring: exact match on A/B/C/D.
+    """
+    tasks = load_longbench_codeqa_tasks(
+        n_tasks=n_tasks,
+        max_context_chars=max_context_chars,
+    )
+
+    results = []
+    trajectories = []
+
+    for task in tqdm(tasks, desc="LBv2-Code"):
+        logger.info(f"\nTask: {task.task_id} | {task.difficulty} | {task.context_length:,} chars")
+        logger.info(f"  Q: {task.question[:100]}")
+
+        traj = safe_rlm(
+            prompt=task.prompt,
+            model=model,
+            system_prompt=system_prompt,
+            max_iterations=max_iterations,
+            verbose=verbose,
+        )
+
+        scores = score_longbench_codeqa(traj.answer, task.expected_answer)
+
+        result = {
+            "task_id": task.task_id,
+            "difficulty": task.difficulty,
             "expected": task.expected_answer,
             "predicted": traj.answer,
             "score": scores["score"],
@@ -572,22 +651,22 @@ def run_oolong_eval(
 
         logger.info(
             f"  Score: {scores['score']:.1f} ({scores['match_type']}) | "
-            f"Expected: {task.expected_answer[:60]} | Got: {str(traj.answer)[:60]}"
+            f"Expected: {task.expected_answer} | Got: {str(traj.answer)[:60]}"
         )
 
     avg_score = sum(r["score"] for r in results) / len(results) if results else 0
 
-    by_type = {}
+    by_diff = {}
     for r in results:
-        by_type.setdefault(r["question_type"], []).append(r["score"])
-    by_type_avg = {k: sum(v) / len(v) for k, v in by_type.items()}
+        by_diff.setdefault(r["difficulty"], []).append(r["score"])
+    by_diff_avg = {k: sum(v) / len(v) for k, v in by_diff.items()}
 
     return {
-        "benchmark": "oolong",
+        "benchmark": "longbench_codeqa",
         "accuracy": avg_score,
         "score": avg_score,
         "n_tasks": len(results),
-        "by_question_type": by_type_avg,
+        "by_difficulty": by_diff_avg,
         "results": results,
         "trajectories": trajectories,
     }
@@ -1062,7 +1141,7 @@ def main():
     parser.add_argument("--backend", default="tinker", choices=["tinker", "hf"],
                         help="Backend: tinker (remote) or hf (local GPU)")
     parser.add_argument("--benchmark", nargs="+", default=["niah"],
-                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "event_counting", "cross_doc_compare", "key_value_retrieval", "all"])
+                        choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "event_counting", "cross_doc_compare", "key_value_retrieval", "longbench_codeqa", "oolong_trec", "all"])
     parser.add_argument("--n-tasks", type=int, default=10)
     parser.add_argument("--max-iterations", type=int, default=8)
     parser.add_argument("--experiment-name", default="eval")
@@ -1138,7 +1217,7 @@ def main():
 
     # Run eval
     if "all" in args.benchmark:
-        benchmarks_to_run = ["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "event_counting", "cross_doc_compare", "key_value_retrieval"]
+        benchmarks_to_run = ["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "event_counting", "cross_doc_compare", "key_value_retrieval", "oolong_trec", "longbench_codeqa"]
     else:
         benchmarks_to_run = args.benchmark
 
@@ -1261,11 +1340,13 @@ def main():
                 verbose=args.verbose,
             )
         elif bench == "oolong":
+            # Legacy oolong uses trec_coarse at 131072 token context
             eval_results = run_oolong_eval(
                 model=model,
                 system_prompt=bench_system_prompt,
-                n_tasks=min(args.n_tasks, 10),
-                max_iterations=12,  # OOLONG tasks are complex, need more iterations
+                n_tasks=min(args.n_tasks, 50),
+                max_iterations=12,
+                context_len=131072,
                 verbose=args.verbose,
             )
         elif bench == "hard_multi_hop":
@@ -1302,6 +1383,23 @@ def main():
                 n_tasks=min(args.n_tasks, 12),
                 max_iterations=10,
                 seed_offset=args.seed_offset,
+                verbose=args.verbose,
+            )
+        elif bench == "oolong_trec":
+            eval_results = run_oolong_eval(
+                model=model,
+                system_prompt=bench_system_prompt,
+                n_tasks=min(args.n_tasks, 50),
+                max_iterations=12,
+                context_len=131072,  # 128K tokens — good RLM test point
+                verbose=args.verbose,
+            )
+        elif bench == "longbench_codeqa":
+            eval_results = run_longbench_codeqa_eval(
+                model=model,
+                system_prompt=bench_system_prompt,
+                n_tasks=min(args.n_tasks, 50),
+                max_iterations=12,
                 verbose=args.verbose,
             )
 

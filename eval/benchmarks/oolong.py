@@ -1,18 +1,25 @@
 """
-OOLONG benchmark integration for RLMs.
+OOLONG benchmark (trec_coarse split) for RLMs.
 
-OOLONG (arXiv:2511.02817) is a challenging aggregation benchmark
-for long-context models. Tasks require analyzing D&D episode transcripts
-to answer questions about rolls, spells, and character actions.
+OOLONG (Bertsch et al., arXiv:2511.02817) is a long-context reasoning benchmark
+that requires aggregating information across the full input. The trec_coarse split
+contains TREC questions labeled with 6 coarse categories; tasks ask about label
+frequencies, comparisons, and counts.
 
-Uses the HuggingFace dataset: oolongbench/oolong-real (toy_dnd config).
+Uses HuggingFace dataset: oolongbench/oolong-synth (validation split, dataset='trec_coarse').
 
-Context lengths range from 50K to 900K+ characters — ideal for testing RLMs.
+This is the SAME benchmark used in the original RLM paper (Zhang, Kraska, Khattab,
+arXiv:2502.14155), which evaluates on 50 tasks at a given context length.
+
+Scoring follows the paper: 0.75^|y - y_hat| for numeric answers, exact match otherwise.
 """
 
 from __future__ import annotations
 
+import ast
+import math
 import random
+import re
 from dataclasses import dataclass
 
 
@@ -22,109 +29,148 @@ class OolongTask:
     task_id: str
     prompt: str
     expected_answer: str
-    question_type: str  # singledoc_rolls, multidoc_rolls, singledoc_spells, multidoc_spells
-    context_length: int
+    answer_type: str     # ANSWER_TYPE.LABEL, NUMERIC, USER, COMPARISON
+    task_type: str       # TASK_TYPE.MOST_FREQ, LEAST_FREQ, etc.
+    context_length: int  # context_len token bucket from the dataset
     question: str
 
 
 def load_oolong_tasks(
-    n_tasks: int = 20,
-    max_context_chars: int = 200000,
-    question_types: list[str] | None = None,
+    n_tasks: int = 50,
+    context_len: int = 131072,
     seed: int = 42,
 ) -> list[OolongTask]:
-    """Load OOLONG tasks from HuggingFace.
+    """Load OOLONG trec_coarse tasks from HuggingFace.
 
     Args:
-        n_tasks: Number of tasks to load
-        max_context_chars: Maximum context length in characters
-        question_types: Filter by question type (None = all)
-        seed: Random seed for sampling
+        n_tasks: Number of tasks to load (max 50 per context_len)
+        context_len: Token-count bucket to filter on.
+            Available: 1024, 2048, 4096, 8192, 16384, 32768, 65536,
+            131072, 262144, 524288, 1048576, 2097152, 4194304.
+            Default 131072 (128K tokens) is a good RLM test point.
+        seed: Random seed for sampling when n_tasks < available
     """
     from datasets import load_dataset
 
-    ds = load_dataset('oolongbench/oolong-real', 'toy_dnd', split='validation')
+    ds = load_dataset('oolongbench/oolong-synth', split='validation')
 
-    # Filter by context length and question type
+    # Filter to trec_coarse at the requested context length
     candidates = []
     for ex in ds:
-        ctx_len = len(ex['context_window_text'])
-        if ctx_len > max_context_chars:
+        if ex['dataset'] != 'trec_coarse':
             continue
-        if question_types and ex['question_type'] not in question_types:
+        if ex['context_len'] != context_len:
             continue
         candidates.append(ex)
 
-    # Sample tasks
+    if not candidates:
+        available_lens = sorted(set(
+            ex['context_len'] for ex in ds if ex['dataset'] == 'trec_coarse'
+        ))
+        raise ValueError(
+            f"No trec_coarse tasks at context_len={context_len}. "
+            f"Available: {available_lens}"
+        )
+
+    # Sample if needed
     rng = random.Random(seed)
     if len(candidates) > n_tasks:
         candidates = rng.sample(candidates, n_tasks)
 
     tasks = []
     for i, ex in enumerate(candidates):
-        prompt = f"QUESTION: {ex['question']}\n\nCONTEXT:\n{ex['context_window_text']}"
+        # The dataset provides both raw text and labeled text
+        # Use raw text (context_window_text) as the context
+        context_text = ex['context_window_text']
+
+        # Parse the answer from the dataset's string-list format
+        # Answers look like "['abbreviation']" or "['42']" or "['more common than']"
+        raw_answer = ex['answer']
+        try:
+            parsed = ast.literal_eval(raw_answer)
+            if isinstance(parsed, list) and len(parsed) == 1:
+                answer = str(parsed[0])
+            elif isinstance(parsed, list):
+                # Multi-value answer (e.g. USER tasks with multiple labels)
+                answer = ", ".join(str(x) for x in parsed)
+            else:
+                answer = str(parsed)
+        except (ValueError, SyntaxError):
+            answer = str(raw_answer)
+
+        # The dataset uses 'task' field (e.g. TASK_TYPE.MOST_FREQ), not 'task_type'
+        task_type_str = ex.get('task', ex.get('task_type', 'unknown'))
+
+        prompt = f"QUESTION: {ex['question']}\n\nDOCUMENT:\n{context_text}"
+
         tasks.append(OolongTask(
-            task_id=f"oolong_{i:03d}_{ex['question_type']}",
+            task_id=f"oolong_{i:03d}_{task_type_str}",
             prompt=prompt,
-            expected_answer=str(ex['answer']),
-            question_type=ex['question_type'],
-            context_length=len(prompt),
+            expected_answer=answer,
+            answer_type=ex.get('answer_type', 'unknown'),
+            task_type=task_type_str,
+            context_length=ex['context_len'],
             question=ex['question'],
         ))
 
     return tasks
 
 
-def score_oolong(predicted: str | None, expected: str) -> dict:
-    """Score an OOLONG prediction.
+def score_oolong(predicted: str | None, expected: str, answer_type: str = "") -> dict:
+    """Score an OOLONG prediction using the paper's scoring method.
 
-    OOLONG uses exact match scoring, but we add some flexibility:
-    - Numeric answers: tolerance within 5%
-    - Text answers: case-insensitive containment
+    Scoring (from Bertsch et al. 2025):
+    - Numeric answers: score = 0.75^|y - y_hat|
+    - All other answers: exact match (case-insensitive)
     """
     if predicted is None:
         return {"score": 0.0, "match_type": "none"}
 
-    pred = predicted.strip()
-    exp = expected.strip()
+    pred = predicted.strip().strip("'\"[]")
+    exp = expected.strip().strip("'\"[]")
 
-    # Exact match
+    # Exact match (case-insensitive)
     if pred.lower() == exp.lower():
         return {"score": 1.0, "match_type": "exact"}
 
-    # Containment (prediction contains expected)
-    # For short numeric answers, require word boundary match to avoid "1" matching "14"
+    # Check if this is a numeric answer
+    is_numeric = "NUMERIC" in answer_type.upper() if answer_type else False
+
+    # Try numeric scoring: 0.75^|y - y_hat|
+    pred_num = _extract_number(pred)
+    exp_num = _extract_number(exp)
+
+    if pred_num is not None and exp_num is not None:
+        diff = abs(pred_num - exp_num)
+        score = math.pow(0.75, diff)
+        match_type = "numeric_exact" if diff == 0 else f"numeric_partial_diff{diff:.1f}"
+        return {"score": score, "match_type": match_type}
+
+    # For non-numeric: check if the expected label appears in the prediction
+    # This handles cases where the model wraps the answer in extra text
     if exp.lower() in pred.lower():
-        # Check if it's a numeric answer — require word boundaries
-        try:
-            float(exp)
-            # Numeric — check word boundary
-            import re
-            if re.search(r'\b' + re.escape(exp) + r'\b', pred):
-                return {"score": 1.0, "match_type": "contains"}
-        except ValueError:
-            # Non-numeric — containment is fine
+        # Verify it's not a substring match (e.g., "entity" in "no entity found")
+        # Check word boundaries
+        pattern = r'\b' + re.escape(exp.lower()) + r'\b'
+        if re.search(pattern, pred.lower()):
             return {"score": 1.0, "match_type": "contains"}
 
-    # Numeric tolerance
+    return {"score": 0.0, "match_type": "none"}
+
+
+def _extract_number(s: str) -> float | None:
+    """Try to extract a number from a string."""
+    s = s.strip()
+    # Direct parse
     try:
-        pred_num = float(pred.replace(",", ""))
-        exp_num = float(exp.replace(",", ""))
-        if exp_num != 0:
-            rel_error = abs(pred_num - exp_num) / abs(exp_num)
-            if rel_error < 0.05:
-                return {"score": 0.5, "match_type": "numeric_close"}
+        return float(s.replace(",", ""))
     except ValueError:
         pass
-
-    # Comma-separated list comparison (for multidoc tasks)
-    if "," in exp:
-        exp_items = set(item.strip().lower() for item in exp.split(","))
-        pred_items = set(item.strip().lower() for item in pred.split(","))
-        if exp_items == pred_items:
-            return {"score": 1.0, "match_type": "set_match"}
-        overlap = exp_items & pred_items
-        if overlap and len(overlap) >= len(exp_items) * 0.5:
-            return {"score": 0.5, "match_type": "partial_set"}
-
-    return {"score": 0.0, "match_type": "none"}
+    # Find a number in the string
+    m = re.search(r'[-+]?\d+(?:,\d{3})*(?:\.\d+)?', s)
+    if m:
+        try:
+            return float(m.group().replace(",", ""))
+        except ValueError:
+            pass
+    return None
