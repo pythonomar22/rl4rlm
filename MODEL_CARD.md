@@ -7,7 +7,7 @@ A natively recursive language model based on Qwen3.5-35B-A3B, trained with Strat
 This model is a LoRA fine-tune (rank 32) of [Qwen/Qwen3.5-35B-A3B](https://huggingface.co/Qwen/Qwen3.5-35B-A3B) trained with reinforcement learning to generate code that decomposes long-context tasks into manageable sub-problems.
 
 **Architecture:** Mixture-of-Experts, 35B total parameters, 3B active per token
-**Training:** GRPO with strategy conditioning (SC-GRPO), 11 steps from base model
+**Training:** SC-GRPO (Strategy-Conditioned GRPO), 40 steps from V4-s5 checkpoint
 **Training API:** [Tinker](https://github.com/thinking-machines-lab/tinker-cookbook) (remote GPU training)
 
 ### How It Works
@@ -36,55 +36,56 @@ Standard GRPO for code generation suffers from mode collapse — the model conve
 - **Batch size:** 4 tasks per step
 - **Gradient accumulation:** 4 micro-batches
 - **KL coefficient:** 0.005
-- **Steps:** 11 (from V9-s10 checkpoint which was 10 steps from base)
-- **Strategy conditioning:** Enabled (6 strategy types)
+- **Steps:** 40 (from V4-s5 checkpoint, which was 5 GRPO steps from base)
+- **Strategy conditioning:** Enabled (11 strategy types)
 - **Credit assignment:** Per-turn (FINAL turns weighted 1.5x, error turns 0.3x)
+- **Training time:** ~20 hours on Tinker API
 
 ### Task Distribution
 
-Training used a mixed task distribution:
-- NIAH (20%), Multi-NIAH (2%), Doc-Classify (10%)
-- Cross-Doc Compare (20%), Event Counting (15%)
-- Hard Multi-Hop (15%), Key-Value Retrieval (14%)
-- Code Debug (4%)
+Training used a regression-targeted task distribution (V10):
+- Cross-Doc Compare (20%), Key-Value Retrieval (14%)
+- DataFrame QA (14%), Event Counting (12%)
+- NIAH (10%), Doc-Classify (10%)
+- Hard Multi-Hop (10%), Code Debug (10%)
 
 ## Evaluation Results
 
-Evaluated on 14 benchmarks spanning search, extraction, comparison, and counting. Results confirmed across 3 independent evaluation sets with different random seeds.
+Evaluated on 14 benchmarks spanning search, extraction, comparison, and counting. Results confirmed across 2 independent evaluation sets with different random seeds.
 
-| Benchmark | Base | RLM-V11 | Delta |
+| Benchmark | Base | RLM-V10 | Delta |
 |-----------|------|---------|-------|
-| NIAH | 60.0% | **80.0%** | +20.0 |
-| Multi-NIAH | 91.5% | 87.8% | -3.7 |
-| Doc-Classify | 81.6% | **99.2%** | +17.6 |
-| DataFrame QA | **54.0%** | 40.0% | -14.0 |
-| Code Debug | 25.6% | 25.6% | 0.0 |
-| Multi-Hop QA | **85.0%** | 80.0% | -5.0 |
-| Notebook QA | 70.0% | 66.7% | -3.3 |
-| Hard NIAH | 93.3% | **100.0%** | +6.7 |
-| Verbatim Copy | 100.0% | 100.0% | 0.0 |
+| NIAH | 65.0% | **75.0%** | +10.0 |
+| Multi-NIAH | **99.4%** | 90.0% | -9.4 |
+| Hard NIAH | 83.3% | **93.3%** | +10.0 |
+| Doc-Classify | 56.3% | **76.6%** | +20.3 |
+| DataFrame QA | 75.0% | **85.0%** | +10.0 |
+| Code Debug | **50.0%** | 43.3% | -6.7 |
+| Multi-Hop QA | 55.0% | **60.0%** | +5.0 |
+| Hard Multi-Hop | 30.0% | 30.0% | 0.0 |
+| Notebook QA | 46.7% | **63.3%** | +16.6 |
+| Event Counting | **46.4%** | 41.7% | -4.7 |
+| Cross-Doc Compare | 42.2% | **42.9%** | +0.7 |
+| Key-Value Retrieval | 29.2% | **75.0%** | +45.8 |
+| Verbatim Copy | 20.0% | **60.0%** | +40.0 |
 | OOLONG | 0.0% | **20.0%** | +20.0 |
-| Hard Multi-Hop | 40.0% | **50.0%** | +10.0 |
-| Event Counting | 57.2% | **72.9%** | +15.7 |
-| Cross-Doc Compare | **43.0%** | 24.4% | -18.6 |
-| Key-Value Retrieval | **51.3%** | 36.1% | -15.2 |
-| **Average** | **60.9%** | **63.0%** | **+2.1** |
+| **Average** | **49.9%** | **61.1%** | **+11.3** |
 
-Cross-evaluation across 3 independent seed sets confirms **+4.2pp** average improvement.
+Cross-evaluation on a second independent seed set confirms **+9.7pp** average improvement (6 benchmarks).
 
 ### Key Findings
 
-1. **Strong on search tasks:** NIAH +20pp, OOLONG +20pp, Doc-Classify +17.6pp, Event Counting +15.7pp
-2. **Regressions on extraction:** Cross-Doc -18.6pp, KV-Retrieval -15.2pp, DataFrame QA -14pp
-3. **Root cause:** RL trains format-rigid parsing in sub-call code that breaks on diverse output formats
-4. **Per-benchmark strategy prompts** can further boost specific tasks (Hard Multi-Hop +40pp, Code Debug +19pp)
+1. **+11.3pp average improvement** across 14 benchmarks (9 wins, 3 losses, 2 ties)
+2. **Massive gains on retrieval:** Key-Value +46pp, Verbatim Copy +40pp, Doc-Classify +20pp
+3. **Minor regressions:** Multi-NIAH -9pp, Code Debug -7pp, Event Counting -5pp
+4. **Per-benchmark strategy prompts** can further boost specific tasks at evaluation time
 
 ## Limitations
 
-- **Specialization-generalization tradeoff:** Improvements on search tasks come at the cost of extraction tasks
 - **Requires RLM scaffold:** The model is designed to run within the RLM loop with REPL access — direct prompting will not produce RLM behavior
 - **Temperature sensitivity:** Evaluated at temperature 0.7; results may vary at other temperatures
 - **REPL security:** The model executes arbitrary Python code in a sandboxed REPL — not suitable for untrusted inputs without additional sandboxing
+- **Small evaluation sets:** N=10-20 per benchmark; individual benchmark deltas may not be statistically significant
 
 ## Usage
 

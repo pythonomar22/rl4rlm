@@ -405,7 +405,7 @@ def _generate_document_from_all(
     rng: random.Random,
 ) -> str:
     """Build registry document from pre-built target and distractor lists."""
-    fmt_rng = random.Random(rng.randint(0, 2**31))
+    fmt_idx = rng.randint(0, 3)
 
     all_entries = list(targets) + list(distractors)
     rng.shuffle(all_entries)

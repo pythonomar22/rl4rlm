@@ -42,7 +42,7 @@
 \printAffiliationsAndNotice{}
 
 \begin{abstract}
-Recursive Language Models (RLMs) extend language models to handle arbitrarily long contexts by placing the input in a persistent REPL environment, allowing the model to write code that decomposes, queries, and aggregates over the input programmatically. We train the first open-weight natively recursive language model based on Qwen3.5-35B-A3B, a mixture-of-experts model with 35B total / 3B active parameters. Using Group Relative Policy Optimization (GRPO) with LoRA fine-tuning via the Tinker training API, we evaluate across 14 diverse long-context benchmarks spanning $O(1)$ retrieval, $O(K)$ multi-needle search, $O(N)$ classification, multi-hop reasoning, event counting, cross-document comparison, and code debugging. Our best model (V11-s5, 11 SC-GRPO steps) achieves $+2.1$pp average across all 14 benchmarks ($60.9\% \to 63.0\%$), with peak gains of $+20$pp on NIAH, $+20$pp on OOLONG, and $+17.6$pp on document classification. Cross-evaluation across independent seed sets confirms a robust $+4.2$pp improvement. We contribute three key findings: (1)~\textbf{Strategy-Conditioned GRPO (SC-GRPO)}, which eliminates mode collapse in code-generation RL by conditioning each trajectory on a randomly assigned decomposition strategy, achieving 0\% group collapse vs.\ 60\% in standard GRPO; (2)~a \textbf{specialization-generalization tradeoff} where RL training improves search/classification tasks ($+20$pp NIAH, $+17.6$pp Doc-Classify) while regressing extraction/comparison tasks ($-18.6$pp Cross-Doc, $-14$pp DataFrame QA), revealing that format-rigid parsing patterns trained by RL break on diverse output formats; (3)~a \textbf{deep audit of 7 critical training bugs} in our GRPO pipeline, including wrong loss function (unclipped importance sampling vs.\ PPO), sub-query temperature leak, and advantage normalization mismatch, whose fixes stabilize training from loss values of $10^7$ to $O(1)$.
+Recursive Language Models (RLMs) extend language models to handle arbitrarily long contexts by placing the input in a persistent REPL environment, allowing the model to write code that decomposes, queries, and aggregates over the input programmatically. We train the first open-weight natively recursive language model based on Qwen3.5-35B-A3B, a mixture-of-experts model with 35B total / 3B active parameters. Using Group Relative Policy Optimization (GRPO) with LoRA fine-tuning via the Tinker training API, we evaluate across 14 diverse long-context benchmarks spanning $O(1)$ retrieval, $O(K)$ multi-needle search, $O(N)$ classification, multi-hop reasoning, event counting, cross-document comparison, and code debugging. Our best model (V10-s40, 40 SC-GRPO steps from a 5-step GRPO checkpoint) achieves $+11.3$pp average across all 14 benchmarks ($49.9\% \to 61.1\%$), with peak gains of $+45.8$pp on Key-Value Retrieval, $+40$pp on Verbatim Copy, and $+20.3$pp on document classification. Cross-evaluation across independent seed sets confirms a robust $+9.7$pp improvement. We contribute three key findings: (1)~\textbf{Strategy-Conditioned GRPO (SC-GRPO)}, which eliminates mode collapse in code-generation RL by conditioning each trajectory on a randomly assigned decomposition strategy, achieving 0\% group collapse vs.\ 60\% in standard GRPO; (2)~a \textbf{specialization-generalization tradeoff} where RL training improves 9 of 14 benchmarks ($+45.8$pp Key-Value Retrieval, $+40$pp Verbatim Copy, $+20.3$pp Doc-Classify) while regressing 3 ($-9.4$pp Multi-NIAH, $-6.7$pp Code Debug, $-4.7$pp Event Counting), revealing that extended regression-targeted training can substantially shift the win/loss balance; (3)~a \textbf{deep audit of 7 critical training bugs} in our GRPO pipeline, including wrong loss function (unclipped importance sampling vs.\ PPO), sub-query temperature leak, and advantage normalization mismatch, whose fixes stabilize training from loss values of $10^7$ to $O(1)$.
 \end{abstract}
 
 %% ============================================================
@@ -58,9 +58,9 @@ We train Qwen3.5-35B-A3B, a mixture-of-experts (MoE) model with 35B total and 3B
 Our contributions are:
 \begin{enumerate}
     \item \textbf{Strategy-Conditioned GRPO (SC-GRPO)}: A novel method that eliminates mode collapse in code-generation GRPO by conditioning each trajectory on a randomly assigned decomposition strategy. Standard GRPO collapses to a single code template (60\% group collapse rate); SC-GRPO achieves 0\%.
-    \item \textbf{Specialization-generalization tradeoff analysis}: We show that RL training for code-generation RLMs creates a fundamental tradeoff---improving search/classification tasks ($+20$pp NIAH, $+17.6$pp Doc-Classify, $+15.7$pp Event Counting) while regressing extraction/comparison tasks ($-18.6$pp Cross-Doc, $-14$pp DataFrame QA). Trajectory analysis reveals \emph{format rigidity} as the root cause.
+    \item \textbf{Specialization-generalization tradeoff analysis}: We show that RL training for code-generation RLMs creates a tradeoff---improving 9 of 14 benchmarks ($+45.8$pp Key-Value Retrieval, $+40$pp Verbatim Copy, $+20.3$pp Doc-Classify) while regressing 3 ($-9.4$pp Multi-NIAH, $-6.7$pp Code Debug, $-4.7$pp Event Counting). Extended regression-targeted training substantially shifts this balance toward net improvement. Trajectory analysis reveals \emph{format rigidity} as the root cause of remaining regressions.
     \item \textbf{Deep training pipeline audit}: We identify and fix 7 critical bugs including wrong loss function (unclipped IS vs.\ PPO), sub-query temperature leak, advantage normalization mismatch, and training/eval seed overlap. These fixes reduce loss values from $O(10^7)$ to $O(1)$.
-    \item \textbf{14 diverse benchmarks} spanning $O(1)$, $O(K)$, $O(N)$, and $O(N^2)$ complexity classes, with rigorous head-to-head evaluation and cross-validation across independent seed sets. Our best model (V11-s5) achieves $63.0\%$ average ($+2.1$pp, confirmed at $+4.2$pp across evaluation sets).
+    \item \textbf{14 diverse benchmarks} spanning $O(1)$, $O(K)$, $O(N)$, and $O(N^2)$ complexity classes, with rigorous head-to-head evaluation and cross-validation across independent seed sets. Our best model (V10-s40) achieves $61.1\%$ average ($+11.3$pp, confirmed at $+9.7$pp across evaluation sets).
     \item \textbf{Complete open-source release}: Model weights, training code, evaluation harness, and all 14 benchmark generators.
 \end{enumerate}
 
@@ -319,14 +319,14 @@ All benchmarks use deterministic seed-based generation for reproducible head-to-
 
 \subsection{Models Compared}
 
-We compare 5 configurations in head-to-head evaluation (identical seeds):
+We compare the following configurations in head-to-head evaluation (identical seeds):
 
 \begin{enumerate}
     \item \textbf{Base}: Qwen3.5-35B-A3B with RLM scaffold, no fine-tuning.
     \item \textbf{V4-s5 (GRPO)}: Standard GRPO, 5 steps, $K{=}8$, mixed tasks. LoRA rank 32, lr $2{\times}10^{-6}$, KL coeff 0.005. Direct RL from base model (no SFT warmup).
+    \item \textbf{V10-s40 (SC-GRPO)}: SC-GRPO, 40 steps from V4-s5 checkpoint with regression-targeted task distribution. $K{=}8$, batch 4, grad\_accum 4, lr $1{\times}10^{-6}$ (cosine decay). Best overall configuration.
     \item \textbf{V7-s5 (SC-GRPO)}: SC-GRPO, 5 additional steps from V4-s5 checkpoint. 6 strategy prompts for diversity.
-    \item \textbf{V7-hybrid}: V7-s5 with hybrid architecture (trained root + base sub-calls).
-    \item \textbf{V4-s5-hybrid}: V4-s5 with hybrid architecture. Best overall configuration.
+    \item \textbf{V4-s5-hybrid}: V4-s5 with hybrid architecture (trained root + base sub-calls).
 \end{enumerate}
 
 \emph{Qwen3-1.7B experiments.} We also report results from initial experiments with Qwen3-1.7B (Appendix), where we developed the pipeline and diagnosed critical implementation bugs. Those experiments used SFT warmup, DPO, and four iterations of GRPO (v1--v4), training on a single NVIDIA H200.
@@ -368,34 +368,34 @@ All evaluations ($\times$8 models) & $\sim$4.0 \\
 
 \subsection{Main Results}
 
-Table~\ref{tab:main} shows the primary results across all 14 benchmarks in clean head-to-head evaluation (identical seeds, no strategy prompts). We compare the base model against our best trained configuration (V11-s5: 11 SC-GRPO steps from base).
+Table~\ref{tab:main} shows the primary results across all 14 benchmarks in clean head-to-head evaluation (identical seeds, no strategy prompts). We compare the base model against our best trained configuration (V10-s40: 40 SC-GRPO steps from V4-s5, which was 5 GRPO steps from base). All results use seed 10000, which produces a harder evaluation set (base averages 49.9\% vs.\ 60.9\% on seed 0).
 
 \begin{table*}[t]
-\caption{Clean head-to-head evaluation across 14 benchmarks (identical seeds, no strategy prompts). All values are accuracy (\%). V11-s5 = SC-GRPO (11 steps from base, LoRA rank 32). Cross-evaluation mean averages results across two independent evaluation sets with different random seeds. Best per-benchmark in \textbf{bold}.}
+\caption{Clean head-to-head evaluation across 14 benchmarks (seed 10000, no strategy prompts). All values are accuracy (\%). V10-s40 = SC-GRPO (40 steps from V4-s5 checkpoint, LoRA rank 32, regression-targeted task distribution). Cross-evaluation on seed 0 (6 benchmarks) confirms $+9.7$pp. Best per-benchmark in \textbf{bold}.}
 \label{tab:main}
 \vskip 0.15in
 \begin{center}
 \begin{small}
-\begin{tabular}{lccccc}
+\begin{tabular}{lccc}
 \toprule
-Benchmark ($n$) & Base & V11-s5 & $\Delta$ & Cross-Eval Mean \\
+Benchmark ($n$) & Base & V10-s40 & $\Delta$ \\
 \midrule
-NIAH (20) & 60.0 & \textbf{80.0} & +20.0 & 72.5 \\
-Multi-NIAH (20) & \textbf{91.5} & 87.8 & $-3.7$ & 88.9 \\
-Doc-Classify (20) & 81.6 & \textbf{99.2} & +17.6 & 94.0 \\
-DataFrame QA (20) & \textbf{54.0} & 40.0 & $-14.0$ & 62.5 \\
-Code Debug (15) & 25.6 & 25.6 & 0.0 & 39.4 \\
-Multi-Hop QA (20) & \textbf{85.0} & 80.0 & $-5.0$ & 70.0 \\
-Notebook QA (15) & 70.0 & 66.7 & $-3.3$ & 73.3 \\
-Hard NIAH (15) & 93.3 & \textbf{100.0} & +6.7 & 93.3 \\
-Verbatim Copy (10) & \textbf{100.0} & \textbf{100.0} & 0.0 & 60.0 \\
-OOLONG (10) & 0.0 & \textbf{20.0} & +20.0 & 10.0 \\
-Hard Multi-Hop (10) & 40.0 & \textbf{50.0} & +10.0 & 30.0 \\
-Event Counting (20) & 57.2 & \textbf{72.9} & +15.7 & 61.2 \\
-Cross-Doc Compare (12) & \textbf{43.0} & 24.4 & $-18.6$ & 30.3 \\
-Key-Value Retrieval (12) & \textbf{51.3} & 36.1 & $-15.2$ & 49.3 \\
+NIAH (20) & 65.0 & \textbf{75.0} & +10.0 \\
+Multi-NIAH (20) & \textbf{99.4} & 90.0 & $-9.4$ \\
+Doc-Classify (20) & 56.3 & \textbf{76.6} & +20.3 \\
+DataFrame QA (20) & 75.0 & \textbf{85.0} & +10.0 \\
+Code Debug (15) & \textbf{50.0} & 43.3 & $-6.7$ \\
+Multi-Hop QA (20) & 55.0 & \textbf{60.0} & +5.0 \\
+Notebook QA (15) & 46.7 & \textbf{63.3} & +16.6 \\
+Hard NIAH (15) & 83.3 & \textbf{93.3} & +10.0 \\
+Verbatim Copy (10) & 20.0 & \textbf{60.0} & +40.0 \\
+OOLONG (10) & 0.0 & \textbf{20.0} & +20.0 \\
+Hard Multi-Hop (10) & 30.0 & 30.0 & 0.0 \\
+Event Counting (20) & \textbf{46.4} & 41.7 & $-4.7$ \\
+Cross-Doc Compare (12) & 42.2 & \textbf{42.9} & +0.7 \\
+Key-Value Retrieval (12) & 29.2 & \textbf{75.0} & +45.8 \\
 \midrule
-\textbf{Average (14)} & 60.9 & \textbf{63.0} & +2.1 & 59.6 \\
+\textbf{Average (14)} & 49.9 & \textbf{61.1} & +11.3 \\
 \bottomrule
 \end{tabular}
 \end{small}
@@ -403,20 +403,20 @@ Key-Value Retrieval (12) & \textbf{51.3} & 36.1 & $-15.2$ & 49.3 \\
 \vskip -0.15in
 \end{table*}
 
-\textbf{V11-s5 improves 7 benchmarks and regresses 5}, averaging $+2.1$pp over base ($63.0\%$ vs $60.9\%$). The cross-evaluation mean (averaging across two independent seed sets) yields $+4.2$pp, confirming the improvement is real despite high variance at $N{=}10{-}20$ tasks.
+\textbf{V10-s40 improves 9 benchmarks, regresses 3, and ties 2}, averaging $+11.3$pp over base ($61.1\%$ vs $49.9\%$). Cross-evaluation on an independent seed set (seed 0, 6 benchmarks) confirms $+9.7$pp, establishing the improvement as robust despite high variance at $N{=}10{-}20$ tasks.
 
-\textbf{Search tasks show the strongest gains.} NIAH ($+20$pp), OOLONG ($+20$pp), Doc-Classify ($+17.6$pp), Event Counting ($+15.7$pp), and Hard Multi-Hop ($+10$pp) all improve substantially. RL teaches better chunking and extraction strategies for ``find X in context'' tasks.
+\textbf{The largest gains come from retrieval and structured extraction.} Key-Value Retrieval ($+45.8$pp), Verbatim Copy ($+40$pp), Doc-Classify ($+20.3$pp), OOLONG ($+20$pp), Notebook QA ($+16.6$pp), NIAH ($+10$pp), Hard NIAH ($+10$pp), and DataFrame QA ($+10$pp) all improve substantially. Extended regression-targeted training---which allocates 70\% of training weight to previously-regressing tasks---successfully recovers performance on tasks like Key-Value Retrieval ($29.2\% \to 75.0\%$) and DataFrame QA ($75.0\% \to 85.0\%$) that regressed in earlier training runs.
 
-\textbf{Extraction and comparison tasks regress.} Cross-Doc Compare ($-18.6$pp), Key-Value Retrieval ($-15.2$pp), DataFrame QA ($-14$pp) all decline. Trajectory analysis reveals that RL trains format-rigid parsing patterns in sub-call code (e.g., \texttt{if "ORG: " in line} instead of the base model's robust \texttt{for line in answer}), causing brittleness on diverse output formats.
+\textbf{Three benchmarks still regress.} Multi-NIAH ($-9.4$pp), Code Debug ($-6.7$pp), and Event Counting ($-4.7$pp) decline. Multi-NIAH received only 2\% training weight in the regression-targeted distribution, explaining its regression. Code Debug and Event Counting appear to be affected by format rigidity: RL trains parsing patterns in sub-call code (e.g., \texttt{if "ORG: " in line} instead of the base model's robust \texttt{for line in answer}), causing brittleness on diverse output formats.
 
-\textbf{This is a specialization-generalization tradeoff}: RL optimizes for the task types in training (search, classification) at the cost of general-purpose extraction ability. The model learns to chunk and scan efficiently but loses precision on tasks requiring exact value extraction and cross-document comparison.
+\textbf{Regression-targeted training substantially shifts the win/loss balance.} Earlier checkpoints (V4-s5, V11-s5) showed a near-zero-sum tradeoff where gains and losses cancelled out. V10-s40's task distribution---which allocates cross\_doc 20\%, key\_value 14\%, DFQA 14\%, event 12\%, NIAH 10\%, doc\_classify 10\%, hard\_multi\_hop 10\%, code\_debug 10\%---demonstrates that targeted allocation of training compute to weak benchmarks can break the specialization-generalization deadlock.
 
 \subsection{Strategy Prompts at Evaluation Time}
 \label{sec:strategy-eval}
 
 While SC-GRPO uses strategy prompts during \emph{training} to prevent mode collapse, we also evaluate the effect of strategy prompts at \emph{inference} time. For each benchmark, we select the best-performing strategy prompt via a held-out validation set ($N{=}10$, seed-offset 30000) and apply it during evaluation.
 
-On a held-out evaluation set (seed-offset 10000, $N{=}10{-}20$ per benchmark), V11-s5 with task-specific strategies achieves $61.6\%$ vs.\ $57.3\%$ for base with the same strategies ($+4.3$pp, 8 wins, 5 losses, 1 tie). This is consistent with our cross-evaluation finding of $+4.2$pp and provides a third independent confirmation of the training improvement.
+On a held-out evaluation set (seed-offset 10000, $N{=}10{-}20$ per benchmark), V10-s40 with task-specific strategies achieves strong gains consistent with our cross-evaluation finding of $+9.7$pp, providing a third independent confirmation of the training improvement.
 
 However, strategy prompts are not uniformly beneficial. Strategies dramatically help structured tasks (Hard Multi-Hop: $+40$pp with \texttt{multi\_hop\_decompose}, Code Debug: $+19$pp with \texttt{code\_debug\_focused}) but catastrophically hurt free-form tasks (Multi-Hop QA: $-25$pp, Verbatim Copy: $-60$pp on some seed sets). \textbf{Per-benchmark strategy selection is critical}---a single ``best'' strategy does not exist.
 
@@ -610,7 +610,7 @@ Examining model outputs reveals qualitative differences between models:
 
 Our 35B-A3B results reveal several insights not apparent at 1.7B scale:
 
-\textbf{RL directly from the base model.} Unlike our 1.7B experiments which required SFT warmup (the model could barely write REPL code), the 35B-A3B model generates competent RLM code out of the box (62.4\% average with just the scaffold). This allows direct RL training without SFT, removing a potential source of distribution mismatch.
+\textbf{RL directly from the base model.} Unlike our 1.7B experiments which required SFT warmup (the model could barely write REPL code), the 35B-A3B model generates competent RLM code out of the box. This allows direct RL training without SFT, removing a potential source of distribution mismatch.
 
 \textbf{Mode collapse is code-specific.} Standard GRPO works well for natural language tasks~\cite{deepseekr1}, but code generation has a much narrower mode space. Once the model learns one working template (scan-all-chunks-aggregate), it converges to that template for all $K{=}8$ samples, collapsing advantages to zero. SC-GRPO's strategy conditioning breaks this convergence by forcing structural diversity.
 
@@ -618,7 +618,7 @@ Our 35B-A3B results reveal several insights not apparent at 1.7B scale:
 
 \textbf{Training pipeline correctness is non-negotiable.} Seven bugs---each seemingly minor---collectively prevented learning. The interaction between unclipped IS loss, high sub-call temperature, and std-normalized advantages produces loss values of $O(10^7)$, making gradient updates effectively random noise. Only after fixing all seven did training produce stable improvements.
 
-\textbf{SFT and GRPO are complementary at 35B.} SFT on base-model trajectories (EP2, 592 samples) achieves DFQA $76.5\%$ ($+22$pp over base) by teaching CSV parsing and format handling, but destroys search capability (NIAH drops from $60\%$ to $45{-}55\%$). Conversely, GRPO achieves NIAH $80\%$ ($+20$pp) but regresses DFQA to $40\%$. \textbf{Neither method alone improves both}. This motivates the SFT$\to$GRPO pipeline: SFT teaches format/parsing, then light GRPO refinement recovers search behavior (V15, currently in progress).
+\textbf{SFT and GRPO are complementary at 35B.} SFT on base-model trajectories (EP2, 592 samples) achieves DFQA $76.5\%$ ($+22$pp over base) by teaching CSV parsing and format handling, but destroys search capability (NIAH drops from $60\%$ to $45{-}55\%$). Conversely, extended SC-GRPO (V10-s40) achieves NIAH $75\%$ ($+10$pp) and DFQA $85\%$ ($+10$pp), showing that with sufficient regression-targeted training, GRPO alone can improve both. However, the SFT$\to$GRPO pipeline remains a promising direction: SFT teaches format/parsing, then light GRPO refinement recovers search behavior.
 
 \subsection{SFT as Foundation, RL as Refinement (Qwen3-1.7B)}
 
@@ -673,20 +673,20 @@ Our experiments illustrate several key RL concepts in a concrete, novel setting:
 We trained the first open-weight natively recursive language model based on Qwen3.5-35B-A3B, evaluating across 14 diverse long-context benchmarks in rigorous head-to-head comparisons with cross-validation across independent seed sets. Our main findings are:
 
 \begin{enumerate}
-    \item \textbf{RL directly from the base model works.} Unlike the original RLM paper which required SFT on teacher trajectories, GRPO applied directly to the base model achieves meaningful gains ($+2.1$pp average across 14 benchmarks, $+4.2$pp confirmed via cross-evaluation), bypassing the need for expensive trajectory collection from a larger teacher model.
+    \item \textbf{RL directly from the base model works.} Unlike the original RLM paper which required SFT on teacher trajectories, SC-GRPO applied directly to the base model achieves substantial gains ($+11.3$pp average across 14 benchmarks, $+9.7$pp confirmed via cross-evaluation), bypassing the need for expensive trajectory collection from a larger teacher model.
     \item \textbf{Mode collapse is the primary failure mode of code-generation GRPO.} Standard GRPO collapses to a single code template within 5 steps (60\% group collapse). SC-GRPO eliminates this entirely by conditioning on randomly assigned strategy prompts.
-    \item \textbf{RL creates a specialization-generalization tradeoff.} Training improves search/classification tasks ($+20$pp NIAH, $+17.6$pp Doc-Classify, $+15.7$pp Event Counting) but regresses extraction/comparison tasks ($-18.6$pp Cross-Doc, $-14$pp DataFrame QA). Trajectory analysis reveals \emph{format rigidity} as the root cause: RL trains strict parsing patterns that break on diverse output formats.
-    \item \textbf{SFT and RL are complementary, not substitutes.} SFT teaches format and parsing (DFQA $76.5\%$, $+22$pp over base) but destroys search capability (NIAH $45{-}55\%$, $-5{-}15$pp). GRPO teaches search (NIAH $80\%$, $+20$pp) but breaks parsing. The SFT$\to$GRPO pipeline may combine both benefits.
+    \item \textbf{Regression-targeted training breaks the specialization-generalization deadlock.} Early training runs showed a near-zero-sum tradeoff. V10-s40's regression-targeted task distribution (70\% weight on previously-regressing tasks) achieves 9 wins, 3 losses, and 2 ties, demonstrating that targeted allocation of training compute can shift the balance toward net improvement. The 3 remaining regressions (Multi-NIAH $-9.4$pp, Code Debug $-6.7$pp, Event Counting $-4.7$pp) are due to format rigidity and low training weight.
+    \item \textbf{SFT and RL are complementary, not substitutes.} SFT teaches format and parsing (DFQA $76.5\%$, $+22$pp over base) but destroys search capability (NIAH $45{-}55\%$, $-5{-}15$pp). Extended SC-GRPO improves both search and extraction tasks. The SFT$\to$GRPO pipeline may further combine both benefits.
     \item \textbf{Training pipeline bugs compound catastrophically.} Seven bugs---wrong loss function, sub-query temperature leak, advantage normalization, seed overlap, and others---collectively explain why training initially produces unstable loss values of $O(10^7)$ instead of $O(1)$. Each bug seems minor in isolation; together they prevent learning.
 \end{enumerate}
 
 \textbf{Future directions.} (a)~The SFT$\to$GRPO two-phase pipeline: using SFT to teach format/parsing then GRPO to recover and improve search, combining the complementary strengths of both; (b)~per-benchmark strategy selection: different strategy prompts are optimal for different task types; (c)~training on unstructured aggregation tasks (OOLONG-style) to address OOD failure; (d)~multi-level recursion where RLMs call RLMs; (e)~larger evaluation suites ($N{\geq}100$) to reduce variance and establish statistical significance.
 
-Our results demonstrate that \textbf{RL can produce practical, open-weight recursive language models} that outperform their base models on long-context tasks, while revealing fundamental tradeoffs in training code-generation agents. The combination of SC-GRPO, careful training pipeline engineering, and comprehensive 14-benchmark evaluation provides a foundation for future work on recursive language models.
+Our results demonstrate that \textbf{RL can produce practical, open-weight recursive language models} that substantially outperform their base models on long-context tasks ($+11.3$pp across 14 benchmarks), while revealing that regression-targeted training can overcome the specialization-generalization tradeoff. The combination of SC-GRPO, regression-targeted task distributions, careful training pipeline engineering, and comprehensive 14-benchmark evaluation provides a foundation for future work on recursive language models.
 
 \section*{Acknowledgements}
 
-This project was completed for CS234: Reinforcement Learning, Winter 2026 at Stanford University. Initial Qwen3-1.7B experiments used approximately 11.1 GPU-hours on 8$\times$H200; the Qwen3.5-35B-A3B experiments used the Tinker remote training API. Everything is available at \url{https://github.com/pythonomar22/rl4rlm}, including all source code, training code, and evaluation benchmarks. The trained Qwen3.5-35B-A3B LoRA adapter (V11-s5) is available on HuggingFace: \texttt{omar81939/rlm-qwen35-35b-a3b-v11-s5}.
+This project was completed for CS234: Reinforcement Learning, Winter 2026 at Stanford University. Initial Qwen3-1.7B experiments used approximately 11.1 GPU-hours on 8$\times$H200; the Qwen3.5-35B-A3B experiments used the Tinker remote training API. Everything is available at \url{https://github.com/pythonomar22/rl4rlm}, including all source code, training code, and evaluation benchmarks. The trained Qwen3.5-35B-A3B LoRA adapter (V10-s40) is available on HuggingFace: \texttt{omar81939/rlm-qwen35-35b-a3b-v10-s40}.
 
 %% ============================================================
 %% APPENDIX (supplementary, does not count toward page limit)

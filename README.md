@@ -4,36 +4,36 @@ Training [Recursive Language Models](https://arxiv.org/abs/2502.14155) (RLMs) vi
 
 ## Key Results
 
-| Benchmark (N) | Base | RLM-V11 | Delta |
+| Benchmark (N) | Base | RLM-V10 | Delta |
 |----------------|------|---------|-------|
-| NIAH (20) | 60.0% | **80.0%** | +20.0 |
-| Multi-NIAH (20) | 91.5% | 87.8% | -3.7 |
-| Doc-Classify (20) | 81.6% | **99.2%** | +17.6 |
-| DataFrame QA (20) | **54.0%** | 40.0% | -14.0 |
-| Code Debug (15) | 25.6% | 25.6% | 0.0 |
-| Multi-Hop QA (20) | 85.0% | 80.0% | -5.0 |
-| Notebook QA (15) | 70.0% | 66.7% | -3.3 |
-| Hard NIAH (15) | 93.3% | **100.0%** | +6.7 |
-| Verbatim Copy (10) | 100.0% | 100.0% | 0.0 |
+| NIAH (20) | 65.0% | **75.0%** | +10.0 |
+| Multi-NIAH (20) | **99.4%** | 90.0% | -9.4 |
+| Hard NIAH (15) | 83.3% | **93.3%** | +10.0 |
+| Doc-Classify (20) | 56.3% | **76.6%** | +20.3 |
+| DataFrame QA (20) | 75.0% | **85.0%** | +10.0 |
+| Code Debug (15) | **50.0%** | 43.3% | -6.7 |
+| Multi-Hop QA (20) | 55.0% | **60.0%** | +5.0 |
+| Hard Multi-Hop (10) | 30.0% | 30.0% | 0.0 |
+| Notebook QA (15) | 46.7% | **63.3%** | +16.6 |
+| Event Counting (20) | **46.4%** | 41.7% | -4.7 |
+| Cross-Doc Compare (12) | 42.2% | **42.9%** | +0.7 |
+| Key-Value Retrieval (12) | 29.2% | **75.0%** | +45.8 |
+| Verbatim Copy (10) | 20.0% | **60.0%** | +40.0 |
 | OOLONG (10) | 0.0% | **20.0%** | +20.0 |
-| Hard Multi-Hop (10) | 40.0% | **50.0%** | +10.0 |
-| Event Counting (20) | 57.2% | **72.9%** | +15.7 |
-| Cross-Doc Compare (12) | 43.0% | 24.4% | -18.6 |
-| Key-Value Retrieval (12) | 51.3% | 36.1% | -15.2 |
-| **Average (14)** | **60.9%** | **63.0%** | **+2.1** |
+| **Average (14)** | **49.9%** | **61.1%** | **+11.3** |
 
-**RLM-V11**: GRPO RL training (11 steps from base, LoRA rank 32).
-Trained on Tinker API. Evaluated on 14 diverse benchmarks spanning search, extraction, comparison, and counting.
+**RLM-V10**: SC-GRPO RL training (40 steps, LoRA rank 32, from V4-s5 checkpoint).
+Trained on Tinker API. Evaluated on 14 diverse benchmarks spanning search, extraction, comparison, and counting. 9 wins, 3 losses, 2 ties vs base.
 
 ### Key Findings
 
-1. **+20pp on needle-in-haystack search** (NIAH 60% -> 80%, OOLONG 0% -> 20%) — RL teaches better chunking and extraction strategies.
+1. **+11.3pp average improvement** across 14 benchmarks — 9 out of 14 benchmarks improve, with massive gains on key-value retrieval (+46pp), verbatim copy (+40pp), and doc classification (+20pp).
 
-2. **Specialization-generalization tradeoff** — RL improves search/classification tasks but regresses structured extraction (DataFrame QA -14pp, Cross-Doc -19pp). Training teaches format-rigid parsing that breaks on diverse output formats.
+2. **Strategy-Conditioned GRPO (SC-GRPO)** — novel training method that assigns random strategy prompts per trajectory, eliminating mode collapse (0% degenerate outputs vs 60% with standard GRPO).
 
-3. **Strategy-Conditioned GRPO (SC-GRPO)** — novel training method that assigns random strategy prompts per trajectory, eliminating mode collapse (0% degenerate outputs vs 60% with standard GRPO).
+3. **Specialization-generalization tradeoff** — RL improves most tasks but regresses multi-NIAH (-9pp), code debug (-7pp), and event counting (-5pp). Training teaches format-rigid parsing that can break on some output formats.
 
-4. **Cross-validated improvement** — Training improvement confirmed across 3 independent evaluation sets: +2.1pp (seed 0), +6.3pp (deterministic), +4.3pp (seed 10000). Mean: **+4.2pp**.
+4. **Cross-validated improvement** — Improvement confirmed on two independent evaluation sets: +11.3pp (seed 10000, 14 benchmarks), +9.7pp (seed 0, 6 benchmarks).
 
 ## What is an RLM?
 

@@ -7,8 +7,8 @@ Usage:
 
     # Then upload:
     uv run python scripts/upload_to_huggingface.py \
-        --checkpoint-dir checkpoints/v11_s5 \
-        --repo-id omar81939/rlm-qwen35-35b-a3b-v11-s5 \
+        --checkpoint-dir checkpoints/v10_s40 \
+        --repo-id omar81939/rlm-qwen35-35b-a3b \
         --model-card MODEL_CARD.md
 """
 
@@ -53,7 +53,7 @@ def main():
     upload_folder(
         folder_path=str(ckpt_dir),
         repo_id=args.repo_id,
-        commit_message="Upload RLM LoRA adapter (V11-s5, SC-GRPO trained)",
+        commit_message="Upload RLM LoRA adapter (V10-s40, SC-GRPO trained)",
     )
 
     print(f"\nDone! Model available at: https://huggingface.co/{args.repo_id}")
