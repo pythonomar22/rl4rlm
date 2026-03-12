@@ -50,3 +50,17 @@ Task: dfqa_010_30t_120d_multi_step | 3600 rows, 216,972 chars
 Task: dfqa_011_30t_120d_multi_step | 3600 rows, 217,802 chars
 2026-03-11 01:53:27,896 tinker.lib.retry_handler ERROR: Request failed with non-retryable error: BadRequestError: Error code: 400 - {'detail': "Prompt length plus max_tokens exceeds the model's context window: 85592 prompt tokens + 2048 max_tokens > 65536."}
 2026-03-11 01:53:28,102 tinker.lib.telemetry INFO: Exception logged for session ID: c8b5b3a8-4aef-51f1-bd7d-f5bcd58aca88
+2026-03-11 01:58:22,468 tinker.lib.retry_handler ERROR: Request failed with non-retryable error: BadRequestError: Error code: 400 - {'detail': "Prompt length plus max_tokens exceeds the model's context window: 85567 prompt tokens + 2048 max_tokens > 65536."}
+2026-03-11 01:58:22,683 tinker.lib.telemetry INFO: Exception logged for session ID: c8b5b3a8-4aef-51f1-bd7d-f5bcd58aca88
+2026-03-11 01:58:22,688 eval INFO:   Score: 0.00 (no_match) | Answer: None | Expected: MS
+DataFrame QA:  60%|██████    | 12/20 [58:40<1:24:54, 636.85s/it]2026-03-11 01:58:22,689 eval INFO: 
+Task: dfqa_012_30t_120d_sector | 3600 rows, 216,558 chars
+2026-03-11 02:07:07,983 eval INFO:   Score: 0.00 (no_match) | Answer: Consumer | Expected: Technology
+DataFrame QA:  65%|██████▌   | 13/20 [1:07:25<1:10:21, 603.05s/it]2026-03-11 02:07:07,986 eval INFO: 
+Task: dfqa_013_30t_120d_multi_step | 3600 rows, 215,996 chars
+2026-03-11 02:18:30,437 eval INFO:   Score: 0.00 (no_match) | Answer: Finance | Expected: Healthcare
+DataFrame QA:  70%|███████   | 14/20 [1:18:47<1:02:42, 627.04s/it]2026-03-11 02:18:30,439 eval INFO: 
+Task: dfqa_014_30t_120d_aggregation | 3600 rows, 218,356 chars
+2026-03-11 02:25:57,853 eval INFO:   Score: 1.00 (numeric_close) | Answer: 363.10 | Expected: 363.16
+DataFrame QA:  75%|███████▌  | 15/20 [1:26:15<47:44, 572.89s/it]  2026-03-11 02:25:57,854 eval INFO: 
+Task: dfqa_015_50t_250d_aggregation | 12500 rows, 752,578 chars

@@ -219,11 +219,20 @@ class TinkerModel:
         )
 
         t0 = time.time()
-        result = self.sampling_client.sample(
-            prompt=prompt,
-            sampling_params=params,
-            num_samples=1,
-        ).result()
+        try:
+            result = self.sampling_client.sample(
+                prompt=prompt,
+                sampling_params=params,
+                num_samples=1,
+            ).result()
+        except Exception as e:
+            elapsed = time.time() - t0
+            error_msg = str(e)
+            if "context window" in error_msg or "prompt length" in error_msg.lower():
+                logger.warning(f"Sub-query context overflow ({prompt.length} tokens): {error_msg[:100]}")
+                return f"ERROR: Input too long ({prompt.length} tokens). Use smaller chunks."
+            logger.error(f"Sub-query failed: {type(e).__name__}: {error_msg[:200]}")
+            raise
         elapsed = time.time() - t0
 
         seq = result.sequences[0]
@@ -402,11 +411,20 @@ class HybridTinkerModel:
         )
 
         t0 = time.time()
-        result = self.sub_sampling_client.sample(
-            prompt=prompt,
-            sampling_params=params,
-            num_samples=1,
-        ).result()
+        try:
+            result = self.sub_sampling_client.sample(
+                prompt=prompt,
+                sampling_params=params,
+                num_samples=1,
+            ).result()
+        except Exception as e:
+            elapsed = time.time() - t0
+            error_msg = str(e)
+            if "context window" in error_msg or "prompt length" in error_msg.lower():
+                logger.warning(f"Sub-query context overflow ({prompt.length} tokens): {error_msg[:100]}")
+                return f"ERROR: Input too long ({prompt.length} tokens). Use smaller chunks."
+            logger.error(f"Sub-query failed: {type(e).__name__}: {error_msg[:200]}")
+            raise
         elapsed = time.time() - t0
 
         seq = result.sequences[0]

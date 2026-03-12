@@ -23,6 +23,46 @@ All bug fixes applied (temperature, event_counting seeded RNG, config recording)
 | Cross-Doc Compare (12) | **43.0%** | 28.6% | 28.7% | -14.3 |
 | Key-Value Retrieval (12) | **51.3%** | 45.3% | 52.1% | +0.8 |
 
+## V10-s5 / V11-s5 Partial Results (running, seed-offset 10000)
+
+| Benchmark | Base | V4-s5 | V4-H | V10-s5 | V11-s5 | Best |
+|-----------|------|-------|------|--------|--------|------|
+| NIAH | 60.0 | 70.0 | 75.0 | 75.0 | **80.0** | V11-s5 |
+| Multi-NIAH | 91.5 | 95.5 | **99.4** | 90.4 | 87.8 | V4-H |
+| Doc-Classify | 81.6 | 98.8 | 99.2 | 98.8 | **99.2** | V4-H/V11 |
+| DFQA | **54.0** | 47.0 | 20.0 | 38.7%* | 41.7%* | Base |
+| Code Debug | **25.6** | 25.6 | 22.2 | ... | ... | |
+| Multi-Hop QA | 85.0 | 85.0 | 85.0 | ... | ... | |
+| Notebook QA | **70.0** | 60.0 | 63.3 | ... | ... | |
+| Hard NIAH | 93.3 | 93.3 | 93.3 | ... | ... | |
+| Verbatim Copy | 100.0 | 100.0 | 100.0 | ... | ... | |
+| OOLONG | 0.0 | **10.0** | 0.0 | ... | ... | |
+| Hard Multi-Hop | 40.0 | **50.0** | 40.0 | ... | ... | |
+| Event Counting | **57.2** | 50.4 | 55.6 | ... | ... | |
+| Cross-Doc | **43.0** | 28.6 | 28.7 | ... | ... | |
+| Key-Value | 51.3 | 45.3 | **52.1** | ... | ... | |
+
+*partial — 15/20 (V10-s5) and 12/20 (V11-s5) DFQA tasks complete. Remaining are 50t tasks (expected ~0%).
+
+DFQA by size (confirms scaling failure):
+| Size | Base | V10-s5 | V11-s5 |
+|------|------|--------|--------|
+| 5t | ~40% | 76% | 60% |
+| 15t | ~40% | 20% | 20% |
+| 30t | ~80% | 20% | 50%* |
+| 50t | ~56% | ... | ... |
+*only 2/5 done
+
+Critical to watch: V11-s5 cross_doc (validates strategy fix), V10-s5 hard_multi_hop (validates task weight)
+
+### Training Reward Trends (last 5 steps avg)
+| Run | Steps Done | Avg Reward | Trend |
+|-----|-----------|------------|-------|
+| V9 | 20/30 | 0.481 | volatile, declining from s10 peak |
+| V10 | 12/40 | 0.508 | flat |
+| V10h | 12/40 | 0.510 | flat |
+| V11 | 9/20 | 0.620 | **increasing** (best of all) |
+
 ## Averages
 
 | Config | Average (14 benchmarks) |

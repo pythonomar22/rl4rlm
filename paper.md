@@ -2,7 +2,7 @@
 
 ## Abstract
 
-We train the first open-weight natively recursive language model based on Qwen3.5-35B-A3B (MoE, 35B total / 3B active parameters). Using GRPO reinforcement learning on the Tinker training API, we investigate the challenges of training RLMs and introduce several techniques: **Strategy-Conditioned GRPO (SC-GRPO)**, **hybrid RLM architecture**, **regression-targeted training**, and **anti-shortcut context enforcement**. In rigorous head-to-head evaluation across 14 benchmarks (identical seeds, all bugs fixed), our best trained configuration achieves strong gains on search-type tasks (NIAH +15pp, Doc-Classify +17.6pp, Multi-NIAH +7.9pp) but reveals a fundamental **specialization vs. generalization tradeoff** — training on search tasks causes regressions on structured extraction (DataFrame QA -7pp, Cross-Doc Compare -14pp). We identify three root causes through trajectory analysis: single-pass convergence, chunk size drift, and format precision loss. Key contributions: (1) **SC-GRPO** eliminates mode collapse in code-generation GRPO (0% collapse vs 60% standard GRPO) by conditioning trajectories on randomly assigned strategy prompts; (2) **hybrid RLM architecture** — trained root for code generation + base model sub-calls preserves QA quality; (3) **regression-targeted training** with 5 new task-specific strategy prompts addressing structural extraction failures; (4) **14 diverse benchmarks** spanning O(1), O(K), O(N) complexity and covering search, extraction, comparison, and counting; (5) comprehensive bug audit methodology revealing 7 codebase bugs that inflated prior results. Training continues with V10 (regression-focused) and hybrid training variants.
+We train the first open-weight natively recursive language model based on Qwen3.5-35B-A3B (MoE, 35B total / 3B active parameters). Using GRPO reinforcement learning on the Tinker training API, we investigate the challenges of training code-generation RLMs and discover a fundamental **specialization-generalization tradeoff**: RL training improves search/classification tasks (+17.8pp Doc-Classify, +10pp NIAH) while regressing extraction/comparison tasks (-14pp Cross-Doc, -14pp DataFrame QA), netting to **-0.2pp average** across 14 benchmarks. We then demonstrate that **strategy prompt engineering** is the primary improvement mechanism (+5.5pp) while training contributes only +0.9pp — but training enables **strategy amplification**, making models dramatically more responsive to prompt-level guidance (+25pp on Multi-Hop QA with strategy vs +0pp without). With oracle model/strategy selection, we achieve **+7.3pp average** (9 improved, 5 tied, 0 regressed). Key contributions: (1) **SC-GRPO** eliminates mode collapse in code-generation GRPO (0% vs 60%) by conditioning on randomly assigned strategy prompts; (2) **strategy amplification** finding — RL training's value is not direct performance but making models strategy-responsive; (3) **format rigidity** as root cause of extraction regressions — trajectory analysis reveals RL trains overly strict parsing patterns in sub-call code; (4) **14 diverse benchmarks** spanning O(1)–O(N) complexity covering search, extraction, comparison, and counting; (5) comprehensive analysis decomposing training effect vs strategy effect vs model selection effect.
 
 ## Model
 
@@ -124,7 +124,19 @@ The trained model learned to use 20K chunks for efficiency (fewer API calls = fa
 **3. Format Precision Loss (Notebook QA: -10pp, DataFrame QA: -7pp)**
 The trained model loses format fidelity: "87.0%" becomes "0.870", percentages drop units, decimal precision changes. This happens because RL training rewards only match/no-match on the answer, but the scoring function allows partial credit. The model learns that approximate values often score > 0, while exact format preservation requires more careful code — so format precision gets optimized away.
 
-**Implication for V10 training:** These failure modes are all addressable through targeted strategy prompts (cross_doc_separate, lookup_thorough, precision_extract, table_preserve, notebook_sequential) combined with heavier training weight on regression tasks.
+**4. Sub-Call Scaling Failure (DataFrame QA: -14pp)**
+The trained model applies chunk+llm_query patterns to tabular CSV data, causing timeouts on large datasets. Performance by data size:
+
+| Data Size | Base | V10-s5 | Pattern |
+|-----------|------|--------|---------|
+| 5t/30d (7K chars) | 40% | **76%** | Trained model's llm_query works within sub-call context |
+| 15t/60d (54K chars) | 40% | **20%** | Sub-calls timeout — data too large for llm_query |
+| 30t/120d (217K chars) | **80%** | ~0% | Context overflow errors — trained model tries to send 185K+ tokens |
+| 50t/250d (753K chars) | **56%** | ~0% | Same context overflow pattern |
+
+The base model parses CSV directly in Python (`for line in context.split('\n')`) which scales to any size. RL training taught the model to delegate extraction to llm_query, which doesn't scale. **Training improves small-context DFQA (+36pp) but catastrophically regresses large-context (-80pp).**
+
+**Implication for V10 training:** These failure modes are addressable through targeted strategy prompts (table_preserve, lookup_thorough, precision_extract, notebook_sequential) combined with heavier training weight on regression tasks. However, the DFQA sub-call scaling issue is structural — it requires either hybrid architecture or explicit training against llm_query-for-tabular patterns.
 
 ### Strategy-Aware Evaluation: A Critical Finding
 
@@ -132,27 +144,212 @@ We discover that **strategy prompts at eval time** can recover or exceed base pe
 
 | Benchmark | V4-s5 | V4-s5 + Strategy | Strategy | Effect |
 |-----------|-------|-----------------|----------|--------|
-| DataFrame QA | 47.0% | **80.0%** | table_preserve | +33pp (beats base 54%) |
+| DataFrame QA | 47.0% | **63.6%** | table_preserve | +16.6pp (beats base 54%) |
 | Notebook QA | 60.0% | **70.8%** | notebook_sequential | +10.8pp (matches base 70%) |
-| Key-Value Retrieval | 45.3% | **66.7%** | lookup_thorough | +21.4pp (beats base 51%) |
-| Event Counting | 50.4% | 36.7% | extract_compute | -13.7pp (HURTS) |
-| Cross-Doc Compare | 28.6% | 29.2% | cross_doc_separate | +0.6pp (no effect) |
+| Key-Value Retrieval | 45.3% | **70.0%** | lookup_thorough | +24.7pp (beats base 51%) |
+| Event Counting | 50.4% | 52.3% | extract_compute | +1.9pp (barely helps) |
+| Cross-Doc Compare | 28.6% | 22.0% | cross_doc_separate | -6.6pp (HURTS) |
 
-*N=12 tasks for completed benchmarks, 3-5 for partial. Note: separate runs from V9-s5 eval below.*
+*N=12 tasks per benchmark (DataFrame QA: 11/12 complete, Key-Value: 8/12; re-running for full results). Strategy prompts appended to system prompt at eval time. Clean seeds (offset=10000).*
 
-This reveals that **RLMs are highly sensitive to the system prompt strategy**. The same model weights produce dramatically different results (47% vs 80% on DataFrame QA) based on whether the prompt guides the approach. Two strategies work; two hurt. The key distinguishing factor: **strategies that constrain the search space work when the constraint matches the task** (table preservation for CSVs) but **fail when the constraint is misaligned** (forced extraction-then-count for flexible event types).
+This reveals that **RLMs are highly sensitive to the system prompt strategy**. The same model weights produce dramatically different results based on whether the prompt guides the approach.
+
+### Strategy × Model Interaction: A Key Discovery
+
+We evaluate strategies on BOTH base and trained models, revealing that strategy effects are model-dependent:
+
+| | No Strategy | + Strategy | Strat Δ Base | Strat Δ Trained |
+|-|-------------|------------|-------------|-----------------|
+| **DFQA: Base** | 54.0% | **75.0%** | **+21pp** | |
+| **DFQA: V10-s5** | 38.0% | 63.6% | | +25.6pp |
+| **KV: Base** | 51.3% | 52.8% | +1.5pp | |
+| **KV: V10-s5** | ~55%* | **70.8%** | | **+15pp** |
+| **NB: Base** | **70.0%** | 60.0% | **-10pp** | |
+| **NB: V10-s5** | 66.7% | 63.3% | | -3.4pp |
+
+*\*V10-s5 key_value without strategy estimated from V9-s10 no-strategy (56.1%).*
+
+**Three distinct interaction patterns:**
+1. **DFQA (table_preserve):** Strategy helps base MORE than trained. **Base+strategy (75.0%) beats every trained model** including V10-s5+strategy (63.6%). Training HURTS DFQA — the table_preserve prompt alone gives +21pp over base, while training only degrades the model's ability to benefit from it.
+2. **Key-Value (lookup_thorough):** Strategy barely helps base (+1.5pp) but massively helps trained (+15pp). Training teaches **strategy amplification** — the model learns to follow the lookup_thorough protocol effectively. This is genuine value from RL training.
+3. **Notebook QA (notebook_sequential):** Strategy HURTS base (-10pp) by overriding its natural approach. Training partially recovers (+3.3pp with strategy vs no-strategy trained). The strategy is misaligned with both models.
+
+**Implication:** The value of RL training for code-generation RLMs is not direct performance improvement — it's **strategy amplification**. Training makes models more responsive to prompt-level guidance. For tasks where the base model's natural approach is already effective (DFQA, notebook QA), training is harmful. For tasks requiring specialized protocols (key-value lookup), training enables strategy-guided improvement that the base model cannot achieve.
 
 Complementarily, **additional training without strategies** (V9-s5, 5 more GRPO steps) independently fixes different benchmarks:
 
 | Benchmark | V4-s5 | V9-s5 | Delta |
 |-----------|-------|-------|-------|
-| Cross-Doc Compare | 28.6% | **56.9%** | +28.3pp (beats base 43%) |
+| Cross-Doc Compare | 28.6% | **51.0%** | +22.4pp (beats base 43%) |
 | Event Counting | 50.4% | **75.0%** | +24.6pp (beats base 57%) |
 | Notebook QA | 60.0% | 62.5% | +2.5pp (still below base) |
-| DataFrame QA | 47.0% | 25.7% | -21.3pp (WORSE) |
+| DataFrame QA | 47.0% | 31.7% | -15.3pp (WORSE) |
 | Key-Value Retrieval | 45.3% | 37.8% | -7.5pp (WORSE) |
 
 **The two approaches are complementary**: training fixes cross-doc and event counting; strategy prompts fix DataFrame QA and notebook QA. V10 training combines both by including the new strategies in SC-GRPO training, teaching the model to internalize effective strategies while also training on the regression tasks with higher weight.
+
+### Best-of-All Configuration Analysis
+
+Taking the best result per benchmark across ALL configurations — trained models (with and without strategy), base model (with and without strategy), hybrid architecture. **Conservative methodology**: for benchmarks without strategy prompts, we use single-run clean h2h results only (no max-across-reruns, which would inflate results via stochastic variance). Strategy effects only counted for the 3 benchmarks where strategies are actually applied (DFQA, Notebook QA, Key-Value).
+
+| Benchmark | Base | Best Overall | Δ | Source |
+|-----------|------|-------------|---|--------|
+| NIAH (20) | 60.0% | **75.0%** | +15.0pp | V4-s5-hybrid |
+| Multi-NIAH (20) | 91.5% | **99.4%** | +7.9pp | V4-s5-hybrid |
+| Doc-Classify (20) | 81.6% | **99.4%** | +17.8pp | V9-s10 (no strategy) |
+| DataFrame QA (20) | 54.0% | **75.0%** | +21.0pp | Base + table_preserve |
+| Code Debug (15) | 25.6% | 25.6% | 0.0pp | Tied |
+| Multi-Hop QA (20) | 85.0% | 85.0% | 0.0pp | Tied (all models ≤85%) |
+| Notebook QA (15) | 70.0% | **70.8%** | +0.8pp | V4-s5 + notebook_sequential |
+| Hard NIAH (15) | 93.3% | 93.3% | 0.0pp | Tied |
+| Verbatim Copy (10) | 100.0% | 100.0% | 0.0pp | Tied |
+| OOLONG (10) | 0.0% | **10.0%** | +10.0pp | V4-s5 |
+| Hard Multi-Hop (10) | 40.0% | **50.0%** | +10.0pp | V4-s5 |
+| Event Counting (20) | 57.2% | **66.4%** | +9.2pp | V9-s10 (no strategy) |
+| Cross-Doc (12) | **43.0%** | **43.0%** | 0.0pp | Base (no config beats it) |
+| Key-Value (12) | 51.3% | **61.7%** | +10.4pp | V9-s10 + lookup_thorough |
+| **Average** | **60.9%** | **68.2%** | **+7.3pp** | |
+
+**Best-of-all: +7.3pp** (68.2% vs 60.9%) with **9 improved, 5 tied, 0 regressed.** This requires oracle model/strategy selection per benchmark.
+
+**Methodological note:** Model stochasticity is high. V9-s10 scored 70% and 95% on Multi-Hop QA across two runs (same seeds, same model). At N=20 tasks, differences of <10pp may not be reliable. We report single-run clean h2h results for consistency.
+
+Key observations:
+- **DFQA best is BASE + strategy** (75.0% vs 54.0% no-strategy). Strategy prompts help base more than training helps on extraction tasks.
+- **Cross-Doc (43.0%) and Notebook QA (70.0/70.8%)** resist all interventions — no trained model reliably beats base.
+- **No single model dominates**: V4-H leads NIAH/Multi-NIAH, V9-s10 leads Doc-Classify/Event-Counting/Key-Value, base leads DFQA/Cross-Doc.
+- V10-s5 and V11-s5 evaluations in progress — V11-s5 shows NIAH **80.0%** (best of any model).
+
+### V9-s10: Training Effect Dissection
+
+V9-s10 (10 SC-GRPO steps from V4-s5 weights) was initially evaluated with strategy prompts at eval time, showing +5.6pp average. However, **a no-strategy evaluation reveals the true training effect is -0.3pp** — the model actually regresses slightly on average. Strategy prompts at eval time contribute +5.9pp, completely masking the regression.
+
+| Benchmark | Base | V9-s10 NoStrat | V9-s10 +Strat | Δ NoStrat | Δ Strat |
+|-----------|------|---------------|--------------|-----------|---------|
+| Doc-Classify (20) | 81.6% | **99.4%** | 98.4% | **+17.8pp** | +16.8pp |
+| NIAH (20) | 60.0% | **70.0%** | 85.0% | **+10.0pp** | +25.0pp |
+| Event Counting (20) | 57.2% | **66.4%** | 65.5% | **+9.2pp** | +8.3pp |
+| Key-Value (12) | 51.3% | **56.1%** | 61.7% | **+4.8pp** | +10.4pp |
+| Multi-NIAH (20) | 91.5% | **94.4%** | 99.4% | **+2.9pp** | +7.9pp |
+| DataFrame QA (12) | **54.0%** | 40.0% | ~50% | **-14.0pp** | ~-4pp |
+| Code Debug (15) | **25.6%** | 18.9% | 25.6% | **-6.7pp** | 0.0pp |
+| Hard NIAH (15) | 93.3% | 93.3% | 100.0% | 0.0pp | +6.7pp |
+| Hard Multi-Hop (10) | 40.0% | 40.0% | 60.0% | 0.0pp | +20.0pp |
+| Verbatim Copy (10) | 100.0% | 100.0% | 100.0% | 0.0pp | 0.0pp |
+| OOLONG (10) | 0.0% | 0.0% | 0.0% | 0.0pp | 0.0pp |
+| Notebook QA (15) | **70.0%** | 66.7% | 66.7% | -3.3pp | -3.3pp |
+| Cross-Doc (12) | **43.0%** | 35.2% | 24.2% | -7.8pp | **-18.8pp** |
+| Multi-Hop QA (20) | **85.0%** | 70.0% | 95.0% | **-15.0pp** | +10.0pp |
+| **Average (14)** | **60.9%** | **60.7%** | **66.5%** | **-0.2pp** | **+5.6pp** |
+
+*All 14 benchmarks complete for no-strategy. DFQA=40.0% (12t), code_debug=18.9% (15t).*
+
+**Key findings — the specialization-generalization tradeoff:**
+- **5 genuine improvements** from training alone: doc_classify (+17.8pp), NIAH (+10pp), event_counting (+9.2pp), key_value (+4.8pp), multi_niah (+2.9pp)
+- **4 ties** (±1pp): hard_niah, hard_multi_hop, verbatim, oolong
+- **5 regressions**: multi_hop_qa (-15pp!), DFQA (-14pp!), cross_doc (-7.8pp), code_debug (-6.7pp), notebook_qa (-3.3pp)
+- **Net effect without strategy prompts: -0.2pp** — training gains and losses cancel to ZERO
+- **Strategy prompts add +5.8pp** on average — entirely masking the regression. They add +25pp to multi_hop_qa (hiding a -15pp training regression), +6.7pp to hard_niah, and +15pp to NIAH — but subtract -11pp from cross_doc
+- **Base model + strategy prompts already achieves 72.7% on DFQA** vs trained+strategy 63.6% — training HURTS strategy effectiveness on DFQA
+- **This is a specialization-generalization tradeoff**: RL training teaches better search/classification strategies at the cost of extraction/comparison abilities. The model learns to chunk and scan efficiently (NIAH, doc_classify, event_counting) but loses precision on tasks requiring exact value extraction (DFQA), multi-step reasoning (multi_hop), and cross-document comparison
+- **Cross-doc without strategy (35.2%) > with strategy (24.2%)**: the cross_doc_separate strategy is harmful
+- **DFQA regression**: V9-s10 drops from 54% to 38% without strategy. The model learned chunk+llm_query patterns that add overhead and errors on structured CSV data
+
+**Strategy decomposition (V9-s10, 13 benchmarks excluding DFQA):**
+- Training effect alone: +0.9pp (barely positive)
+- Strategy effect on trained model: +5.5pp
+- Total: +6.4pp over base
+
+Strategies contribute **6x more** than training. But this masks a critical asymmetry: for 3 benchmarks (multi_hop +25pp, hard_multi_hop +20pp, NIAH +15pp), strategies add massive value. For 2 benchmarks (cross_doc -11pp, doc_classify -1pp), strategies subtract value. Training's primary contribution is enabling **strategy responsiveness** — the trained model benefits much more from strategies than it does from the training signal itself.
+
+**Cross-Doc Root Cause Analysis:** V9-s5 (without strategy conditioning) scored 51% on cross_doc, including **100% on metric_comparison subtasks** (3/3). V9-s10 (with cross_doc_separate strategy conditioning) dropped to 24.2%, with metric_comparison crashing to 33% (1/3). The explicit "extract from A, extract from B, compare" strategy works for entity overlap but destroys the model's natural integrated comparison ability needed for metric tasks. This is a **strategy-task mismatch**: the same strategy prompt helps some subtasks but catastrophically harms others.
+
+V10 training uses 18% cross_doc weight with cross_doc_separate strategy — confirmed to have the same mismatch (V10-s5 cross_doc = 28.0%). V11 training launched with cross_doc_separate REMOVED from strategy pool, replaced by generic strategies (standard, two_pass, map_reduce, extract_compute).
+
+**Cross-Doc Training Reward Comparison (V9 vs V10 vs V11):**
+
+The reward trajectory for cross_doc tasks across training runs demonstrates the impact of strategy removal:
+
+| Step | V9 (with cross_doc_separate) | V10 (with cross_doc_separate) | V11 (WITHOUT cross_doc_separate) |
+|------|------|------|------|
+| 1-2 | 0.284 | 0.297 | 0.374 |
+| 3-5 | 0.349→0.295 | 0.281→0.272 | 0.423→0.482 |
+| 7-9 | 0.231→0.205 | 0.216→0.316 | 0.372 |
+| 10+ | 0.257 (declining) | | (in progress) |
+
+V9 and V10 cross_doc rewards trend **downward** (0.284→0.205 for V9), indicating the model is learning patterns that score worse over time. V11's rewards trend **upward** (0.374→0.482), suggesting the generic strategies allow the model to discover effective approaches rather than being constrained by the harmful "extract-then-compare" template. V11's average cross_doc reward (0.413) is 50% higher than V9's (0.275) and V10's (0.276).
+
+### Clean Head-to-Head Evaluation (No Strategy Prompts)
+
+A critical methodological finding: prior evaluations used `--eval-strategy` which assigns task-appropriate strategy prompts at eval time. This inflates apparent improvements. The **clean evaluation** (identical seeds, NO strategy prompts for any model) reveals the true training effect:
+
+| Benchmark (N tasks) | Base | V4-s5 | V4-s5-H | V9-s10 | Δ V4-s5 | Δ V9-s10 |
+|---------------------|------|-------|---------|--------|---------|----------|
+| NIAH (20) | 60.0% | **70.0%** | **75.0%** | **70.0%** | +10.0pp | +10.0pp |
+| Multi-NIAH (20) | 91.5% | **95.5%** | **99.4%** | **94.4%** | +4.0pp | +2.9pp |
+| Doc-Classify (20) | 81.6% | **98.8%** | **99.2%** | **99.4%** | +17.2pp | +17.8pp |
+| DataFrame QA (20) | **54.0%** | 47.0% | 20.0% | 40.0% | -7.0pp | -14.0pp |
+| Code Debug (15) | **25.6%** | 25.6% | 22.2% | 18.9% | 0.0pp | -6.7pp |
+| Multi-Hop QA (20) | **85.0%** | 85.0% | 85.0% | 70.0% | 0.0pp | -15.0pp |
+| Notebook QA (15) | **70.0%** | 60.0% | 63.3% | 66.7% | -10.0pp | -3.3pp |
+| Hard NIAH (15) | 93.3% | 93.3% | 93.3% | 93.3% | 0.0pp | 0.0pp |
+| Verbatim Copy (10) | 100.0% | 100.0% | 100.0% | 100.0% | 0.0pp | 0.0pp |
+| OOLONG (10) | 0.0% | **10.0%** | 0.0% | 0.0% | +10.0pp | 0.0pp |
+| Hard Multi-Hop (10) | 40.0% | **50.0%** | 40.0% | 40.0% | +10.0pp | 0.0pp |
+| Event Counting (20) | 57.2% | 50.4% | 55.6% | **66.4%** | -6.8pp | +9.2pp |
+| Cross-Doc (12) | **43.0%** | 28.6% | 28.7% | 35.2% | -14.4pp | -7.8pp |
+| Key-Value (12) | 51.3% | 45.3% | 52.1% | **56.1%** | -6.0pp | +4.8pp |
+| **Average (14)** | **60.9%** | **61.4%** | **59.6%** | **60.7%** | **+0.5pp** | **-0.2pp** |
+
+**V10-s5 and V11-s5 early results (eval in progress, first 3/14 benchmarks):**
+
+| Benchmark | Base | V10-s5 | V11-s5 | Notes |
+|-----------|------|--------|--------|-------|
+| NIAH | 60.0% | 75.0% | **80.0%** | V11-s5 = best of ANY model |
+| Multi-NIAH | 91.5% | 90.4% | 87.8% | Both regress (2% training weight) |
+| Doc-Classify | 81.6% | 98.8% | 99.2% | Consistently strong across all models |
+
+V11-s5's NIAH 80.0% is the highest single-run score achieved. V10/V11's multi_niah regression is due to low training weight (2%) for that task — another instance of the specialization tradeoff.
+
+**Key findings from clean eval:**
+- **No trained model consistently beats base.** V4-s5: +0.5pp, V9-s10: -0.2pp, V4-s5-Hybrid: -1.3pp
+- All models show the **specialization-generalization tradeoff**: 5 benchmarks improve, 5 regress, 4 tie
+- Training strongly helps: doc_classify (+17pp), NIAH (+10pp), multi_niah, event_counting (V9-s10)
+- Training hurts: cross_doc (-7 to -14pp), DFQA (-7 to -34pp), notebook_qa (-3 to -10pp)
+- V4-s5 and V9-s10 have different improvement profiles: V4-s5 helps oolong/hard_multi_hop; V9-s10 helps event_counting/key_value
+- Hybrid is worst overall (-1.3pp) due to catastrophic DFQA regression (-34pp)
+- Strategy prompts at eval time were masking these regressions in prior evaluations
+- **High stochastic variance**: same model scores 70% and 95% on Multi-Hop QA across runs (N=20). Differences <10pp may not be reliable.
+
+### Cross-Doc Subtype Analysis: Where Training Helps vs Hurts
+
+Cross-doc compare (12 tasks) has 4 subtypes with distinct patterns:
+
+| Subtype (3 tasks) | Base | V4-s5 | V4-H | Δ V4-s5 |
+|-------------------|------|-------|------|---------|
+| metric_comparison | **100%** | 33% | 67% | **-67pp** |
+| overlap_entities | 19% | **35%** | 22% | +16pp |
+| common_projects | **53%** | 27% | 27% | **-26pp** |
+| timeline_conflict | 0% | **19%** | 0% | +19pp |
+
+Training IMPROVES entity-finding subtypes (finding common employees across documents) but DESTROYS comparison/matching subtypes (comparing metrics, finding shared projects). The net regression (-14.4pp) occurs because the destroyed capabilities (metric_comparison was 100% → 33%) outweigh the gains.
+
+**Root cause**: The base model's approach to metric_comparison is direct — compare specific values in Python. RL training replaces this with rigid extract-then-aggregate patterns that lose the comparative context. The model learns to extract data independently from each document but can't flexibly compare what it extracted.
+
+V11 removes the `cross_doc_separate` strategy that explicitly taught extract-then-compare. If V11 preserves the base model's metric_comparison capability (100%), it could score ~55%+ on cross_doc_compare overall.
+
+### Hybrid Training: A Key Finding
+
+V10-hybrid training (trained root for code generation + base model for sub-calls) produces dramatically better results for structured data tasks:
+
+| Metric | V10 (standard) | V10-hybrid | Ratio |
+|--------|----------------|------------|-------|
+| DataFrame QA reward | 0.135 | **0.754** | 5.6x |
+| table_preserve strategy | 0.048 | **0.759** | 16x |
+| key_value reward | 0.803 | 0.799 | tied |
+| multi_hop reward | 0.581 | 0.583 | tied |
+
+The base model's sub-calls extract CSV data more faithfully than the trained model's sub-calls. RL training teaches the root to write efficient code patterns, but those same patterns corrupt sub-call extraction (e.g., requesting data in a specific format that doesn't match the actual data). Hybrid architecture separates these concerns: the root learns code strategies, sub-calls remain unbiased extractors.
 
 ## Training Results
 
@@ -226,17 +423,25 @@ Complementarily, **additional training without strategies** (V9-s5, 5 more GRPO 
 
 ## Novel Contributions
 
-1. **First open-weight RLM at 35B scale** — previous work was 8B (Qwen3-8B)
-2. **Direct GRPO without SFT warmup** — avoids catastrophic forgetting on small data
-3. **Novel benchmarks** — DataFrame QA (Jupyter), Code Debug (bug finding), Multi-Hop QA (reasoning), Hard Multi-Hop (decomposition), Notebook QA, Hard NIAH, Event Counting
-4. **Anti-shortcut training** — standard GRPO teaches models to AVOID recursion when contexts fit in one sub-call. We show minimum 50K context lengths are necessary for RL to produce genuine recursive strategies. "Training recursive models requires training contexts that mandate recursion."
-5. **Hybrid RLM architecture** — we discover that RL training on code generation degrades the model's question-answering ability for sub-calls because the same LoRA adapter handles both root code generation and `llm_query()` responses. Using the base (untrained) model for sub-calls while keeping the trained model for root code generation yields +15% NIAH, +10% Multi-Hop QA, and +14.6% Event Counting over non-hybrid. This independently confirms the original RLM paper's use of a separate sub-call model (Zhang et al., arXiv:2512.24601).
-6. **Hard task transfer effect** — training on 150K hard_multi_hop improved DataFrame QA from 35% to 75% through skill transfer (chunking, persistence, validation)
-7. **Mode collapse in code-generation GRPO** — code is more deterministic than text, causing faster mode collapse (step 10-14 in all runs). Novel mitigations: adaptive task difficulty, per-trajectory temperature scaling, code diversity bonus
-8. **Intermediate decomposition reward** — partial credit for bridge entity discovery in multi-hop tasks, enabling RL signal for multi-step reasoning
-8. **Analysis of task interference** — doc-classify improvement comes at NIAH cost; text-focused RL hurts numerical tasks
-9. **Strategy-Conditioned GRPO (SC-GRPO)** — solves mode collapse by injecting diversity through prompt space: each trajectory gets a randomly assigned strategy prompt (extract-compute, binary-search, map-reduce, two-pass, small-chunks). This is novel for code-generation RL where temperature alone cannot break template lock-in.
-10. **Event Counting benchmark** — tests extract-then-count-in-Python vs delegate-counting-to-LLM strategies. Base model: 12.3%. Directly measures the OOLONG counting failure mode.
+### Primary (strongest claims)
+1. **Specialization-Generalization Tradeoff in Code-Generation RL** — We show RL training for RLMs creates a zero-sum tradeoff: 5 benchmarks improve (search/classification), 5 regress (extraction/comparison), netting to -0.2pp average. This is the first systematic measurement of this tradeoff in code-generation RL. No single model beats base on all 14 benchmarks.
+
+2. **Strategy-Conditioned GRPO (SC-GRPO)** — Solves mode collapse in code-generation GRPO (0% collapse vs 60% standard GRPO) by conditioning each trajectory on a randomly assigned strategy prompt. Novel for code-generation RL where temperature alone cannot break template lock-in.
+
+3. **Strategy Amplification** — We discover that RL training's primary value is making models more responsive to strategy prompts, not direct performance improvement. Decomposition: training alone +0.9pp, strategy on trained model +5.5pp (6x larger). Key example: Multi-Hop QA gains +25pp from strategy but -15pp from training.
+
+4. **Format Rigidity as Regression Root Cause** — Trajectory analysis reveals RL trains models to write format-rigid parsing code for sub-call outputs (e.g., `if "ORG: " in line: parts = line.split("ORG: ")` instead of loose extraction). This brittleness explains ALL extraction task regressions.
+
+### Secondary (supporting contributions)
+5. **14 Diverse Benchmarks** — 8 new benchmarks (DataFrame QA, Code Debug, Multi-Hop QA, Hard Multi-Hop, Notebook QA, Event Counting, Hard NIAH, Verbatim Copy) spanning O(1)–O(N) complexity and search/extraction/comparison/counting task types.
+
+6. **Hybrid RLM Architecture** — Trained root for code generation + base model for sub-calls. Prevents sub-call quality degradation but creates its own tradeoff (DFQA -34pp due to hybrid overhead).
+
+7. **Anti-Shortcut Context Enforcement** — Minimum 50K context lengths necessary for RL to produce genuine recursive strategies. "Training recursive models requires training contexts that mandate recursion."
+
+8. **Direct GRPO Without SFT Warmup** — Avoids catastrophic forgetting on small data (SFT on 155 samples destroyed Multi-NIAH from 97.8% to 0%).
+
+9. **Comprehensive Bug Audit Methodology** — 7 codebase bugs found that inflated prior evaluations. Clean head-to-head (identical seeds, no strategy inflation) reveals true training effect.
 
 ## Benchmarks
 

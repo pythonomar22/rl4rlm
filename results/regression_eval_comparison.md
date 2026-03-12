@@ -6,10 +6,10 @@ Date: 2026-03-11
 
 | Benchmark | Base | V4-s5 | V9-s5 | V4-s5+Strategy |
 |-----------|------|-------|-------|----------------|
-| Cross-Doc Compare | **43.0%** | 28.6% | **51.0%** | 26.5% |
+| Cross-Doc Compare | **43.0%** | 28.6% | **51.0%** | 22.0% |
 | Key-Value Retrieval | 51.3% | 45.3% | 37.8% | **62.5%** |
 | Notebook QA | **70.0%** | 60.0% | 62.5% | **70.8%** |
-| DataFrame QA | 54.0% | 47.0% | 25.5% | **63.6%** |
+| DataFrame QA | 54.0% | 47.0% | 31.7% | **63.6%** |
 | Event Counting | 57.2% | 50.4% | **75.0%** | 52.5% |
 
 ## Strategies Used (V4-s5+Strategy)

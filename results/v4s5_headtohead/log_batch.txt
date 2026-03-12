@@ -858,3 +858,35 @@ Task: hard_multihop_2hop_5 | 2-hop | 100,083 chars
 Task: hard_multihop_2hop_6 | 2-hop | 100,083 chars
 2026-03-11 01:57:23,146 eval INFO:   Q: In which city is the Director of Human Resources based?
 2026-03-11 01:57:23,146 eval INFO:   Decomposition: Find who is the Director of Human Resources → Victor Hall → Find where Victor Hall is based → New York
+2026-03-11 01:58:23,564 eval INFO:   Score: 0.0 (none) | Expected: New York | Got: Zurich
+HardMultiHop:  70%|███████   | 7/10 [09:00<03:30, 70.15s/it]2026-03-11 01:58:23,564 eval INFO: 
+Task: hard_multihop_3hop_7 | 3-hop | 200,134 chars
+2026-03-11 01:58:23,564 eval INFO:   Q: Where is the project led by Carol Brown headquartered?
+2026-03-11 01:58:23,564 eval INFO:   Decomposition: Find what initiative Carol Brown leads → Project Atlas → Find where Project Atlas is headquartered → San Francisco
+2026-03-11 01:59:58,297 eval INFO:   Score: 1.0 (contains) | Expected: San Francisco | Got: Project Atlas, San Francisco
+HardMultiHop:  80%|████████  | 8/10 [10:35<02:35, 77.98s/it]2026-03-11 01:59:58,298 eval INFO: 
+Task: hard_multihop_2hop_8 | 2-hop | 150,153 chars
+2026-03-11 01:59:58,298 eval INFO:   Q: What is the budget for the project led by Rachel Robinson?
+2026-03-11 01:59:58,298 eval INFO:   Decomposition: Find what project Rachel Robinson leads → Project Atlas → Find the budget of Project Atlas → $4.2 million
+2026-03-11 02:01:23,560 eval INFO:   Score: 0.0 (none) | Expected: $4.2 million | Got: $12.3 million
+HardMultiHop:  90%|█████████ | 9/10 [12:00<01:20, 80.26s/it]2026-03-11 02:01:23,561 eval INFO: 
+Task: hard_multihop_3hop_9 | 3-hop | 150,112 chars
+2026-03-11 02:01:23,561 eval INFO:   Q: Where is the project led by Olivia Lopez headquartered?
+2026-03-11 02:01:23,563 eval INFO:   Decomposition: Find what initiative Olivia Lopez leads → Project Prism → Find where Project Prism is headquartered → New York
+2026-03-11 02:03:11,032 eval INFO:   Score: 0.0 (none) | Expected: New York | Got: Olivia Lopez not found in context
+HardMultiHop: 100%|██████████| 10/10 [13:47<00:00, 88.66s/it]HardMultiHop: 100%|██████████| 10/10 [13:48<00:00, 82.80s/it]
+2026-03-11 02:03:11,039 eval INFO: 
+--- hard_multi_hop Results ---
+2026-03-11 02:03:11,040 eval INFO: Accuracy/Recall: 30.0%
+2026-03-11 02:03:11,040 eval INFO: Tasks: 10
+2026-03-11 02:03:11,060 eval INFO: 
+============================================================
+2026-03-11 02:03:11,061 eval INFO: ALL EVALUATIONS COMPLETE
+2026-03-11 02:03:11,061 eval INFO: ============================================================
+2026-03-11 02:03:11,061 eval INFO:   hard_multi_hop: 30.0% (10 tasks)
+2026-03-11 02:03:11,061 eval INFO: Total time: 828.0s
+2026-03-11 02:03:11,061 eval INFO: Model stats: {'root_calls': 10, 'sub_calls': 84, 'total_input_tokens': 258561, 'total_output_tokens': 2004, 'total_time': 826.0897626876831}
+2026-03-11 02:03:11,061 eval INFO: Results saved to: results/v4s5_headtohead/20260311_014747
+Finished hard_multi_hop at Wed Mar 11 02:03:14 CET 2026
+
+ALL BENCHMARKS COMPLETE at Wed Mar 11 02:03:14 CET 2026

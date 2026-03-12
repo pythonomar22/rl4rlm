@@ -121,10 +121,11 @@ def rlm(
         system_prompt=system_prompt,
     )
 
-    # Auto-scale timeout with document length: 90s base + 60s per 100K chars
-    # 150K doc → 8 chunks × ~10s each = ~80s, plus API latency variance
+    # Auto-scale timeout with document length: 120s base + 60s per 100K chars
+    # Tinker API sub-calls take 10-20s each; 54K doc with 3 chunks needs ~60-90s
+    # Previous 90s base caused excessive timeouts in training
     if code_timeout is None:
-        code_timeout = max(90, 90 + (len(prompt) // 100000) * 60)
+        code_timeout = max(120, 120 + (len(prompt) // 100000) * 60)
 
     # 1. Init REPL with prompt as context, model's sub_query as llm_query
     state = init_repl(

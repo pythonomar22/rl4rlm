@@ -11,39 +11,39 @@ appended to the system prompt during evaluation.
 
 | Benchmark | Base | V4-s5 | V4-s5+Strat | Strategy Used | Verdict |
 |-----------|------|-------|-------------|---------------|---------|
-| notebook_qa | 70.0% | 60.0% | **70.8%** | notebook_sequential | FIXES regression |
-| dataframe_qa | 54.0% | 47.0% | **80.0%** (5/12) | table_preserve | BEATS base by +26pp |
-| key_value_retrieval | 51.3% | 45.3% | **66.7%** (3/12) | lookup_thorough | BEATS base (early) |
-| event_counting | 57.2% | 50.4% | 31.2% (8/12) | extract_compute | HURTS |
-| cross_doc_compare | 43.0% | 28.6% | 5.7% (3/12) | cross_doc_separate | HURTS |
+| notebook_qa | 70.0% | 60.0% | **70.8%** (12/12) | notebook_sequential | FIXES regression |
+| dataframe_qa | 54.0% | 47.0% | **63.6%** (11/12) | table_preserve | BEATS base by +10pp |
+| key_value_retrieval | 51.3% | 45.3% | **62.5%** (8/12) | lookup_thorough | BEATS base by +11pp |
+| event_counting | 57.2% | 50.4% | 52.3% (12/12) | extract_compute | BARELY HELPS (+2pp) |
+| cross_doc_compare | 43.0% | 28.6% | 22.0% (12/12) | cross_doc_separate | HURTS (-6.6pp) |
 
 ## Analysis
 
 ### Strategies That WORK at eval time:
-1. **table_preserve** (DataFrame QA): +33pp over V4-s5. The model CAN parse CSVs correctly,
-   it just needs to be told not to chunk them.
-2. **notebook_sequential** (Notebook QA): +10.8pp over V4-s5. Recovers base performance.
+1. **table_preserve** (DataFrame QA): +16.6pp over V4-s5 (63.6% vs 47.0%). Beats base by +9.6pp.
+   The model CAN parse CSVs correctly, it just needs to be told not to chunk them.
+2. **notebook_sequential** (Notebook QA): +10.8pp over V4-s5 (70.8% vs 60.0%). Matches base.
    Format precision (87.0% vs 0.870) still sometimes fails.
-3. **lookup_thorough** (Key-Value Retrieval): +21.4pp over V4-s5 (early, 3 tasks).
+3. **lookup_thorough** (Key-Value Retrieval): +17.2pp over V4-s5 (62.5% vs 45.3%). Beats base by +11.2pp.
    Small chunks + exhaustive search catches entries missed by larger chunks.
 
 ### Strategies That HURT at eval time:
-4. **extract_compute** (Event Counting): -19.2pp vs V4-s5. The "NEVER delegate counting
-   to llm_query" instruction is too constraining. The model does better with flexibility.
-5. **cross_doc_separate** (Cross-Doc Compare): -22.9pp vs V4-s5. The instruction to
-   "process each document SEPARATELY" requires knowing where each document is in the
-   context, which the model can't determine without first scanning. The prescriptive
-   approach backfires.
+4. **extract_compute** (Event Counting): +1.9pp vs V4-s5 (52.3% vs 50.4%). Barely helps —
+   not worth the risk. The "NEVER delegate counting to llm_query" instruction sometimes
+   constrains helpful behavior.
+5. **cross_doc_separate** (Cross-Doc Compare): -6.6pp vs V4-s5 (22.0% vs 28.6%). The
+   instruction to "process each document SEPARATELY" requires knowing where each document
+   is in the context, which the model can't determine without first scanning.
 
 ## V9-s5 Results (more training, no strategy prompts)
 
 | Benchmark | Base | V4-s5 | V9-s5 | Delta vs Base |
 |-----------|------|-------|-------|---------------|
-| cross_doc_compare | 43.0% | 28.6% | **56.9%** (9/12) | **+13.9** |
+| cross_doc_compare | 43.0% | 28.6% | **51.0%** (12/12) | **+8.0** |
 | event_counting | 57.2% | 50.4% | **75.0%** (12/12) | **+17.8** |
 | notebook_qa | 70.0% | 60.0% | 62.5% (12/12) | -7.5 |
 | key_value_retrieval | 51.3% | 45.3% | 37.8% (12/12) | -13.5 |
-| dataframe_qa | 54.0% | 47.0% | 25.7% (7/12) | -28.3 |
+| dataframe_qa | 54.0% | 47.0% | 31.7% (12/12) | -22.3 |
 
 V9-s5 improves cross_doc and event_counting through training,
 but worsens dataframe_qa (lack of table-aware training).
