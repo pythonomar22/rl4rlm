@@ -112,8 +112,9 @@ def _generate_entry(
             f"sts {status}, cat {category}"
         ),
     ]
-    # Use the same format index per document to keep the registry consistent
-    fmt_idx = rng.getrandbits(2)  # 0-3, chosen once per document via doc-level rng
+    # Use a fixed format index per document to keep the registry consistent.
+    # fmt_idx is passed from the caller (computed once per document).
+    fmt_idx = rng % 4 if isinstance(rng, int) else rng.getrandbits(2)
     return templates[fmt_idx]
 
 
@@ -140,8 +141,8 @@ def _generate_document(
     all entries in a document share the same visual format, making it harder
     to distinguish targets from distractors.
     """
-    # Choose a single entry format for this document
-    fmt_rng = random.Random(rng.randint(0, 2**31))
+    # Choose a single entry format for this document (fixed, not per-entry)
+    fmt_idx = rng.randint(0, 3)
 
     # Collect all registry IDs to avoid collisions
     used_ids = {e["registry_id"] for e in target_entries}
@@ -177,7 +178,7 @@ def _generate_document(
     # Target filler chars between blocks
     n_blocks = len(entry_blocks)
     total_entry_chars = sum(
-        len(_generate_entry(e["registry_id"], e["value"], e["status"], e["category"], fmt_rng))
+        len(_generate_entry(e["registry_id"], e["value"], e["status"], e["category"], fmt_idx))
         for block in entry_blocks for e in block
     )
     remaining_chars = max(0, doc_length - total_entry_chars)
@@ -200,7 +201,7 @@ def _generate_document(
             parts.append(
                 _generate_entry(
                     entry["registry_id"], entry["value"],
-                    entry["status"], entry["category"], fmt_rng,
+                    entry["status"], entry["category"], fmt_idx,
                 )
             )
         parts.append("")
@@ -419,7 +420,7 @@ def _generate_document_from_all(
 
     n_blocks = len(entry_blocks)
     total_entry_chars = sum(
-        len(_generate_entry(e["registry_id"], e["value"], e["status"], e["category"], fmt_rng))
+        len(_generate_entry(e["registry_id"], e["value"], e["status"], e["category"], fmt_idx))
         for block in entry_blocks for e in block
     )
     remaining_chars = max(0, doc_length - total_entry_chars)
@@ -440,7 +441,7 @@ def _generate_document_from_all(
             parts.append(
                 _generate_entry(
                     entry["registry_id"], entry["value"],
-                    entry["status"], entry["category"], fmt_rng,
+                    entry["status"], entry["category"], fmt_idx,
                 )
             )
         parts.append("")

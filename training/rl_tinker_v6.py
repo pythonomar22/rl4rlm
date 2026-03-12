@@ -166,6 +166,69 @@ For this task, the context contains a Jupyter notebook with code cells and their
 3. Pay attention to cell output sections — the answer is often in a print() or display() output
 4. Distinguish between code and output: code defines logic, output contains results
 5. When asked about a specific value, trace it through the cell execution chain.""",
+
+    # V15: New strategies for remaining weak benchmarks (based on failure mode analysis)
+    "code_debug_focused": """
+
+## Strategy: Focused Bug Detection
+For this task, you are debugging a codebase with intentionally planted bugs.
+CRITICAL RULES:
+1. IGNORE functions with obvious runtime errors (undefined variables, missing returns, import errors) — these are FILLER CODE, not real bugs
+2. The real bugs are SUBTLE LOGIC ERRORS: off-by-one, wrong operators (< vs <=), wrong indices (a[i][j] vs a[j][i]), wrong default values
+3. For each function, mentally trace execution with a simple test case (e.g., [1,2,3] for a list function)
+4. Compare what the function SHOULD return vs what it ACTUALLY returns
+5. Focus on mathematical/algorithmic correctness, NOT syntax or variable scope
+6. Return ONLY bugs where the function produces WRONG OUTPUT for valid input""",
+
+    "event_extract_python": """
+
+## Strategy: Verbatim Extraction + Python Counting
+For this task, you must count or find events in a long document.
+CRITICAL RULES:
+1. Ask llm_query to RETURN THE EXACT MATCHING LINES/EVENTS verbatim — not counts, not summaries
+2. Use Python regex on the raw context to VALIDATE extracted events (e.g., re.findall for event patterns)
+3. NEVER let llm_query count for you — always aggregate in Python code
+4. For "first"/"last" tasks: track the CHARACTER POSITION of each match in the original context
+5. Deduplicate by event ID or unique identifiers, not by content similarity
+6. Cross-check: if regex count differs from llm_query extraction count, trust the regex""",
+
+    "multi_hop_decompose": """
+
+## Strategy: Explicit Question Decomposition
+For this task, the answer requires chaining 2-3 facts spread far apart in the document.
+CRITICAL RULES:
+1. DECOMPOSE the question into sub-questions (e.g., "budget of project led by X" → "What project does X lead?" then "What is that project's budget?")
+2. Find each fact SEPARATELY — search for it specifically, don't try to find everything in one pass
+3. VERIFY each intermediate answer before using it for the next hop
+4. BEWARE of distractor entities: multiple people may have similar roles, multiple projects may exist
+5. After finding your chain, do a VERIFICATION pass: re-read the relevant chunks to confirm each link
+6. If you find conflicting answers, use the one with the most specific context match
+7. Return answers in the SAME format as they appear in the document (e.g., 'September 8, 2026' not '2026-09-08', '$1.9 million' not '1900000')""",
+
+    "cross_doc_structured": """
+
+## Strategy: Structured Document Extraction
+For this task, you must compare information across two documents in a long context.
+CRITICAL RULES:
+1. FIRST: Find the document boundaries (look for "=== Document" markers or similar delimiters)
+2. Process Document A completely: extract ALL relevant data into a Python dict/set
+3. Process Document B completely: extract ALL relevant data into a Python dict/set
+4. COMPARE in Python: use set operations (intersection, difference) on the structured data
+5. For entity overlap: extract names from EACH document into separate Python sets, then compute intersection
+6. For budget/metric comparison: extract numerical data into dicts, compare mathematically
+7. NEVER ask llm_query to do the comparison — always compare in Python after extraction""",
+
+    "oolong_regex": """
+
+## Strategy: Regex-First Extraction
+For this task, the context contains long transcripts with specific countable items (rolls, spells, actions).
+CRITICAL RULES:
+1. FIRST try Python regex directly on context to find all matches (e.g., re.findall for roll patterns, spell names)
+2. Common patterns: "rolls a/an N", "natural N", "casts SPELL", "uses SPELL"
+3. Only use llm_query for chunks where regex fails or for interpretation questions
+4. Count ALL matches in Python — NEVER let llm_query estimate or count
+5. Use small chunks (10K chars) with large overlap (3K chars) to avoid boundary misses
+6. For spell identification: extract exact spell names, deduplicate with set(), sort alphabetically""",
 }
 
 # Which strategies to prefer for each task type
@@ -596,7 +659,9 @@ def trajectory_to_training_data_is(
             )
             data.append(datum)
         except Exception as e:
-            logger.warning(f"Failed to convert turn for IS: {e}")
+            logger.warning(f"Failed to convert turn {turn_idx} for IS: {e}")
+        finally:
+            turn_idx += 1
 
     return data
 
@@ -760,6 +825,24 @@ TASK_DISTRIBUTIONS = {
         ("key_value_retrieval", 0.10),  # Needs Python-direct approach
         ("multi_hop_qa", 0.15),      # Benefits from multi-turn reasoning
     ],
+    # V14: Equal weight on all 14 benchmarks — for SFT→GRPO two-phase refinement.
+    # Light GRPO (3-5 steps) on SFT checkpoint to push all tasks uniformly.
+    "v14_all": [
+        ("niah", 0.08),
+        ("multi_niah", 0.08),
+        ("doc_classify", 0.08),
+        ("dataframe_qa", 0.08),
+        ("code_debug", 0.06),
+        ("multi_hop_qa", 0.08),
+        ("notebook_qa", 0.08),
+        ("hard_niah", 0.06),
+        ("verbatim_copy", 0.04),
+        ("hard_multi_hop", 0.08),
+        ("event_counting", 0.08),
+        ("cross_doc_compare", 0.08),
+        ("key_value_retrieval", 0.08),
+        ("oolong", 0.04),
+    ],
 }
 
 
@@ -869,6 +952,20 @@ def sample_tasks_v6(
                 n_tasks=count, doc_lengths=[50000, 100000, 150000], seed_offset=s
             )
             tasks.extend({"task": t, "type": "key_value_retrieval"} for t in items)
+        elif ttype == "hard_niah":
+            from eval.benchmarks.hard_niah import generate_hard_niah_suite
+            items = generate_hard_niah_suite(n_tasks=count, seed_offset=s)
+            tasks.extend({"task": t, "type": "hard_niah"} for t in items)
+        elif ttype == "verbatim_copy":
+            from eval.benchmarks.verbatim_copy import generate_verbatim_copy_suite
+            items = generate_verbatim_copy_suite(n_tasks=count, seed_offset=s)
+            tasks.extend({"task": t, "type": "verbatim_copy"} for t in items)
+        elif ttype == "oolong":
+            from eval.benchmarks.oolong import load_oolong_tasks
+            items = load_oolong_tasks(n_tasks=count)
+            tasks.extend({"task": t, "type": "oolong"} for t in items)
+        else:
+            logger.warning(f"Unknown task type '{ttype}' in distribution — skipping")
 
     rng.shuffle(tasks)
     return tasks
@@ -916,7 +1013,29 @@ def score_trajectory(traj_dict: dict, task_info: dict) -> float:
     elif task_type == "key_value_retrieval":
         scores = score_key_value(answer, task)
         return scores["score"]
-    return 0
+    elif task_type == "hard_niah":
+        return score_niah(answer, task.expected_answer)
+    elif task_type == "verbatim_copy":
+        from eval.benchmarks.verbatim_copy import score_verbatim_copy
+        scores = score_verbatim_copy(answer, task.expected_answer)
+        return scores["score"]
+    elif task_type == "oolong":
+        # OOLONG uses exact match with numeric tolerance
+        if answer is None:
+            return 0
+        pred = str(answer).strip().lower()
+        exp = str(task.expected_answer).strip().lower()
+        if pred == exp:
+            return 1.0
+        try:
+            if abs(float(pred) - float(exp)) / max(abs(float(exp)), 1e-9) < 0.05:
+                return 1.0
+        except (ValueError, ZeroDivisionError):
+            pass
+        return 1.0 if exp in pred else 0.0
+    else:
+        logger.warning(f"Unknown task type '{task_type}' — returning score 0")
+        return 0
 
 
 # ============================================================================
@@ -1046,7 +1165,7 @@ def train_rl_v6(
     logger.info(f"  K: {K}, Batch: {batch_size}, Steps: {steps}")
     logger.info(f"  Task type: {task_type}")
     # Map task_type CLI arg to distribution key
-    _TASK_TYPE_TO_DIST = {"mixed_v6": "v9", "mixed_v10": "v10", "mixed_v11": "v11", "mixed_v12": "v12", "mixed_v13": "v13"}
+    _TASK_TYPE_TO_DIST = {"mixed_v6": "v9", "mixed_v10": "v10", "mixed_v11": "v11", "mixed_v12": "v12", "mixed_v13": "v13", "mixed_v14": "v14_all"}
     if task_type in _TASK_TYPE_TO_DIST:
         dist_name = _TASK_TYPE_TO_DIST[task_type]
         dist_info = TASK_DISTRIBUTIONS[dist_name]
@@ -1070,14 +1189,13 @@ def train_rl_v6(
         logger.info(f"  Asymmetric advantage: clip_high={clip_high}, clip_low={clip_low}")
     logger.info(f"{'='*60}\n")
 
-    # Temperature schedule
+    # Temperature schedule — MoE models are sensitive to high temperature.
+    # T>1.0 can cause expert routing failures → multilingual gibberish.
+    # Strategies already provide diversity; temperature should stay modest.
     if strategy_conditioning:
-        # Wider range for SC-GRPO: strategies provide diversity, temperature adds variation
-        # Cap at 1.3 — T=1.5 produces gibberish on Qwen3.5 (validated empirically)
-        temp_schedule = [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3]
+        temp_schedule = [0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0, 1.0]
     else:
-        # Narrower range for standard GRPO (1.2+ mainly causes failures)
-        temp_schedule = [0.7, 0.8, 0.9, 1.0, 1.0, 1.1, 1.1, 1.2]
+        temp_schedule = [0.7, 0.8, 0.85, 0.9, 0.95, 1.0, 1.0, 1.0]
     if K > len(temp_schedule):
         temp_schedule = temp_schedule + [1.0] * (K - len(temp_schedule))
 
@@ -1260,11 +1378,17 @@ def train_rl_v6(
             per_task_groups[ttype] += 1
 
             if std_r < 1e-6:
-                if ngrpo_virtual_reward and mean_r < 0.9:
+                # Check if group is all-correct or all-wrong using scores (not rewards).
+                # Rewards include format bonuses (correct NIAH ≈ 0.77 < 0.9), but score=1.0.
+                scores = [t.get("score", 0) for t in group["trajectories"]]
+                all_correct = all(s >= 0.5 for s in scores)
+
+                if ngrpo_virtual_reward and not all_correct and mean_r < 0.9:
                     # NGRPO virtual max-reward (arXiv:2509.18851):
-                    # For all-wrong groups, add a virtual optimal completion with reward=1.0.
+                    # For all-WRONG groups, add a virtual optimal completion with reward=1.0.
                     # This gives negative advantage to all actual completions, pushing the
                     # model away from failure patterns instead of wasting compute by skipping.
+                    # CRITICAL: Never apply to all-correct groups (would push away correct behavior).
                     virtual_mean = (mean_r * len(rewards) + 1.0) / (len(rewards) + 1)
                     virtual_std = np.std(rewards + [1.0])
                     logger.info(f"  NGRPO virtual reward for {ttype}: mean {mean_r:.3f} → "
@@ -1293,9 +1417,11 @@ def train_rl_v6(
                     continue
                 else:
                     # All same reward — skip (no learning signal)
+                    # This correctly skips: (1) all-correct groups, (2) all-wrong without NGRPO
                     n_skipped_groups += 1
                     per_task_skips[ttype] += 1
-                    logger.info(f"  SKIP group {ttype}: all same reward {mean_r:.3f}")
+                    status = "all-correct" if all_correct else "all-same"
+                    logger.info(f"  SKIP group {ttype}: {status} reward {mean_r:.3f}")
                     continue
 
             for traj_dict, reward in zip(group["trajectories"], rewards):
@@ -1396,7 +1522,11 @@ def train_rl_v6(
             sampling_client = training_client.save_weights_and_get_sampling_client(
                 name=f"v6-step-{step+1}"
             )
-            model.sampling_client = sampling_client
+            if hasattr(model, 'root_sampling_client'):
+                # HybridTinkerModel: update the root (code-gen) client
+                model.root_sampling_client = sampling_client
+            else:
+                model.sampling_client = sampling_client
 
         # 9. Log comprehensively
         step_time = time.time() - step_t0

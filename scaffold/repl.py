@@ -12,6 +12,7 @@ The full prompt NEVER enters the LLM's context window. It lives only here.
 
 from __future__ import annotations
 
+import builtins
 import io
 import signal
 import sys
@@ -21,8 +22,10 @@ from dataclasses import dataclass, field
 from typing import Any, Callable
 
 
-class FinalAnswer(Exception):
-    """Raised when FINAL() or FINAL_VAR() is called to terminate execution."""
+class FinalAnswer(BaseException):
+    """Raised when FINAL() or FINAL_VAR() is called to terminate execution.
+    Inherits from BaseException so it won't be caught by 'except Exception'
+    in model-generated code."""
     def __init__(self, answer: Any):
         self.answer = answer
 
@@ -73,12 +76,14 @@ def _make_final_var(state: REPLState) -> Callable:
     return final_var
 
 
-class TimeoutError(Exception):
+class REPLTimeoutError(builtins.TimeoutError):
+    """REPL-specific timeout. Inherits from builtins.TimeoutError
+    to avoid shadowing the built-in."""
     pass
 
 
 def _timeout_handler(signum, frame):
-    raise TimeoutError("REPL execution timed out")
+    raise REPLTimeoutError("REPL execution timed out")
 
 
 def init_repl(
@@ -153,7 +158,7 @@ def repl_execute(state: REPLState, code: str, timeout: int | None = None) -> REP
     except FinalAnswer:
         # Normal termination via FINAL() or FINAL_VAR()
         pass
-    except TimeoutError as e:
+    except REPLTimeoutError as e:
         error = f"TimeoutError: {e}"
     except Exception:
         error = traceback.format_exc()

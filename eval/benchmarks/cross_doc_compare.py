@@ -1015,7 +1015,7 @@ def _score_exact_entity(predicted: str, expected: str) -> dict:
 
     # Try partial match for project names: e.g., "Alpha" in "Project Alpha"
     # Split expected into words and check if all significant words appear
-    exp_words = [w for w in exp_lower.split() if len(w) > 3]
+    exp_words = [w for w in exp_lower.split() if len(w) > 2 and w not in {"the", "and", "for"}]
     if exp_words and all(w in pred_lower for w in exp_words):
         return {"score": 0.8, "match_type": "partial_words"}
 

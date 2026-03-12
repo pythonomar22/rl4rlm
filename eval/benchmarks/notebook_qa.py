@@ -264,11 +264,11 @@ def _generate_variable_trace_task(
     chain_templates = [
         {
             "cells": [
-                ("initial_samples = {n1}\nprint(f'Initial dataset: {initial_samples} samples')",
+                ("initial_samples = {n1}\nprint(f'Initial dataset: {{initial_samples}} samples')",
                  "Initial dataset: {n1} samples"),
-                ("# Remove duplicates\nduplicates = {n2}\nclean_samples = initial_samples - duplicates\nprint(f'After dedup: {clean_samples} samples (removed {duplicates})')",
+                ("# Remove duplicates\nduplicates = {n2}\nclean_samples = initial_samples - duplicates\nprint(f'After dedup: {{clean_samples}} samples (removed {{duplicates}})')",
                  "After dedup: {clean} samples (removed {n2})"),
-                ("# Apply filters\nfiltered_out = int(clean_samples * {frac})\nfinal_samples = clean_samples - filtered_out\nprint(f'Final dataset: {final_samples} samples')",
+                ("# Apply filters\nfiltered_out = int(clean_samples * {frac})\nfinal_samples = clean_samples - filtered_out\nprint(f'Final dataset: {{final_samples}} samples')",
                  "Final dataset: {final} samples"),
             ],
             "question": f"How many samples remained in the final dataset after deduplication and filtering in the {experiment} notebook?",
@@ -276,11 +276,11 @@ def _generate_variable_trace_task(
         },
         {
             "cells": [
-                ("base_accuracy = {base_acc}\nprint(f'Baseline accuracy: {base_acc:.1%}')",
+                ("base_accuracy = {base_acc}\nprint(f'Baseline accuracy: {{base_accuracy:.1%}}')",
                  "Baseline accuracy: {base_pct}"),
-                ("# After feature engineering\nimproved_accuracy = base_accuracy + {delta1}\nprint(f'After feature eng: {improved_accuracy:.1%}')",
+                ("# After feature engineering\nimproved_accuracy = base_accuracy + {delta1}\nprint(f'After feature eng: {{improved_accuracy:.1%}}')",
                  "After feature eng: {mid_pct}"),
-                ("# After hyperparameter tuning\nfinal_accuracy = improved_accuracy + {delta2}\nprint(f'Final accuracy: {final_accuracy:.1%}')",
+                ("# After hyperparameter tuning\nfinal_accuracy = improved_accuracy + {delta2}\nprint(f'Final accuracy: {{final_accuracy:.1%}}')",
                  "Final accuracy: {final_pct}"),
             ],
             "question": f"What was the final accuracy after all improvements in the {experiment} notebook?",

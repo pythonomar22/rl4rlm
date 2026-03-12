@@ -1061,7 +1061,7 @@ def main():
                         help="(Legacy) Path to local LoRA adapter")
     parser.add_argument("--backend", default="tinker", choices=["tinker", "hf"],
                         help="Backend: tinker (remote) or hf (local GPU)")
-    parser.add_argument("--benchmark", default="niah",
+    parser.add_argument("--benchmark", nargs="+", default=["niah"],
                         choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "event_counting", "cross_doc_compare", "key_value_retrieval", "all"])
     parser.add_argument("--n-tasks", type=int, default=10)
     parser.add_argument("--max-iterations", type=int, default=8)
@@ -1077,6 +1077,8 @@ def main():
                         help="Path to custom system prompt file")
     parser.add_argument("--eval-strategy", action="store_true",
                         help="Use best strategy prompt per benchmark (for trained models)")
+    parser.add_argument("--temperature", type=float, default=0.7,
+                        help="Root generation temperature (0.0 for deterministic)")
     args = parser.parse_args()
 
     # Results directory
@@ -1095,14 +1097,14 @@ def main():
                 model_name=args.model,
                 model_path=args.model_path,
                 max_new_tokens=2048,
-                temperature=0.7,
+                temperature=args.temperature,
             )
         else:
             model = TinkerModel(
                 model_name=args.model,
                 model_path=args.model_path,
                 max_new_tokens=2048,
-                temperature=0.7,
+                temperature=args.temperature,
             )
     else:
         # Legacy: local HF model
@@ -1135,10 +1137,10 @@ def main():
         system_prompt = QWEN_2B_SYSTEM_PROMPT
 
     # Run eval
-    benchmarks_to_run = (
-        ["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "event_counting", "cross_doc_compare", "key_value_retrieval"] if args.benchmark == "all"
-        else [args.benchmark]
-    )
+    if "all" in args.benchmark:
+        benchmarks_to_run = ["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "event_counting", "cross_doc_compare", "key_value_retrieval"]
+    else:
+        benchmarks_to_run = args.benchmark
 
     all_eval_results = {}
     eval_start = time.time()
@@ -1148,13 +1150,17 @@ def main():
     # cross_doc_separate HURTS cross_doc (5.7% vs 28.6%) — too prescriptive
     # extract_compute HURTS event_counting (31.2% vs 50.4%) — constrains approach
     BEST_EVAL_STRATEGY = {
-        # Only empirically validated strategies that IMPROVE over no-strategy:
+        # Empirically validated strategies (base model, seed 30000, N=10):
         "dataframe_qa": "table_preserve",       # +16.6pp (63.6% vs 47.0%)
         "notebook_qa": "notebook_sequential",    # +10.8pp (70.8% vs 60.0%)
         "key_value_retrieval": "lookup_thorough", # +17.2pp (62.5% vs 45.3%)
-        # cross_doc_compare: NO strategy — cross_doc_separate HURTS (-4.5pp)
-        # event_counting: NO strategy — extract_compute barely helps (+2pp)
-        # All other benchmarks: V4-s5 already beats base, no strategy needed
+        "hard_multi_hop": "multi_hop_decompose", # +60pp  (90.0% vs 30.0%)
+        "event_counting": "event_extract_python", # +11.6pp (54.0% vs 42.4%)
+        # NEUTRAL: multi_hop_qa — decompose gives 70% = same as baseline 70%
+        "code_debug": "code_debug_focused",     # +24pp  (44% vs 20%)
+        # REJECTED: cross_doc_structured HURTS (-5.6pp, 43.3% vs 48.9%)
+        # REJECTED: oolong_regex — baseline 0%, strategy doesn't help
+        # NEUTRAL: multi_hop_qa — decompose gives 70% = same as baseline 70%
     }
 
     for bench in benchmarks_to_run:
@@ -1301,6 +1307,29 @@ def main():
 
         all_eval_results[bench] = eval_results
         _print_benchmark_summary(bench, eval_results)
+
+        # Save results incrementally (prevents data loss on crash)
+        if len(benchmarks_to_run) > 1:
+            _bench_dir = results_dir / bench
+            _bench_dir.mkdir(parents=True, exist_ok=True)
+            _eval_output = {
+                "benchmark": bench,
+                "accuracy": eval_results["accuracy"],
+                "n_tasks": eval_results["n_tasks"],
+                "per_task": eval_results["results"],
+            }
+            for _key in ["by_doc_length", "by_needle_position", "by_n_needles", "by_n_docs",
+                         "avg_recall", "avg_f1"]:
+                if _key in eval_results:
+                    _eval_output[_key] = eval_results[_key]
+            with open(_bench_dir / "eval_results.json", "w") as f:
+                json.dump(_eval_output, f, indent=2, default=str)
+            _traj_dir = _bench_dir / "trajectories"
+            _traj_dir.mkdir(exist_ok=True)
+            for _i, _traj in enumerate(eval_results["trajectories"][:20]):
+                with open(_traj_dir / f"trajectory_{_i:03d}.json", "w") as f:
+                    json.dump(_traj, f, indent=2, default=str)
+            logger.info(f"  Saved {bench} results to {_bench_dir}")
 
     eval_time = time.time() - eval_start
 

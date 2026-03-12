@@ -425,4 +425,24 @@ def score_hard_multi_hop(predicted: str | None, expected: str) -> dict:
     if exp_clean in pred_clean:
         return {"score": 1.0, "match_type": "normalized"}
 
+    # ISO date format comparison (e.g., "2026-09-08" vs "September 8, 2026")
+    from datetime import datetime
+    date_formats = [
+        "%Y-%m-%d", "%B %d, %Y", "%B %d %Y", "%b %d, %Y", "%b %d %Y",
+        "%m/%d/%Y", "%d %B %Y", "%d %b %Y",
+    ]
+    def parse_date(s):
+        s = re.sub(r'[,\s]+', ' ', s).strip()
+        for fmt in date_formats:
+            try:
+                return datetime.strptime(s, fmt)
+            except ValueError:
+                continue
+        return None
+
+    pred_date = parse_date(predicted)
+    exp_date = parse_date(expected)
+    if pred_date and exp_date and pred_date == exp_date:
+        return {"score": 1.0, "match_type": "date_normalized"}
+
     return {"score": 0.0, "match_type": "none"}

@@ -264,7 +264,7 @@ def trajectory_to_dict(traj: RLMTrajectory) -> dict:
     return {
         "prompt": traj.prompt[:500] + ("..." if len(traj.prompt) > 500 else ""),
         "prompt_length": len(traj.prompt),
-        "system_prompt": traj.system_prompt[:200] + "...",
+        "system_prompt": traj.system_prompt[:200] + ("..." if len(traj.system_prompt) > 200 else ""),
         "answer": traj.answer,
         "terminated": traj.terminated,
         "num_turns": len(traj.turns),

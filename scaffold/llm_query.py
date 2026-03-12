@@ -102,6 +102,9 @@ class TinkerModel:
         self.capture_logprobs = False  # Enable for RL training
         self.last_logprobs: list[float] | None = None
         self.last_tokens: list[int] | None = None
+        # Sub-call temperature: default 0.3 for factual extraction,
+        # but 0.0 when root is 0.0 for fully deterministic evaluation
+        self.sub_temperature = 0.0 if temperature == 0.0 else 0.3
 
         # Setup tokenizer and renderer
         self.tokenizer = tokenizer_utils.get_tokenizer(model_name)
@@ -317,6 +320,8 @@ class HybridTinkerModel:
         self.capture_logprobs = False
         self.last_logprobs: list[float] | None = None
         self.last_tokens: list[int] | None = None
+        # Sub-call temperature: 0.0 when root is 0.0 for fully deterministic eval
+        self.sub_temperature = 0.0 if temperature == 0.0 else 0.3
 
         # Setup tokenizer and renderer
         self.tokenizer = tokenizer_utils.get_tokenizer(model_name)
