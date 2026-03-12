@@ -39,7 +39,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from tqdm import tqdm
 
 from scaffold.llm_query import TinkerModel, HybridTinkerModel, strip_think_tags
-from scaffold.rlm import rlm, trajectory_to_dict
+from scaffold.rlm import rlm, trajectory_to_dict, RLMTrajectory
 from scaffold.prompts.qwen35_35b import QWEN35_35B_SYSTEM_PROMPT
 from training.rl_tinker_v6 import STRATEGY_SUFFIXES
 from scaffold.prompts.qwen2b import QWEN_2B_SYSTEM_PROMPT
@@ -65,6 +65,20 @@ logging.basicConfig(
 logger = logging.getLogger("eval")
 
 
+def safe_rlm(prompt: str, model, system_prompt: str, max_iterations: int = 8,
+             verbose: bool = False) -> RLMTrajectory:
+    """Run RLM with error handling — context overflow etc. returns score-0 trajectory."""
+    try:
+        return rlm(prompt=prompt, model=model, system_prompt=system_prompt,
+                    max_iterations=max_iterations, verbose=verbose)
+    except Exception as e:
+        logger.error(f"RLM failed on task ({len(prompt)} chars): {type(e).__name__}: {e}")
+        return RLMTrajectory(
+            prompt=prompt, system_prompt=system_prompt,
+            answer=None, terminated=False, total_time=0.0,
+        )
+
+
 def run_niah_eval(
     model,
     system_prompt: str,
@@ -87,7 +101,7 @@ def run_niah_eval(
     for task in tqdm(tasks, desc="NIAH"):
         logger.info(f"\nTask: {task.task_id} | Q: {task.question} | Expected: {task.expected_answer}")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -163,7 +177,7 @@ def run_multi_niah_eval(
             f"\nTask: {task.task_id} | {task.n_needles} needles in {task.doc_length} chars"
         )
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -247,7 +261,7 @@ def run_doc_classify_eval(
             f"\nTask: {task.task_id} | {task.n_docs} docs, {task.doc_length} chars"
         )
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -316,7 +330,7 @@ def run_dataframe_qa_eval(
     for task in tqdm(tasks, desc="DataFrame QA"):
         logger.info(f"\nTask: {task.task_id} | {task.n_rows} rows, {len(task.prompt):,} chars")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -390,7 +404,7 @@ def run_code_debug_eval(
     for task in tqdm(tasks, desc="CodeDebug"):
         logger.info(f"\nTask: {task.task_id} | {task.n_bugs} bugs, {task.total_lines} lines")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -460,7 +474,7 @@ def run_multi_hop_eval(
     for task in tqdm(tasks, desc="MultiHopQA"):
         logger.info(f"\nTask: {task.task_id} | {task.n_hops} hops, {task.doc_length} chars")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -531,7 +545,7 @@ def run_oolong_eval(
         logger.info(f"\nTask: {task.task_id} | {task.question_type} | {task.context_length:,} chars")
         logger.info(f"  Q: {task.question[:100]}")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -596,7 +610,7 @@ def run_verbatim_copy_eval(
     for task in tqdm(tasks, desc="VerbatimCopy"):
         logger.info(f"\nTask: {task.task_id} | {task.doc_length} chars, target {task.target_paragraph_length} chars")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -656,7 +670,7 @@ def run_hard_multi_hop_eval(
         logger.info(f"  Q: {task.question[:100]}")
         logger.info(f"  Decomposition: {' → '.join(task.decomposition)}")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -724,7 +738,7 @@ def run_event_counting_eval(
         logger.info(f"\nTask: {task.task_id} | {task.task_type} | {task.doc_length:,} chars | {task.n_events} events")
         logger.info(f"  Q: {task.question[:100]}")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -778,10 +792,11 @@ def run_cross_doc_eval(
     system_prompt: str,
     n_tasks: int = 12,
     max_iterations: int = 12,
+    seed_offset: int = 50000,
     verbose: bool = False,
 ) -> dict:
     """Run cross-document comparison benchmark."""
-    tasks = generate_cross_doc_suite(n_tasks=n_tasks, seed_offset=50000)
+    tasks = generate_cross_doc_suite(n_tasks=n_tasks, seed_offset=seed_offset)
 
     results = []
     trajectories = []
@@ -790,7 +805,7 @@ def run_cross_doc_eval(
         logger.info(f"\nTask: {task.task_id} | {task.task_type} | {task.doc_length:,} chars")
         logger.info(f"  Q: {task.question[:100]}")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -843,10 +858,11 @@ def run_key_value_eval(
     system_prompt: str,
     n_tasks: int = 12,
     max_iterations: int = 10,
+    seed_offset: int = 70000,
     verbose: bool = False,
 ) -> dict:
     """Run key-value retrieval benchmark."""
-    tasks = generate_key_value_suite(n_tasks=n_tasks, seed_offset=70000)
+    tasks = generate_key_value_suite(n_tasks=n_tasks, seed_offset=seed_offset)
 
     results = []
     trajectories = []
@@ -855,7 +871,7 @@ def run_key_value_eval(
         logger.info(f"\nTask: {task.task_id} | {task.task_type} | {task.doc_length:,} chars")
         logger.info(f"  Q: {task.question[:100]}")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -920,7 +936,7 @@ def run_hard_niah_eval(
     for task in tqdm(tasks, desc="HardNIAH"):
         logger.info(f"\nTask: {task.task_id} | {task.difficulty} | {task.doc_length} chars")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -987,7 +1003,7 @@ def run_notebook_qa_eval(
     for task in tqdm(tasks, desc="NotebookQA"):
         logger.info(f"\nTask: {task.task_id} | {task.question_type} | {task.n_cells} cells, {task.doc_length} chars")
 
-        traj = rlm(
+        traj = safe_rlm(
             prompt=task.prompt,
             model=model,
             system_prompt=system_prompt,
@@ -1132,16 +1148,13 @@ def main():
     # cross_doc_separate HURTS cross_doc (5.7% vs 28.6%) — too prescriptive
     # extract_compute HURTS event_counting (31.2% vs 50.4%) — constrains approach
     BEST_EVAL_STRATEGY = {
-        "dataframe_qa": "table_preserve",       # +33pp (80% vs 47%)
-        "notebook_qa": "notebook_sequential",    # +10.8pp (70.8% vs 60%)
-        "key_value_retrieval": "lookup_thorough", # +21.4pp (66.7% on 3 tasks)
-        # Below: untested, use training analysis defaults
-        "niah": "binary_search",
-        "multi_niah": "map_reduce",
-        "doc_classify": "map_reduce",
-        "hard_multi_hop": "two_pass",
-        "multi_hop_qa": "two_pass",
-        "hard_niah": "small_chunks",
+        # Only empirically validated strategies that IMPROVE over no-strategy:
+        "dataframe_qa": "table_preserve",       # +16.6pp (63.6% vs 47.0%)
+        "notebook_qa": "notebook_sequential",    # +10.8pp (70.8% vs 60.0%)
+        "key_value_retrieval": "lookup_thorough", # +17.2pp (62.5% vs 45.3%)
+        # cross_doc_compare: NO strategy — cross_doc_separate HURTS (-4.5pp)
+        # event_counting: NO strategy — extract_compute barely helps (+2pp)
+        # All other benchmarks: V4-s5 already beats base, no strategy needed
     }
 
     for bench in benchmarks_to_run:
@@ -1175,6 +1188,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 24),
                 max_iterations=args.max_iterations,
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "doc_classify":
@@ -1183,6 +1197,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 20),
                 max_iterations=args.max_iterations,
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "dataframe_qa":
@@ -1191,6 +1206,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 20),
                 max_iterations=args.max_iterations,
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "code_debug":
@@ -1199,6 +1215,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 15),
                 max_iterations=args.max_iterations,
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "multi_hop_qa":
@@ -1207,6 +1224,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 20),
                 max_iterations=args.max_iterations,
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "notebook_qa":
@@ -1215,6 +1233,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 15),
                 max_iterations=args.max_iterations,
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "hard_niah":
@@ -1223,6 +1242,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 15),
                 max_iterations=args.max_iterations,
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "verbatim_copy":
@@ -1231,6 +1251,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 10),
                 max_iterations=args.max_iterations,
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "oolong":
@@ -1247,6 +1268,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 10),
                 max_iterations=args.max_iterations,
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "event_counting":
@@ -1255,6 +1277,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=args.n_tasks,
                 max_iterations=12,  # Counting tasks need more iterations
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "cross_doc_compare":
@@ -1263,6 +1286,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 12),
                 max_iterations=12,  # Cross-doc needs multi-step reasoning
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
         elif bench == "key_value_retrieval":
@@ -1271,6 +1295,7 @@ def main():
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 12),
                 max_iterations=10,
+                seed_offset=args.seed_offset,
                 verbose=args.verbose,
             )
 
@@ -1292,7 +1317,6 @@ def main():
         "max_iterations": args.max_iterations,
         "seed_offset": args.seed_offset,
         "hybrid": args.hybrid,
-        "model_path": args.model_path,
         "system_prompt": system_prompt[:500] + "...",
         "timestamp": timestamp,
         "git_hash": _get_git_hash(),

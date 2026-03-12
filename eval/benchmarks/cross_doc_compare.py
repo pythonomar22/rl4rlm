@@ -968,19 +968,24 @@ def _score_name_set(predicted: str, expected: str) -> dict:
         return {"score": 0.0, "match_type": "empty_expected"}
 
     # Compute true positives, precision, recall, F1
-    true_positives = 0
+    # Track matched expected items to prevent recall > 1.0
+    matched_expected = set()
+    matched_predicted = 0
     for pred_item in pred_normalized:
         for exp_item in exp_normalized:
+            if exp_item in matched_expected:
+                continue
             # Use substring matching for robustness
             if pred_item == exp_item or pred_item in exp_item or exp_item in pred_item:
-                true_positives += 1
+                matched_predicted += 1
+                matched_expected.add(exp_item)
                 break
 
-    if true_positives == 0:
+    if matched_predicted == 0:
         return {"score": 0.0, "match_type": "no_overlap"}
 
-    precision = true_positives / len(pred_normalized) if pred_normalized else 0.0
-    recall = true_positives / len(exp_normalized)
+    precision = matched_predicted / len(pred_normalized) if pred_normalized else 0.0
+    recall = matched_predicted / len(exp_normalized)
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
 
     if f1 >= 1.0:

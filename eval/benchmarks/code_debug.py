@@ -493,10 +493,43 @@ def score_code_debug(answer: str | None, bugs: list[dict]) -> dict:
 
     for bug in bugs:
         func_name = bug["function"].lower()
-        # Check if the function name is mentioned
+        bug_desc = bug.get("description", "").lower()
+        # Extract key descriptive words from the bug description
+        # to verify the model actually identified the bug, not just the function
+        bug_keywords = {
+            "infinite loop": ["infinite", "loop forever", "never terminat"],
+            "off-by-one": ["off.by.one", "boundary", "edge case", "< instead of <=", "<= instead of <"],
+            "over-flattening": ["tuple", "over.flatten", "isinstance.*list.*tuple"],
+            "empty local": ["empty", "local part", "@domain"],
+            "counts.get": ["get.*1", "never increment", "always.*once", "always.*1"],
+            "index swap": ["index", "swap", "b[j][k]", "transpose", "wrong order"],
+            "pops most recently": ["pop.*last", "pop().*wrong", "least recently", "most recently", "wrong.*evict"],
+            "unnecessary re-exploration": ["<=.*<", "equal.distance", "re.explor", "performance"],
+        }
+        # Check if function name is mentioned AND there's evidence of bug understanding
         if func_name in answer_lower:
-            found += 1
-            details.append({"function": bug["function"], "found": True})
+            # Look for any bug-related keyword near the function mention
+            has_evidence = False
+            # Simple check: look for words from the description in the answer
+            desc_words = set(bug_desc.split()) - {"the", "a", "an", "in", "of", "for", "and", "or", "to", "is", "by", "bug"}
+            significant_words = [w for w in desc_words if len(w) >= 4]
+            # Require at least one significant description word in the answer
+            for word in significant_words:
+                if word in answer_lower:
+                    has_evidence = True
+                    break
+            # Fallback: check generic bug-related words near function name
+            if not has_evidence:
+                bug_indicators = ["bug", "error", "wrong", "incorrect", "instead of", "should be", "fix", "issue", "problem"]
+                for indicator in bug_indicators:
+                    if indicator in answer_lower:
+                        has_evidence = True
+                        break
+            if has_evidence:
+                found += 1
+                details.append({"function": bug["function"], "found": True})
+            else:
+                details.append({"function": bug["function"], "found": False, "reason": "function_mentioned_no_evidence"})
         else:
             details.append({"function": bug["function"], "found": False})
 
