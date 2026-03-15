@@ -825,6 +825,23 @@ TASK_DISTRIBUTIONS = {
         ("key_value_retrieval", 0.10),  # Needs Python-direct approach
         ("multi_hop_qa", 0.15),      # Benefits from multi-turn reasoning
     ],
+    # V16: Light GRPO on RS-SFT v16 checkpoint.
+    # RS-SFT v16 pattern: NIAH and hard_niah regressed (-10pp each vs V10-s40),
+    # everything else improved massively. Focus on recovering search tasks while
+    # maintaining gains on the improved benchmarks.
+    # Key: use moderate weight on the improved benchmarks to prevent regression.
+    "v16_search_recovery": [
+        ("niah", 0.25),              # -10pp, highest priority
+        ("hard_niah", 0.20),         # -10pp, second priority
+        ("doc_classify", 0.10),      # Maintain +20pp gain
+        ("key_value_retrieval", 0.10),  # Maintain gains
+        ("multi_hop_qa", 0.08),      # Maintain +15pp gain
+        ("event_counting", 0.07),    # Check if maintained
+        ("hard_multi_hop", 0.07),    # Check if maintained
+        ("notebook_qa", 0.05),       # Maintain +20pp gain
+        ("dataframe_qa", 0.05),      # Maintain +24pp gain
+        ("cross_doc_compare", 0.03),
+    ],
     # V14: Equal weight on all 14 benchmarks — for SFT→GRPO two-phase refinement.
     # Light GRPO (3-5 steps) on SFT checkpoint to push all tasks uniformly.
     "v14_all": [
@@ -1165,7 +1182,7 @@ def train_rl_v6(
     logger.info(f"  K: {K}, Batch: {batch_size}, Steps: {steps}")
     logger.info(f"  Task type: {task_type}")
     # Map task_type CLI arg to distribution key
-    _TASK_TYPE_TO_DIST = {"mixed_v6": "v9", "mixed_v10": "v10", "mixed_v11": "v11", "mixed_v12": "v12", "mixed_v13": "v13", "mixed_v14": "v14_all"}
+    _TASK_TYPE_TO_DIST = {"mixed_v6": "v9", "mixed_v10": "v10", "mixed_v11": "v11", "mixed_v12": "v12", "mixed_v13": "v13", "mixed_v14": "v14_all", "mixed_v16": "v16_search_recovery"}
     if task_type in _TASK_TYPE_TO_DIST:
         dist_name = _TASK_TYPE_TO_DIST[task_type]
         dist_info = TASK_DISTRIBUTIONS[dist_name]

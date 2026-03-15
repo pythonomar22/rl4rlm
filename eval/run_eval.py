@@ -1143,6 +1143,7 @@ def main():
     parser.add_argument("--benchmark", nargs="+", default=["niah"],
                         choices=["niah", "multi_niah", "doc_classify", "dataframe_qa", "code_debug", "multi_hop_qa", "notebook_qa", "hard_niah", "verbatim_copy", "oolong", "hard_multi_hop", "event_counting", "cross_doc_compare", "key_value_retrieval", "longbench_codeqa", "oolong_trec", "all"])
     parser.add_argument("--n-tasks", type=int, default=10)
+    parser.add_argument("--max-context-chars", type=int, default=None, help="Max context chars for LongBench CodeQA")
     parser.add_argument("--max-iterations", type=int, default=8)
     parser.add_argument("--experiment-name", default="eval")
     parser.add_argument("--doc-lengths", nargs="+", type=int, default=None)
@@ -1399,6 +1400,7 @@ def main():
                 model=model,
                 system_prompt=bench_system_prompt,
                 n_tasks=min(args.n_tasks, 50),
+                max_context_chars=getattr(args, 'max_context_chars', None),
                 max_iterations=12,
                 verbose=args.verbose,
             )

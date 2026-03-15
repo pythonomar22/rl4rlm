@@ -53,7 +53,7 @@ def main():
     upload_folder(
         folder_path=str(ckpt_dir),
         repo_id=args.repo_id,
-        commit_message="Upload RLM LoRA adapter (V10-s40, SC-GRPO trained)",
+        commit_message="Upload RLM LoRA adapter (V17, RS-SFT trained, +21.7pp avg over base)",
     )
 
     print(f"\nDone! Model available at: https://huggingface.co/{args.repo_id}")
