@@ -2,7 +2,7 @@
 
 Training [Recursive Language Models](https://arxiv.org/abs/2502.14155) (RLMs) via reinforcement learning on the Tinker API.
 
-**[Paper (LaTeX source)](icmltemplate/final_report.tex)** | **[Model on HuggingFace](https://huggingface.co/omar81939/rlm-qwen35-35b-a3b)**
+**[Paper (PDF)](icmltemplate/finalpaper.pdf)** | **[Model on HuggingFace](https://huggingface.co/omar81939/rlm-qwen35-35b-a3b)**
 
 ## Results
 
