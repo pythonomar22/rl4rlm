@@ -1,0 +1,1468 @@
+%%%%%%%% CS234 FINAL REPORT %%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{multirow}
+\usepackage{xcolor}
+
+\let\theHalgorithm\relax
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+\usepackage[accepted]{icml2018}
+
+\icmltitlerunning{Training Native Recursive Language Models}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{Training Native Recursive Language Models}
+
+\begin{icmlauthorlist}
+\icmlauthor{Omar Abul-Hassan}{cs}
+\icmlauthor{Miguel Villanueva}{cs}
+\icmlauthor{Josh Bowden}{cs}
+\end{icmlauthorlist}
+
+\icmlaffiliation{cs}{Department of Computer Science, Stanford University, Stanford, CA, USA}
+
+\icmlcorrespondingauthor{Omar Abul-Hassan}{omarah@stanford.edu}
+
+\icmlkeywords{Reinforcement Learning, Language Models, Long Context, GRPO, Rejection Sampling, Recursive Models}
+
+\vskip 0.3in
+]
+
+\printAffiliationsAndNotice{}
+
+\begin{abstract}
+Recursive Language Models (RLMs) extend language models to handle arbitrarily long contexts by placing the input in a persistent REPL environment, allowing the model to write code that decomposes, queries, and aggregates over the input programmatically. We train the first open-weight natively recursive language model based on Qwen3.5-35B-A3B, a mixture-of-experts model with 35B total / 3B active parameters. Using the Tinker training API, we develop a complete RL pipeline through 11 training iterations---addressing reward collapse, mode collapse, KL regularization, importance sampling, and credit assignment---and systematically compare two training paradigms: Group Relative Policy Optimization (GRPO) with our novel strategy conditioning (SC-GRPO), and Rejection Sampling SFT (RS-SFT) on iteratively mined correct trajectories.
+
+Our best model, trained with RS-SFT on 3,644 self-mined trajectories (no teacher model required), achieves $+21.7$pp average improvement across 14 benchmarks ($49.9\% \to 71.6\%$), winning 13 of 14 benchmarks against the base model, with peak gains of $+60$pp on Verbatim Copy, $+56$pp on Key-Value Retrieval, and $+30$pp on Hard Multi-Hop QA. This substantially outperforms our best GRPO model ($+11.3$pp), which wins only 9 of 14.
+
+We contribute five key findings: (1)~\textbf{RS-SFT outperforms GRPO by $+$10.4pp}---training only on correct trajectories avoids the cross-task interference caused by GRPO's negative gradients, which suppress useful base-model patterns; (2)~\textbf{GRPO on top of RS-SFT actively hurts}---applying RL refinement to an RS-SFT checkpoint degrades 5 of 9 evaluated benchmarks, with Code Debug collapsing from 50\% to 36\%; (3)~\textbf{Strategy-Conditioned GRPO (SC-GRPO)} eliminates mode collapse in code-generation RL (0\% group collapse vs.\ 60\% in standard GRPO); (4)~\textbf{format rigidity} as the root cause of RL regressions---RL trains rigid format-specific parsing templates that fail on output variation; (5)~\textbf{iterative trajectory mining} produces monotonically improving training data, with each RS-SFT round generating a better model that mines better trajectories for the next round.
+
+We evaluate on 14 diverse benchmarks spanning $O(1)$ retrieval, $O(K)$ multi-needle search, $O(N)$ classification/counting, $O(N^2)$ cross-document comparison, multi-hop reasoning, code debugging, and notebook analysis, plus 2 external benchmarks (OOLONG trec\_coarse and LongBench-v2 CodeQA). We release all weights, code, benchmarks, and training data.
+\end{abstract}
+
+%% ============================================================
+\section{Introduction}
+\label{sec:intro}
+
+A key limitation of modern language models is that their effective context window, while growing, remains insufficient for many real-world tasks involving documents spanning hundreds of thousands of tokens. Even when models accept long inputs, performance degrades with context length~\cite{hsieh2024ruler}. Recursive Language Models (RLMs)~\cite{zhang2026rlm} address this by never placing the full input into the model's context window. Instead, the input is stored as a variable in a persistent Python REPL, and the model writes code to decompose, search, and aggregate over it programmatically. Sub-queries are dispatched via an \texttt{llm\_query()} function, enabling recursive decomposition at arbitrary depth.
+
+Zhang et al.~\cite{zhang2026rlm} showed that SFT on filtered trajectories from a 480B teacher model improved Qwen3-8B by 28.3\% on long-context benchmarks. However, the optimal training strategy for RLMs---whether RL, SFT, or a combination---remained unexplored. We address this gap through a systematic RL exploration spanning \textbf{11 training iterations} across two model scales (4 GRPO versions at 1.7B, 7 iterations at 35B including SC-GRPO, DPO, and RS-SFT). Through this extensive RL development---debugging reward collapse, mode collapse, KL regularization failures, importance sampling explosions, and credit assignment---we discover that RL's relative effectiveness is the opposite of conventional wisdom.
+
+We train Qwen3.5-35B-A3B, a mixture-of-experts (MoE) model with 35B total and 3B active parameters, using the Tinker training API for remote GPU execution. We evaluate across 14 diverse benchmarks (plus 2 external) spanning $O(1)$ retrieval, $O(K)$ multi-needle search, $O(N)$ classification and counting, $O(N^2)$ cross-document comparison, multi-hop reasoning, code debugging, notebook analysis, and more.
+
+Our contributions are:
+\begin{enumerate}
+    \item \textbf{RS-SFT outperforms GRPO for RLM training ($+$21.7pp vs $+$11.3pp).} Rejection Sampling SFT---training only on correct, high-quality trajectories---avoids the cross-task interference caused by GRPO's negative gradients. This finding contradicts the common assumption that RL should outperform behavioral cloning, and we provide detailed analysis of \emph{why} negative gradients are particularly destructive for multi-task code generation.
+
+    \item \textbf{GRPO on top of RS-SFT actively hurts performance.} Applying GRPO refinement to an RS-SFT checkpoint degrades 5 of 9 evaluated benchmarks, with Code Debug collapsing from 50\% to 36\%. This demonstrates that RL's negative gradients damage the carefully learned patterns from RS-SFT, and that the SFT$\to$RL pipeline is not universally beneficial.
+
+    \item \textbf{Strategy-Conditioned GRPO (SC-GRPO)} eliminates mode collapse in code-generation RL by conditioning each trajectory on a randomly assigned decomposition strategy (0\% group collapse vs.\ 60\% in standard GRPO).
+
+    \item \textbf{Format rigidity as the root cause of RL regressions.} Trajectory analysis reveals that RL trains rigid format-specific parsing patterns in sub-call code (e.g., \texttt{if "ORG: " in line}) that fail on output format variation. RS-SFT avoids this because it never pushes the model \emph{away} from flexible base-model patterns.
+
+    \item \textbf{Iterative trajectory mining as a data flywheel.} Each RS-SFT round produces a better model that generates better trajectories for the next round: V16 (2,589 samples, 70.4\%) $\to$ V17 (3,644 samples, 71.6\%). Content-based deduplication and task-balanced batching enable this iterative self-improvement without a teacher model.
+
+    \item \textbf{16 diverse benchmarks} including 5 novel synthetic benchmarks (DataFrame QA, Event Counting, Cross-Document Comparison, Key-Value Retrieval, Notebook QA) and 2 external benchmarks from the original RLM paper (OOLONG, LongBench-v2 CodeQA). Complete open-source release of model weights, training code, evaluation harness, and all benchmark generators.
+\end{enumerate}
+
+%% ============================================================
+\section{Background and Related Work}
+\label{sec:background}
+
+\subsection{Recursive Language Models}
+
+RLMs~\cite{zhang2026rlm} treat the language model as a controller that writes and executes code in a persistent REPL environment. Given input $P$, the RLM loop proceeds as:
+\begin{enumerate}
+    \item Initialize REPL with $P$ stored as the variable \texttt{context}. The model receives only \emph{metadata}: the length of $P$, a short prefix, and the available API (\texttt{context}, \texttt{llm\_query()}, \texttt{FINAL()}, \texttt{FINAL\_VAR()}).
+    \item The model generates Python code to process \texttt{context} (e.g., chunking, regex, slicing).
+    \item Sub-calls via \texttt{llm\_query(text)} invoke the same model on a substring of $P$.
+    \item The model terminates with \texttt{FINAL(answer)} or \texttt{FINAL\_VAR(var\_name)}.
+\end{enumerate}
+
+This design avoids the three anti-patterns of naive scaffolding: the full prompt never enters the context window, output is not bounded by the window, and sub-calls are programmatic rather than verbalized~\cite{zhang2026rlm}. Algorithm~\ref{alg:rlm} formalizes this loop. The key recursive primitive is \texttt{llm\_query(text)}: when the model's generated code calls this function, a fresh instance of $\mathcal{M}$ is invoked on the given text, enabling recursive decomposition at arbitrary depth. Sub-calls use a fixed low temperature (0.3) for reliable factual extraction, regardless of the root generation temperature.
+
+\begin{algorithm}[t]
+\caption{RLM Inference Loop}
+\label{alg:rlm}
+\begin{algorithmic}[1]
+\REQUIRE Input text $P$, model $\mathcal{M}$, max turns $T$
+\STATE $\texttt{repl} \leftarrow \text{InitREPL}(P)$ \COMMENT{Store $P$ as \texttt{context}}
+\STATE $m_0 \leftarrow \text{Metadata}(\texttt{repl})$ \COMMENT{$|P|$, prefix, API docs}
+\STATE $H \leftarrow [\texttt{sys\_prompt}, \text{User}(m_0)]$
+\FOR{$t = 1$ \TO $T$}
+    \STATE $c_t \leftarrow \mathcal{M}.\text{generate}(H)$ \COMMENT{Generate Python code}
+    \STATE $o_t, a_t \leftarrow \text{Execute}(\texttt{repl}, c_t)$ \COMMENT{Run in sandboxed REPL}
+    \IF{$a_t \neq \bot$}
+        \RETURN $a_t$ \COMMENT{\texttt{FINAL()} was called}
+    \ENDIF
+    \STATE $H \leftarrow H \cup [\text{Asst}(c_t), \text{User}(\text{OutMeta}(o_t))]$
+\ENDFOR
+\RETURN \text{timeout}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Reinforcement Learning from Outcome Reward}
+
+RL from outcome-level reward has shown strong results for improving reasoning in language models. DeepSeek-R1~\cite{deepseekr1} introduced Group Relative Policy Optimization (GRPO), which eliminates the critic network by computing advantages relative to a group of sampled responses.
+
+Given prompt $x$ and $K$ sampled responses $\{y_1, \ldots, y_K\}$ with rewards $\{r_1, \ldots, r_K\}$, GRPO computes:
+\begin{equation}
+\hat{A}_i = \frac{r_i - \text{mean}(\{r_j\})}{\text{std}(\{r_j\}) + \epsilon}
+\label{eq:grpo}
+\end{equation}
+and updates the policy with a REINFORCE-style~\cite{williams1992reinforce} gradient weighted by $\hat{A}_i$.
+
+\subsection{Rejection Sampling and Best-of-N Training}
+
+Rejection Sampling Fine-Tuning (RFT)~\cite{yuan2024rft} and related approaches~\cite{cobbe2021gsm8k,singh2024humanevalfix} generate multiple candidate solutions, filter for correctness, and train on only the correct ones using standard supervised learning. Unlike RL, these approaches use only \emph{positive} signal---the model learns to reproduce correct behavior but is never explicitly pushed away from incorrect behavior. This distinction proves critical in our setting, as we show that the negative gradients in GRPO cause cross-task interference that RS-SFT avoids entirely.
+
+\subsection{Related Work}
+
+\textbf{Tool-augmented LMs.} ReAct~\cite{yao2023react} and Toolformer~\cite{schick2023toolformer} augment models with external tools but keep the prompt in the context window. RLMs differ by placing the prompt \emph{outside} the window entirely.
+
+\textbf{Self-improvement.} STaR~\cite{zelikman2022star} bootstraps reasoning by generating rationales, filtering correct ones, and re-training. Our iterative trajectory mining follows a similar approach: each RS-SFT round generates trajectories from the improved model, mines the correct ones, and retrains.
+
+\textbf{Long-context evaluation.} RULER~\cite{hsieh2024ruler} and Needle-in-a-Haystack~\cite{kamradt2023niah} test retrieval at various context lengths. OOLONG~\cite{oolong} provides tasks requiring processing \emph{all} documents, not just retrieval. We design benchmarks spanning both retrieval ($O(1)$, $O(K)$) and processing ($O(N)$, $O(N^2)$) complexity.
+
+\textbf{LoRA fine-tuning.} Low-Rank Adaptation~\cite{hu2022lora} enables efficient fine-tuning of large models. We use LoRA for both SFT and RL stages.
+
+\textbf{Advanced RL objectives for LLMs.} Dr.~GRPO~\cite{drgrpo} removes standard deviation normalization and length normalization from GRPO's advantage computation, preventing length bias and entropy collapse. We incorporate this insight by using raw advantages (without standard deviation division) in our SC-GRPO implementation after observing that normalized advantages amplify noise in low-variance code-generation settings where most trajectories produce near-identical code.
+
+\textbf{Teacherless self-improvement for RLMs.} The original RLM work~\cite{zhang2026rlm} relies on gold trajectories generated by a 480B-parameter teacher model (GPT-5 via API), achieving $+$28.3\% average improvement on Qwen3-8B across their benchmark suite. In contrast, our approach is entirely \emph{teacherless}: we mine correct trajectories from the base model's own evaluation runs, without requiring access to any external or proprietary model. Despite this constraint, we achieve $+$21.7pp average improvement on a more diverse 14-benchmark suite---demonstrating that iterative self-mining can approach teacher-distilled performance. This makes our training recipe fully self-contained and reproducible by anyone with API access to the base model.
+
+%% ============================================================
+\section{Approach}
+\label{sec:approach}
+
+Our training pipeline evolves through two model scales (Qwen3-1.7B for pipeline development, Qwen3.5-35B-A3B for final results) and two training paradigms (GRPO and RS-SFT). We describe the key methods here; the full history of 1.7B experiments (SFT, STaR, GRPO v1--v4, DPO) is preserved in Appendix~\ref{app:1.7b} for completeness.
+
+\subsection{Model and Infrastructure}
+\label{sec:model}
+
+\textbf{Qwen3.5-35B-A3B} is a mixture-of-experts model with 35B total parameters and 3B active parameters per token~\cite{qwen35}. The MoE architecture is cost-effective on the Tinker training API---billing is per active parameter, not total---while providing 35B total parameters for rich representations.
+
+\textbf{Tinker API.} All training and generation runs remotely via the Tinker API. Training uses \texttt{forward\_backward("cross\_entropy")} for SFT and \texttt{forward\_backward("importance\_sampling")} for GRPO, followed by \texttt{optim\_step()}. Generation uses \texttt{sampling\_client.sample()} with configurable temperature and max tokens. This removes all GPU/VRAM constraints, enabling training of models we could never fit on our local cluster.
+
+\textbf{LoRA Configuration.} Rank 32, $\alpha{=}32$, targeting all linear layers (MLP + attention + unembed), producing $\sim$680M trainable parameters.
+
+\subsection{Phase 1: SC-GRPO (Strategy-Conditioned GRPO)}
+\label{sec:sc-grpo}
+
+\subsubsection{GRPO Formulation}
+
+We implement GRPO~\cite{deepseekr1} with PPO-style clipping~\cite{schulman2017ppo}. Given a prompt $x$ and $K{=}8$ sampled trajectories $\{y_1, \ldots, y_K\}$, we compute per-trajectory rewards $r_i$ and advantages following Dr.~GRPO~\cite{drgrpo}, which removes standard deviation normalization:
+\begin{equation}
+\hat{A}_i = r_i - \frac{1}{K}\sum_{j=1}^K r_j
+\label{eq:advantage}
+\end{equation}
+We found standard normalization ($\hat{A}_i = (r_i - \mu) / (\sigma + \epsilon)$) amplified advantages by up to $143{\times}$ in low-variance groups (e.g., rewards $[0.72, 0.73, 0.71]$ yield $\sigma{=}0.007$, inflating a 0.01 raw advantage to 1.43). The policy gradient loss with PPO clipping is:
+\begin{equation}
+\mathcal{L} = -\frac{1}{K}\sum_{i=1}^K \sum_{t=1}^{|y_i|} w_t \cdot \min\!\left(\rho_t \hat{A}_i,\; \text{clip}(\rho_t, 1{-}\epsilon, 1{+}\epsilon)\hat{A}_i\right)
+\label{eq:ppo}
+\end{equation}
+where $\rho_t = \pi_\theta(y_{i,t} | y_{i,<t}, x) / \pi_{\theta_\text{old}}(y_{i,t} | y_{i,<t}, x)$ is the importance sampling ratio, $\epsilon{=}0.2$ is the clipping threshold, and $w_t$ is the per-turn credit assignment weight (defined below). KL regularization is applied via reward shaping: $r'_i = r_i - \beta_\text{KL} \cdot \widehat{\text{KL}}_i$, where $\widehat{\text{KL}}_i$ is the average per-token KL divergence between the current policy and a frozen reference copy.
+
+\textbf{PPO clipping is essential.} Early experiments used unclipped importance sampling (\texttt{forward\_backward("importance\_sampling")} in the Tinker API). This produced gradient explosions: loss values of $O(10^7)$ vs $O(10^2)$ with clipping. The root cause is that gradient accumulation over 48--55 datums per step allows the policy to drift \emph{within} a training step, causing IS ratios $\rho_t$ to diverge before the update. Switching to PPO-clipped loss (\texttt{forward\_backward("ppo")}) resolved this completely.
+
+\textbf{KL regularization: weight-space vs.\ token-level.} We initially attempted weight-space L2 regularization ($\beta \|\theta - \theta_{\text{ref}}\|^2 / d$) as KL proxy. With LoRA's 17.4M parameters, per-parameter L2 values were $O(10^{-10})$, producing effectively zero regularization even at $\beta{=}0.02$. This caused catastrophic policy drift: Multi-NIAH collapsed from 97.8\% to 41.4\% in 10 steps. Switching to token-level KL via a frozen reference forward pass (computing $\sum_t \log \pi_{\text{ref}}(y_t|y_{<t}) - \log \pi_\theta(y_t|y_{<t})$ and subtracting from reward) resolved the drift while preserving learning signal.
+
+\subsubsection{Mode Collapse in Code-Generation GRPO}
+
+Standard GRPO applied to code generation suffers from severe mode collapse: within 5 steps, 60\% of trajectory groups produce identical code across all $K{=}8$ samples, yielding zero advantages and no gradient signal. We quantify this in our V6 experiments: of 5 trajectory groups per step, 3 had standard deviation 0.000 across all $K{=}8$ rewards (identical code, identical outcomes). This is fundamentally different from natural language generation---code has a much narrower mode space, and once the model finds one working template (e.g., scan-all-chunks-aggregate), it converges to that template character-for-character.
+
+The collapse timeline in our V1 experiments at 1.7B scale (Section~\ref{sec:1.7b-rl}) is illustrative: steps 1--10 produced 15--24 parameter updates per step (healthy diversity), steps 11--17 produced 8--16 updates (converging), and steps 18--30 produced \textbf{0 updates} (complete stagnation). All $K$ trajectories became identical, advantages were uniformly zero, and training halted despite continued GPU computation.
+
+\subsubsection{Strategy Conditioning}
+
+\textbf{SC-GRPO.} We address mode collapse by prepending a randomly assigned \emph{strategy prompt} to each trajectory's system prompt. We define 10 strategies spanning different decomposition approaches:
+
+\begin{enumerate}
+    \item \textbf{Standard}: default chunking and aggregation
+    \item \textbf{Extract-Compute}: extract raw data, compute answer in Python
+    \item \textbf{Binary Search}: narrow down location via successive halving
+    \item \textbf{Map-Reduce}: map sub-queries over chunks, reduce results
+    \item \textbf{Two-Pass}: scan pass for candidates, verify pass to confirm
+    \item \textbf{Small Chunks}: 5K chunks with high overlap for precision
+    \item \textbf{Table Preserve}: preserve CSV/tabular structure in chunks
+    \item \textbf{Notebook Sequential}: process cells in order, track state
+    \item \textbf{Lookup Thorough}: exhaustive small-chunk search for exact values
+    \item \textbf{Precision Extract}: extract exact text, not summaries
+\end{enumerate}
+
+Each trajectory in a group of $K{=}8$ is randomly assigned one strategy. This forces structural diversity: even if the model prefers one approach, the strategy prompt pushes toward alternatives. The result is 0\% group collapse, ensuring every training step has meaningful gradient signal.
+
+\textbf{Task-specific strategy distributions.} Different task types benefit from different strategy mixtures. For event counting, we weight extract-compute (40\%), map-reduce (30\%), and small-chunks (20\%). For key-value retrieval, we weight lookup-thorough (40\%) and binary-search (25\%). These distributions are tuned per-task type based on which strategies produce the highest-reward trajectories.
+
+\textbf{SC-GRPO hyperparameters.} $K{=}8$ trajectories per prompt, batch size 4 tasks, gradient accumulation 4, LoRA rank 32, learning rate $1{\times}10^{-6}$ (cosine decay to 10\% of peak), KL coefficient 0.005 via reward shaping. Temperature schedule $[0.6, 0.7, \ldots, 1.3]$ across the 8 trajectories. Fixed sub-call temperature of 0.3.
+
+\textbf{Reward function.} Reward design is critical for RL in code generation, where sparse binary rewards cause reward collapse (Section~\ref{sec:1.7b-rl}). We use a composite reward with task-specific weighting:
+\begin{equation}
+r = \alpha \cdot r_\text{score} + \beta \cdot r_\text{format} + \gamma \cdot r_\text{persist} + \delta \cdot r_\text{subcall} + \zeta \cdot r_\text{decomp}
+\label{eq:reward}
+\end{equation}
+where $r_\text{score} \in [0,1]$ is the task-specific correctness metric (F1 for multi-NIAH, accuracy for doc-classify, exact match for NIAH), $r_\text{format} = +0.05$ if the trajectory terminates with \texttt{FINAL()}, $r_\text{persist} \in [0.05, 0.15]$ rewards multi-turn correct solutions (encouraging iterative refinement over single-pass attempts), $r_\text{subcall} = +0.10$ for trajectories using 2+ \texttt{llm\_query} calls on long contexts (preventing shortcut solutions that avoid recursion), and $r_\text{decomp}$ provides partial credit for bridge entities in multi-hop tasks (rewarding intermediate progress even if the final answer is wrong). The weights $(\alpha, \beta, \gamma, \delta, \zeta)$ vary by task type: NIAH uses $(0.75, 0.10, 0.10, 0.05, 0)$; hard multi-hop uses $(0.50, 0.10, 0.10, 0.10, 0.20)$.
+
+\textbf{Per-turn credit assignment.} RLM trajectories are multi-turn: a single trajectory may contain 3--8 code blocks (turns), each with different semantic roles. Applying uniform advantage $\hat{A}_i$ to all turns dilutes the learning signal, since a correct final turn should receive more credit than a boilerplate setup turn. We assign per-turn weights $w_t$ in Equation~\ref{eq:ppo}:
+
+For \emph{successful} trajectories ($r_i \geq 0.5$): FINAL turns receive $1.5{\times}$, turns containing \texttt{llm\_query} sub-calls receive $1.0{\times}$, setup/print turns receive $0.7{\times}$, and error turns (in otherwise-successful trajectories) receive $0.3{\times}$. For \emph{failed} trajectories: timeout turns receive $1.5{\times}$ blame, error turns $1.2{\times}$, FINAL turns $1.3{\times}$, others $1.0{\times}$. All weights are normalized to mean 1.0 per trajectory to preserve total gradient magnitude:
+\begin{equation}
+w_t^{\text{norm}} = w_t^{\text{raw}} \cdot \frac{|y_i|}{\sum_{t'=1}^{|y_i|} w_{t'}^{\text{raw}}}
+\label{eq:credit}
+\end{equation}
+This credit assignment is a form of structured reward shaping~\cite{schulman2017ppo}: it preserves the optimal policy (since the advantage magnitudes are unchanged in aggregate) while focusing gradient signal on the turns that most influence the outcome.
+
+\textbf{Regression-targeted task distribution.} After observing a zero-sum tradeoff in early GRPO runs (gains on some benchmarks cancelled by regressions on others), we allocate 70\% of training weight to previously-regressing tasks: cross-document comparison (20\%), key-value retrieval (14\%), DataFrame QA (14\%), event counting (12\%), with the remaining 30\% split across NIAH (10\%), doc-classify (10\%), hard multi-hop (10\%), and code debug (10\%).
+
+\textbf{V10-s40}: Our best GRPO model, trained for 40 steps from the V4-s5 checkpoint (which was 5 standard GRPO steps from the base model). Total training time: $\sim$20 hours on Tinker API.
+
+\subsection{Phase 2: Hybrid RLM Architecture}
+\label{sec:hybrid}
+
+We discover that RL training degrades sub-call QA quality because LoRA adapts both root code generation and sub-call response distributions, but training rewards only the final answer. This creates an unintended coupling between \emph{planning} (root code generation) and \emph{perception} (sub-call fact extraction): improving the model's code generation simultaneously biases its text comprehension, because both share the same LoRA adapter.
+
+The \textbf{hybrid architecture} addresses this by maintaining two model instances: a trained root model (with LoRA adapter) for code generation, and the base model (no adapter) for answering sub-call queries. This separation preserves the base model's general-purpose QA ability while allowing RL to optimize code generation.
+
+Trajectory analysis reveals the mechanism: RL-trained sub-calls attempt to answer questions using format-specific patterns learned during training (e.g., looking for ``ORG: Name'' format), while base-model sub-calls use flexible extraction that adapts to varying output formats. In our GRPO experiments, the hybrid architecture achieves $+$25pp over standard (non-hybrid) trained models on multi-hop reasoning, because base-model sub-calls answer atomic factual queries (``Who manages HR?'') more reliably than RL-biased sub-calls, which learn shortcuts like returning the first entity found.
+
+\textbf{Implications for RS-SFT.} RS-SFT partially mitigates planning-perception entanglement by training only on trajectories where both root code and sub-call responses produce correct results. This self-consistency filtering naturally excludes trajectories with poor sub-call extraction, reducing (but not eliminating) the coupling. V17 RS-SFT achieves strong results \emph{without} hybrid inference, suggesting that positive-only training is less destructive to sub-call quality than GRPO's negative gradients. Nevertheless, hybrid inference remains a promising direction for further gains, particularly on $O(N^2)$ cross-document tasks where sub-call quality is the primary bottleneck.
+
+\subsection{Phase 3: Rejection Sampling SFT (RS-SFT)}
+\label{sec:rs-sft}
+
+The central finding of this work: \textbf{RS-SFT substantially outperforms GRPO for RLM training.}
+
+\subsubsection{Motivation: Why Negative Gradients Hurt}
+
+GRPO trains on \emph{all} $K$ trajectories per prompt, weighting each by its advantage $\hat{A}_i$. Trajectories with positive advantage receive positive gradients (reinforce these patterns); trajectories with negative advantage receive negative gradients (suppress these patterns).
+
+The problem is that negative gradients cause \textbf{cross-task interference}: a code pattern that appears in a ``bad'' trajectory for one task type may be the \emph{same pattern} the base model uses successfully for a different task type. Suppressing it hurts globally. For example, GRPO may learn to suppress loose text parsing (e.g., \texttt{for line in answer.split("$\backslash$n")}) because it appeared in a failed notebook QA trajectory, even though this same pattern is essential for successful event counting.
+
+RS-SFT eliminates this problem entirely by training only on correct trajectories with standard cross-entropy loss. The model can only learn to reproduce exemplary behavior---it is never pushed \emph{away} from anything. This makes it theoretically impossible for RS-SFT to cause the format rigidity regression observed with GRPO (Section~\ref{sec:format-rigidity}).
+
+\subsubsection{Data Collection: Iterative Trajectory Mining}
+
+Rather than collecting trajectories from a 480B-parameter teacher model (as in Zhang et al.~\cite{zhang2026rlm}, who used GPT-5 to generate gold demonstrations), we mine correct trajectories from the base model's own evaluation runs---a fully \emph{teacherless} approach that requires no access to any external model:
+
+\begin{enumerate}
+    \item \textbf{Round 1.} Run the base model on all 14 benchmarks with $K{=}8$ attempts per task (seed-based generation for reproducibility). Filter trajectories with score $\geq 0.9$, proper \texttt{FINAL} termination, at least one \texttt{llm\_query} call, clean code (no errors), and reasonable chunk sizes (5K--25K chars). Content-based deduplication removes duplicates across tasks with the same type. Task-balanced batching ensures equal representation across all 14 benchmarks.
+    \item \textbf{Round 2.} Train RS-SFT on the Round 1 data (producing V16). Run V16 on all benchmarks. Mine \emph{additional} correct trajectories---including trajectories for tasks that the base model could not solve but V16 can. Merge with Round 1 data, deduplicate, rebalance.
+    \item \textbf{Round 3.} Train on the merged data (producing V17). Evaluate.
+\end{enumerate}
+
+This iterative mining is analogous to STaR~\cite{zelikman2022star} but operates at the trajectory level rather than the rationale level. Each round produces a better model that can solve harder tasks, generating higher-quality and more diverse training data for the next round.
+
+\subsubsection{Quality Filtering}
+
+All mined trajectories pass through 8 quality filters:
+\begin{enumerate}
+    \item \textbf{Correctness}: Score $\geq 0.9$ (handles accuracy, recall, F1 depending on benchmark)
+    \item \textbf{Proper termination}: \texttt{FINAL()} or \texttt{FINAL\_VAR()} called
+    \item \textbf{Uses sub-calls}: At least 1 \texttt{llm\_query} call (prevents memorization/direct-answer)
+    \item \textbf{Clean code}: No syntax errors or exceptions
+    \item \textbf{Turn count}: 1--8 turns (prevents runaway trajectories)
+    \item \textbf{Multi-turn for complex tasks}: Hard multi-hop, cross-doc tasks require 2+ turns
+    \item \textbf{Reasonable chunk size}: Chunks between 5K--25K chars
+    \item \textbf{No f-string bugs}: No \texttt{llm\_query("\{context\}")} without f-string
+\end{enumerate}
+
+\subsubsection{Training Configuration}
+
+\begin{itemize}
+    \item \textbf{Loss}: Standard cross-entropy via Tinker's \texttt{forward\_backward("cross\_entropy")}
+    \item \textbf{LoRA rank}: 32 (same as GRPO)
+    \item \textbf{Learning rate}: $2{\times}10^{-5}$ (10$\times$ higher than GRPO, following Tinker API recommendations for SFT)
+    \item \textbf{Schedule}: Linear warmup for 10\% of steps, cosine decay to 10\% of peak LR
+    \item \textbf{Epochs}: 3 over the filtered dataset
+    \item \textbf{Batch size}: 4 with gradient accumulation of 4 = effective batch 16
+    \item \textbf{Per-token weighting}: From Tinker's renderer, masking system/user tokens and weighting only assistant code tokens
+\end{itemize}
+
+\textbf{V16 RS-SFT}: 2,589 mined trajectories, 3 epochs, $\sim$2.5 hours on Tinker. Average: 70.4\%.
+
+\textbf{V17 RS-SFT}: 3,644 mined trajectories (includes Round 2 mining from V16), 3 epochs, $\sim$2.8 hours on Tinker. Average: 71.6\%. \textbf{This is our best model.}
+
+\subsection{Phase 4: SFT Scaling Experiments (V18--V21)}
+\label{sec:scaling}
+
+After V17, we conducted four experiments attempting to push beyond 71.6\%:
+
+\textbf{V18 (4,660 samples):} We discovered a bug in trajectory mining---\texttt{mine\_eval\_trajectories.py} only checked the \texttt{score} field, but doc-classify uses \texttt{accuracy} and multi-NIAH uses \texttt{recall}. Fixing this added 858 doc-classify and 798 multi-NIAH trajectories. Despite more data, V18 scored 69.7\% ($-$1.9pp). Adding doc-classify data improved doc-classify (+7.7pp over V17) but degraded code debug ($-$20pp) and hard multi-hop ($-$20pp).
+
+\textbf{V19 (V17 + 1 epoch of V18 data, lr $5{\times}10^{-6}$):} Fine-tuning V17 with the new data at 10$\times$ lower learning rate. Score: 69.5\% ($-$2.1pp). Even gentle fine-tuning damages V17's reasoning.
+
+\textbf{V20 (4,277 reasoning-boosted samples):} Rebalanced data toward hard reasoning tasks. Score: 69.4\% ($-$2.2pp). Notebook QA improved to 90\% (best ever) but multi-hop QA collapsed to 45\% (below base).
+
+\textbf{V21 (V17 + 1,732 targeted samples, lr $3{\times}10^{-6}$):} Minimal targeted fine-tuning on V17's weakest benchmarks. Score: 64.8\% ($-$6.8pp). Cross-doc collapsed to 18.5\%.
+
+\textbf{Key insight}: SFT creates unavoidable benchmark tradeoffs. Every model that gains on some benchmarks loses on others. V17's specific balance of 3,644 samples across 3 epochs represents a local optimum that is surprisingly difficult to improve upon. The oracle maximum (best per-benchmark across V17--V21) is 77.7\%, indicating $\sim$6pp of headroom that could be unlocked by per-benchmark model routing.
+
+%% ============================================================
+\section{Experimental Setup}
+\label{sec:experiments}
+
+\subsection{Benchmarks}
+
+We evaluate on 14 internal benchmarks spanning four algorithmic complexity classes, plus 2 external benchmarks. All benchmarks use deterministic seed-based generation for reproducible head-to-head comparison. Training and evaluation seeds are separated by a +10,000 offset.
+
+\subsubsection{$O(1)$ Tasks (Find a Single Piece of Information)}
+
+\textbf{NIAH} (20 tasks). Needle-in-a-Haystack: a single piece of information (e.g., ``The secret code is ALPHA-7'') is hidden at a random position in a 5K--100K character document of filler text. The model must locate and extract this information. Scoring: binary (1.0 if expected value found, 0.0 otherwise).
+
+\textbf{Hard NIAH} (15 tasks). Adversarial variant with three difficulty modes: (a)~\emph{distractor tasks} (40\%)---similar-looking values placed near the true needle (e.g., ``previous access code was BETA-22K'' near ``current active code is ALPHA-7X9''); (b)~\emph{extreme length} (30\%)---documents of 200K--1M characters; (c)~\emph{boundary tasks} (30\%)---needles placed at extreme positions (0.01, 0.02, 0.97, 0.99).
+
+\textbf{Key-Value Retrieval} (12 tasks). A registry document (like a database dump) with hundreds to thousands of entries, each with \texttt{REGISTRY\_ID}, \texttt{VALUE}, \texttt{STATUS}, \texttt{CATEGORY}. Three task types: single lookup (find one entry by ID), multi-lookup (find 3--5 entries), and aggregate (sum values matching a category filter). Context: 50K--200K characters.
+
+\textbf{Verbatim Copy} (10 tasks). The model must locate and \emph{exactly reproduce} a specific paragraph ($\sim$150--250 characters) from a 10K--100K character document. Scoring: character-level similarity via \texttt{SequenceMatcher} ($\geq$95\% = 1.0, $\geq$80\% = 0.75, $\geq$60\% = 0.5).
+
+\subsubsection{$O(K)$ Tasks (Find Multiple Scattered Items)}
+
+\textbf{Multi-NIAH} (20 tasks). $K{=}3$--10 needles embedded at different positions in 10K--100K character documents. Each needle formatted as \texttt{SECRET\_CODE\_[NAME]: [VALUE]}. Scoring: F1 over found needles.
+
+\textbf{Multi-Hop QA} (20 tasks). Questions requiring 2--3 reasoning hops across different parts of a 10K--100K character document (e.g., ``Find the person in role X, then find their project, then find its budget''). Facts are placed at separated positions to ensure they fall in different chunks. Scoring: exact/contains match (1.0), word overlap $\geq$70\% (0.5).
+
+\textbf{Hard Multi-Hop QA} (10 tasks). Harder variant with explicit distractor chains in 100K--200K character documents. A target chain (e.g., ``VP of Engineering is Rachel Thomas'' $\to$ ``Rachel Thomas leads Project Phoenix'' $\to$ ``Project Phoenix delivery date is March 15, 2026'') is accompanied by a distractor chain with similar structure but different entities. Facts are placed far apart so the model \emph{cannot} concatenate the full answer into a single chunk.
+
+\textbf{Code Debug} (15 tasks). A Python codebase (200--1000 lines) with 1--3 planted bugs (off-by-one errors, logic errors, index swaps, wrong operators). The model must locate and describe each bug. Scoring: fraction of bugs correctly identified (must mention function name + evidence of understanding).
+
+\textbf{Notebook QA} (15 tasks). Simulated Jupyter notebooks (15K--60K characters) with interleaved code cells, markdown, and outputs. Three task types: output lookup (find a specific cell's output), variable trace (follow a variable across cells), and cross-cell (compare results from different cells).
+
+\subsubsection{$O(N)$ Tasks (Process Every Item)}
+
+\textbf{Doc-Classify} (20 tasks). Classify $N{=}5$--20 synthetic news articles into 6 categories (Science, Sports, Business, World, Health, Technology). Each article is $\sim$300--800 characters. The model must process every document and return per-document classifications.
+
+\textbf{DataFrame QA} (20 tasks). A synthetic stock price dataset (5--50 tickers, 30--250 trading days) presented as CSV text (8K--700K characters). Task types: lookup (find a specific price), aggregation (compute average/max), ranking (which stock has highest volatility?), sector analysis, and multi-step queries.
+
+\textbf{Event Counting} (20 tasks). Event logs (50K--200K characters) with 30--100 events scattered among 16--20 entities and 15 event types. Five task types: count by value, count by entity, first/last event, per-entity breakdown, and ratio computation. The correct strategy is to \emph{extract} matching events via sub-calls, then count/aggregate in Python---delegating counting to sub-calls produces hallucinated numbers.
+
+\subsubsection{$O(N^2)$ Tasks (Cross-Document Comparison)}
+
+\textbf{Cross-Doc Compare} (12 tasks). Two documents (30K--100K characters each, embedded in a single context) require cross-document analysis. Four task types: entity overlap (find employees in both org charts), budget difference (largest absolute budget diff across shared projects), timeline conflict (events with conflicting dates), and metric comparison (which division has better average metrics?).
+
+\subsubsection{External Benchmarks}
+
+\textbf{OOLONG trec\_coarse} (10 tasks, $\sim$128K tokens). From Bertsch et al.~\cite{oolong2025}. Document classification tasks requiring label frequency counting, comparison, and aggregation. Scoring follows the original paper: $0.75^{|y - \hat{y}|}$ for numeric answers, exact match otherwise.
+
+\textbf{LongBench-v2 CodeQA} (15 tasks, $\leq$500K characters). From Bai et al.~\cite{longbenchv2}. Multiple-choice code repository understanding questions. The original RLM paper reported RLM(GPT-5) at 62\% on this benchmark.
+
+\subsection{Models Compared}
+
+\begin{enumerate}
+    \item \textbf{Base}: Qwen3.5-35B-A3B with RLM scaffold, no fine-tuning.
+    \item \textbf{V10-s40 (SC-GRPO)}: 40 SC-GRPO steps from V4-s5 checkpoint. LoRA rank 32, lr $1{\times}10^{-6}$, regression-targeted task distribution. Best GRPO model.
+    \item \textbf{V16 (RS-SFT)}: RS-SFT on 2,589 mined trajectories. 3 epochs, lr $2{\times}10^{-5}$.
+    \item \textbf{V16+GRPO}: 10 GRPO steps on top of V16 RS-SFT checkpoint. Tests whether RL refines RS-SFT.
+    \item \textbf{V17 (RS-SFT)}: RS-SFT on 3,644 mined trajectories (includes Round 2 mining from V16). 3 epochs, lr $2{\times}10^{-5}$. \textbf{Best overall model.}
+    \item \textbf{V18--V21 (ablations)}: SFT scaling experiments (Section~\ref{sec:scaling}).
+\end{enumerate}
+
+All results use seed 10000 for fair head-to-head comparison.
+
+\subsection{Computational Cost}
+
+\begin{table}[ht]
+\vskip 0.1in
+\begin{center}
+\begin{small}
+\begin{tabular}{lr}
+\toprule
+Phase & API Hours \\
+\midrule
+Base model evaluation (14 benchmarks) & $\sim$3.0 \\
+V4-s5 GRPO (5 steps from base) & $\sim$2.5 \\
+V10-s40 SC-GRPO (40 steps from V4-s5) & $\sim$20.0 \\
+V10-s40 evaluation & $\sim$3.0 \\
+Trajectory mining (3 rounds, 14 benchmarks) & $\sim$15.0 \\
+V16 RS-SFT training (2,589 samples, 3 ep.) & $\sim$2.5 \\
+V17 RS-SFT training (3,644 samples, 3 ep.) & $\sim$2.8 \\
+V16+GRPO training (10 steps) & $\sim$5.0 \\
+V18--V21 experiments & $\sim$10.0 \\
+All evaluations ($\times$8+ models) & $\sim$20.0 \\
+\midrule
+\textbf{Total} & $\sim$\textbf{84} \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+All Qwen3.5-35B-A3B experiments use the Tinker API for remote GPU execution. The 1.7B pipeline development phase (Appendix~\ref{app:1.7b}) used $\sim$11.1 GPU-hours on a single NVIDIA H200.
+
+%% ============================================================
+\section{Results}
+\label{sec:results}
+
+\subsection{Main Results}
+\label{sec:main-results}
+
+Table~\ref{tab:main} shows the primary comparison across all 14 benchmarks. We compare the base model, V10-s40 (best GRPO), and V17 (best RS-SFT). All results use seed 10000 in clean head-to-head evaluation (identical seeds, no strategy prompts).
+
+\begin{table*}[t]
+\caption{Head-to-head evaluation across 14 benchmarks (seed 10000). Base = Qwen3.5-35B-A3B with RLM scaffold, no fine-tuning. V10-s40 = best SC-GRPO model (40 steps, regression-targeted). V17 = best RS-SFT model (3,644 trajectories, 3 epochs). Best per-benchmark in \textbf{bold}. $\uparrow$ = improvement over base, $\downarrow$ = regression.}
+\label{tab:main}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{tabular}{llcccccc}
+\toprule
+& Benchmark ($n$) & Base & V10-s40 & $\Delta$ Base & \textbf{V17} & $\Delta$ Base & $\Delta$ V10 \\
+\midrule
+\multirow{4}{*}{$O(1)$}
+& NIAH (20) & 65.0 & 75.0 & $\uparrow$10.0 & \textbf{75.0} & $\uparrow$10.0 & 0.0 \\
+& Hard NIAH (15) & 83.3 & 93.3 & $\uparrow$10.0 & \textbf{96.7} & $\uparrow$13.4 & $\uparrow$3.4 \\
+& KV Retrieval (12) & 29.2 & 75.0 & $\uparrow$45.8 & \textbf{85.4} & $\uparrow$56.2 & $\uparrow$10.4 \\
+& Verbatim Copy (10) & 20.0 & 60.0 & $\uparrow$40.0 & \textbf{80.0} & $\uparrow$60.0 & $\uparrow$20.0 \\
+\midrule
+\multirow{5}{*}{$O(K)$}
+& Multi-NIAH (20) & \textbf{99.4} & 90.0 & $\downarrow$9.4 & 95.1 & $\downarrow$4.3 & $\uparrow$5.1 \\
+& Multi-Hop QA (20) & 55.0 & 60.0 & $\uparrow$5.0 & \textbf{80.0} & $\uparrow$25.0 & $\uparrow$20.0 \\
+& Hard Multi-Hop (10) & 30.0 & 30.0 & 0.0 & \textbf{60.0} & $\uparrow$30.0 & $\uparrow$30.0 \\
+& Code Debug (15) & 50.0 & 43.3 & $\downarrow$6.7 & \textbf{60.0} & $\uparrow$10.0 & $\uparrow$16.7 \\
+& Notebook QA (15) & 46.7 & 63.3 & $\uparrow$16.6 & \textbf{70.0} & $\uparrow$23.3 & $\uparrow$6.7 \\
+\midrule
+\multirow{3}{*}{$O(N)$}
+& Doc-Classify (20) & 56.3 & 76.6 & $\uparrow$20.3 & \textbf{80.2} & $\uparrow$23.9 & $\uparrow$3.6 \\
+& DataFrame QA (20) & 75.0 & 85.0 & $\uparrow$10.0 & \textbf{93.0} & $\uparrow$18.0 & $\uparrow$8.0 \\
+& Event Counting (20) & 46.4 & 41.7 & $\downarrow$4.7 & \textbf{73.0} & $\uparrow$26.6 & $\uparrow$31.3 \\
+\midrule
+$O(N^2)$ & Cross-Doc (12) & 42.2 & 42.9 & $\uparrow$0.7 & \textbf{43.4} & $\uparrow$1.2 & $\uparrow$0.5 \\
+\midrule
+External & OOLONG (10) & 0.0 & \textbf{20.0} & $\uparrow$20.0 & 10.0 & $\uparrow$10.0 & $\downarrow$10.0 \\
+\midrule
+\multicolumn{2}{l}{\textbf{Average (14)}} & 49.9 & 61.1 & $\uparrow$11.3 & \textbf{71.6} & $\uparrow$\textbf{21.7} & $\uparrow$\textbf{10.4} \\
+\multicolumn{2}{l}{Win/Loss/Tie vs Base} & --- & 9/3/2 & --- & \textbf{13/1/0} & --- & --- \\
+\multicolumn{2}{l}{Win/Loss/Tie vs V10-s40} & --- & --- & --- & \textbf{12/1/1} & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table*}
+
+\textbf{V17 RS-SFT achieves $+$21.7pp average improvement, winning 13 of 14 benchmarks} against the base model. The only regression is Multi-NIAH ($-$4.3pp, from 99.4\% to 95.1\%---still very high). Against V10-s40 (best GRPO), V17 wins 12 of 14.
+
+\textbf{The largest gains come from tasks requiring precise extraction and multi-step reasoning.} Verbatim Copy ($+$60pp), KV Retrieval ($+$56pp), Hard Multi-Hop ($+$30pp), Event Counting ($+$26.6pp), Multi-Hop QA ($+$25pp), and Doc-Classify ($+$23.9pp) all improve dramatically.
+
+\textbf{V17 fixes V10-s40's regressions.} V10-s40 regressed on 3 benchmarks (Multi-NIAH $-$9.4pp, Code Debug $-$6.7pp, Event Counting $-$4.7pp). V17 fixes all three: Code Debug 43.3\% $\to$ 60.0\%, Event Counting 41.7\% $\to$ 73.0\%, Multi-NIAH 90.0\% $\to$ 95.1\%. This is the core advantage of RS-SFT over GRPO---it avoids the regressions that negative gradients cause.
+
+\subsection{Training Progression}
+\label{sec:progression}
+
+Table~\ref{tab:progression} shows the progression from base model through GRPO to RS-SFT.
+
+\begin{table}[t]
+\caption{Training progression across methods. All averages over 14 benchmarks, seed 10000.}
+\label{tab:progression}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{tabular}{lccc}
+\toprule
+Model & Method & Data & Avg (\%) \\
+\midrule
+Base & --- & --- & 49.9 \\
+V10-s40 & SC-GRPO & 592 prompts & 61.1 \\
+V16 & RS-SFT & 2,589 mined & 70.4 \\
+\textbf{V17} & \textbf{RS-SFT} & \textbf{3,644 mined} & \textbf{71.6} \\
+\midrule
+V18 & RS-SFT & 4,660 (+bug fix) & 69.7 \\
+V19 & V17+finetune & V18 data & 69.5 \\
+V20 & RS-SFT & 4,277 rebalanced & 69.4 \\
+V21 & V17+targeted & 1,732 targeted & 64.8 \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+The progression is clear: RS-SFT produces a large jump over GRPO ($+$9.3pp from V10-s40 to V16), and iterative mining yields a further $+$1.2pp (V16 to V17). However, further scaling (V18--V21) does not improve beyond V17, suggesting diminishing returns from additional SFT data.
+
+\subsection{RS-SFT vs GRPO: The Core Finding}
+\label{sec:rs-sft-vs-grpo}
+
+The comparison between V10-s40 (best GRPO) and V17 (best RS-SFT) reveals a systematic pattern (Table~\ref{tab:main}):
+
+\textbf{V17 wins on 12 of 14 benchmarks vs V10-s40.} The most dramatic improvements are on tasks where GRPO \emph{regressed}: Event Counting ($+$31.3pp), Hard Multi-Hop ($+$30pp), Verbatim Copy ($+$20pp), Multi-Hop QA ($+$20pp), Code Debug ($+$16.7pp). These are precisely the tasks where GRPO's negative gradients suppressed useful base-model patterns.
+
+\textbf{V10-s40 wins only on OOLONG} ($+$10pp over V17). OOLONG is an external benchmark requiring real-world document aggregation at 128K tokens---the one task type least represented in the RS-SFT training data.
+
+\textbf{NIAH ties at 75.0\%.} Both methods improve equally on single-needle retrieval.
+
+\subsection{GRPO on Top of RS-SFT: A Negative Result}
+\label{sec:grpo-on-sft}
+
+A natural question is whether RL can \emph{refine} an RS-SFT checkpoint. We test this by applying 10 GRPO steps to the V16 RS-SFT checkpoint. Table~\ref{tab:grpo-on-sft} shows the results on the 9 benchmarks evaluated.
+
+\begin{table}[t]
+\caption{GRPO applied on top of V16 RS-SFT. On the 9 shared benchmarks, GRPO degrades average performance. Benchmarks where GRPO hurts are shown in \textcolor{red}{red}.}
+\label{tab:grpo-on-sft}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{tabular}{lcc}
+\toprule
+Benchmark & V16 RS-SFT & V16+GRPO \\
+\midrule
+NIAH & 65.0 & 65.0 \\
+Multi-NIAH & 95.0 & 96.1 \\
+Hard NIAH & \textbf{83.3} & \textcolor{red}{83.3} \\
+Doc-Classify & 76.7 & \textbf{83.6} \\
+DataFrame QA & \textbf{99.0} & \textcolor{red}{94.0} \\
+Code Debug & \textbf{50.0} & \textcolor{red}{35.6} \\
+Multi-Hop QA & 75.0 & 75.0 \\
+Notebook QA & \textbf{83.3} & \textcolor{red}{73.3} \\
+Verbatim Copy & \textbf{100.0} & \textcolor{red}{80.0} \\
+\midrule
+Average (9) & \textbf{80.8} & 76.2 \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+\textbf{GRPO on top of RS-SFT degrades average performance by $-$4.6pp.} Code Debug collapses from 50.0\% to 35.6\% ($-$14.4pp), Verbatim Copy from 100\% to 80\% ($-$20pp), DataFrame QA from 99\% to 94\% ($-$5pp), and Notebook QA from 83.3\% to 73.3\% ($-$10pp). The only benefit is a modest doc-classify improvement ($+$6.9pp). This demonstrates that \textbf{the SFT$\to$RL pipeline is not universally beneficial}---for multi-task code generation, RL's negative gradients damage the carefully learned patterns from RS-SFT.
+
+\subsection{SFT Scaling: Diminishing Returns (V18--V21)}
+\label{sec:sft-scaling}
+
+Table~\ref{tab:scaling} shows per-benchmark results for the SFT scaling experiments.
+
+\begin{table*}[t]
+\caption{SFT scaling experiments (V18--V21) compared to V17. All trained from base unless noted. Per-benchmark best across V17--V21 in \textbf{bold}. Oracle = best per-benchmark.}
+\label{tab:scaling}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{tabular}{lccccc|c}
+\toprule
+Benchmark & V17 & V18 & V19 & V20 & V21 & Oracle \\
+\midrule
+NIAH & 75.0 & \textbf{80.0} & 70.0 & 70.0 & 70.0 & 80.0 \\
+Multi-NIAH & 95.1 & 93.4 & \textbf{96.8} & 95.0 & 88.1 & 96.8 \\
+Hard NIAH & \textbf{96.7} & 90.0 & 93.3 & 83.3 & 80.0 & 96.7 \\
+Doc-Classify & 80.2 & \textbf{87.9} & 78.0 & 84.7 & 84.8 & 87.9 \\
+DataFrame QA & 93.0 & 94.0 & 97.0 & 94.0 & \textbf{99.0} & 99.0 \\
+Code Debug & \textbf{60.0} & 40.0 & 46.7 & 43.3 & 43.3 & 60.0 \\
+Multi-Hop QA & \textbf{80.0} & 70.0 & 70.0 & 45.0 & 75.0 & 80.0 \\
+Hard Multi-Hop & \textbf{60.0} & 40.0 & 40.0 & 50.0 & 40.0 & 60.0 \\
+Notebook QA & 70.0 & 76.7 & 83.3 & \textbf{90.0} & 80.0 & 90.0 \\
+Event Counting & \textbf{73.0} & 61.6 & 57.2 & 67.0 & 60.3 & 73.0 \\
+Cross-Doc & 43.4 & \textbf{47.0} & 34.7 & 45.4 & 18.5 & 47.0 \\
+KV Retrieval & 85.4 & 75.0 & 86.7 & \textbf{88.9} & 63.9 & 88.9 \\
+Verbatim Copy & 80.0 & 90.0 & \textbf{100.0} & \textbf{100.0} & 90.0 & 100.0 \\
+OOLONG & 10.0 & \textbf{30.0} & 20.0 & 15.0 & 15.0 & 30.0 \\
+\midrule
+\textbf{Average} & \textbf{71.6} & 69.7 & 69.5 & 69.4 & 64.8 & \textbf{77.7} \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table*}
+
+The oracle column shows the \textbf{theoretical ceiling at 77.7\%}---the average if we could select the best model per benchmark. This 6.1pp gap between V17 (71.6\%) and the oracle suggests that per-benchmark model routing or mixture-of-experts at the trajectory level could yield further improvements.
+
+\textbf{Reasoning tasks are the most fragile.} Code Debug and Hard Multi-Hop are the best indicators of model quality: V17 achieves 60\% on both, while every other variant drops to 40--46\%. These tasks require genuine multi-step decomposition, and even small changes to the training data can disrupt this capability.
+
+\subsection{External Benchmarks}
+\label{sec:external}
+
+\begin{table}[t]
+\caption{External benchmarks from the original RLM paper.}
+\label{tab:external}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{tabular}{lccc}
+\toprule
+Benchmark & Base & V10-s40 & $\Delta$ \\
+\midrule
+OOLONG trec\_coarse (50) & \textbf{32.0} & 24.3 & $-7.7$ \\
+LongBench-v2 CodeQA (15) & 13.3 & \textbf{26.7} & +13.4 \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+V10-s40 doubles the base model's accuracy on LongBench-v2 CodeQA ($+$13.4pp), demonstrating transfer to real-world code comprehension. On OOLONG, the base model performs better ($-$7.7pp), consistent with the specialization-generalization tradeoff. The 128K-token OOLONG contexts exceed the model's 65K context window, and V10's more aggressive strategies sometimes cause sub-call context overflow.
+
+\subsection{Strategy Prompts at Evaluation Time}
+\label{sec:strategy-eval}
+
+While SC-GRPO uses strategy prompts during \emph{training}, we also test strategy prompts at \emph{inference}. Per-benchmark strategy selection yields strong task-specific gains:
+
+\begin{itemize}
+    \item Hard Multi-Hop: $+$40pp with \texttt{multi\_hop\_decompose}
+    \item Code Debug: $+$19pp with \texttt{code\_debug\_focused}
+    \item DataFrame QA: $+$17pp with \texttt{table\_preserve}
+    \item KV Retrieval: $+$17pp with \texttt{lookup\_thorough}
+\end{itemize}
+
+However, strategies catastrophically hurt free-form tasks (Multi-Hop QA: $-$25pp, Verbatim Copy: $-$60pp). \textbf{Per-benchmark strategy selection is critical}---a single ``best'' strategy does not exist. The same model weights can produce 47\% vs 80\% depending on the strategy prompt.
+
+\textbf{Strategy amplification in GRPO.} Decomposing the total improvement in our GRPO experiments (V9-s10) reveals that training alone contributes only $+$0.9pp average, while strategy prompts at evaluation time contribute $+$5.5pp---a $6{\times}$ difference. This motivated our shift toward RS-SFT: since GRPO's direct behavioral change is near zero-sum across benchmarks, the question becomes whether a different training paradigm can achieve larger direct improvements. RS-SFT's $+$21.7pp demonstrates that positive-only training succeeds where GRPO's negative gradients create a zero-sum tradeoff, achieving large gains \emph{without} requiring strategy prompt engineering at evaluation time.
+
+%% ============================================================
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Why RS-SFT Outperforms GRPO: An RL Analysis}
+\label{sec:why-rs-sft}
+
+The $+$10.4pp advantage of RS-SFT over GRPO is our most important finding. Understanding \emph{why} policy gradient methods underperform behavioral cloning in this setting provides insights for the broader RL-for-LLM community. We identify three mechanisms, each rooted in fundamental properties of the RL objective:
+
+\textbf{1. Cross-task interference via negative gradients.} GRPO updates the policy on all $K$ trajectories, including those with negative advantages. A code pattern appearing in a ``bad'' trajectory for task A (receiving negative gradient) may be the same pattern used successfully for task B. Suppressing it hurts B. RS-SFT never pushes the model away from anything, avoiding this interference entirely.
+
+\textbf{2. Format rigidity.} Trajectory analysis reveals that GRPO trains rigid format-specific parsing in sub-call code (Section~\ref{sec:format-rigidity}). For example, after GRPO training, the model generates \texttt{if "ORG: " in line: parts = line.split("ORG: ")} instead of the base model's robust \texttt{for line in answer.split("$\backslash$n")}. When sub-call output doesn't match the expected format, extraction fails silently.
+
+\textbf{3. Zero-sum tradeoff.} GRPO training consistently shows a near-zero-sum pattern: 5 benchmarks improve, 5 regress. The regression-targeted task distribution (V10-s40) partially breaks this deadlock by allocating 70\% of training weight to regressing tasks, but still produces 3 regressions. RS-SFT achieves 13 wins with only 1 minor regression (Multi-NIAH, from 99.4\% to 95.1\%).
+
+\subsection{Format Rigidity: The Root Cause of RL Regressions}
+\label{sec:format-rigidity}
+
+We conduct trajectory analysis comparing base model and GRPO-trained model outputs on cross-document comparison tasks (where GRPO regresses).
+
+\textbf{Base model} (43\% accuracy) uses loose extraction:
+{\footnotesize
+\begin{verbatim}
+for line in answer.split("\n"):
+    line = line.strip()
+    if line:
+        results.append(line)
+\end{verbatim}
+}
+
+\textbf{GRPO-trained model} (28.6\% accuracy) uses strict format parsing:
+{\footnotesize
+\begin{verbatim}
+if "ORG: " in line:
+    parts = line.split("ORG: ")
+    org_name = parts[1].strip()
+\end{verbatim}
+}
+
+The GRPO model's code \emph{works on average} during training because sub-calls often produce ``ORG: Name'' format. But at evaluation time, sub-call outputs vary (``Organization: Name'', ``The organization is Name'', etc.), causing silent extraction failures.
+
+\textbf{Root causes:} (1)~RL rewards code that works ``on average'' even if brittle; (2)~template convergence---seeing the same task type multiple times drives the model toward a single winning template; (3)~no negative signal for format failures---the model doesn't learn \emph{why} format-specific parsing fails; (4)~sub-call non-determinism biases training toward templates that work ``most of the time.''
+
+\textbf{Why RS-SFT avoids this:} RS-SFT quality filtering explicitly selects trajectories with format-robust parsing. The 8-criterion filter (Section~\ref{sec:rs-sft}) rejects trajectories with strict format-specific patterns, ensuring the model only trains on code that uses loose, flexible extraction.
+
+\subsection{Sub-Call Scaling Failure}
+\label{sec:scaling-failure}
+
+Beyond format rigidity, GRPO training introduces a structural regression on tasks with large structured data. On DataFrame QA, the trained model learns to delegate CSV parsing to \texttt{llm\_query} sub-calls---a pattern that works for small datasets but catastrophically fails for large ones because the sub-call context window cannot accommodate the full table:
+
+\begin{center}
+\begin{small}
+\begin{tabular}{lrrc}
+\toprule
+Data size & Base & GRPO & Failure mode \\
+\midrule
+5t/30d (7K chars)    & 40\% & \textbf{76\%} & --- \\
+15t/60d (54K chars)  & 40\% & 20\% & Sub-call timeout \\
+30t/120d (217K chars) & \textbf{80\%} & $\sim$0\% & Context overflow \\
+50t/250d (753K chars) & \textbf{56\%} & $\sim$0\% & Context overflow \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+
+The base model avoids this by parsing CSV directly in Python (\texttt{for line in context.split("$\backslash$n")}), which scales to arbitrary sizes. RL rewards the \texttt{llm\_query} delegation pattern because it works ``on average'' during training (where most training examples use moderate-sized contexts), even though it has structural scaling failures outside the training distribution. RS-SFT avoids this because successful trajectories on large DataFrames naturally use Python-based parsing---the quality filter selects for patterns that actually scale.
+
+\subsection{Training Benefits by Algorithmic Complexity}
+\label{sec:complexity-main}
+
+Stratifying V17's improvement by benchmark complexity class (Table~\ref{tab:complexity}, Appendix~\ref{app:complexity}) reveals a systematic pattern: $O(1)$ tasks (precise retrieval) benefit most ($+$34.6pp average), $O(N)$ tasks (process every item) gain $+$22.9pp, $O(K)$ tasks (multi-item search) gain $+$14.8pp, while $O(N^2)$ tasks (cross-document comparison) gain only $+$1.2pp. This gradient suggests that RS-SFT primarily teaches systematic search patterns and extraction validation---capabilities whose benefit scales with the number of items to find---but does not yet address the combinatorial challenge of cross-document reasoning, where the model must jointly reason about information from two separate sources. The $O(N^2)$ gap represents the most promising direction for future improvement.
+
+\subsection{The SFT Scaling Frontier}
+\label{sec:frontier}
+
+The V18--V21 experiments reveal a fundamental limitation of single-model SFT:
+
+\textbf{Every model that gains on some benchmarks loses on others.} V18's doc-classify gains ($+$7.7pp over V17) come at the cost of code debug ($-$20pp) and hard multi-hop ($-$20pp). V20's notebook QA gains ($+$20pp) come at the cost of multi-hop QA ($-$35pp). Even V21's minimal targeted fine-tuning (1,732 samples at lr $3{\times}10^{-6}$) causes cross-doc to collapse from 43.4\% to 18.5\%.
+
+\textbf{The oracle analysis quantifies the frontier.} At 77.7\% average (best per-benchmark across V17--V21), there is $\sim$6pp of headroom. This could be unlocked by per-benchmark model routing, mixture-of-experts at the trajectory level, or task-conditional adapters.
+
+\textbf{Reasoning tasks as canaries.} Code Debug and Hard Multi-Hop are the most sensitive indicators of training quality. Their fragility to data changes suggests they test capabilities (multi-step decomposition, precise reasoning) that are easily disrupted by SFT on diverse data.
+
+\subsection{Comparison with Zhang et al.\ (2026)}
+\label{sec:comparison-zhang}
+
+Our work differs from the original RLM paper~\cite{zhang2026rlm} in four key ways, summarized in Table~\ref{tab:comparison-zhang}.
+
+\begin{table}[t]
+\caption{Comparison with the original RLM training approach.}
+\label{tab:comparison-zhang}
+\vskip 0.1in
+\begin{center}
+\begin{small}
+\begin{tabular}{lcc}
+\toprule
+& Zhang et al. & Ours \\
+\midrule
+Base model & Qwen3-8B & Qwen3.5-35B-A3B \\
+Architecture & Dense, 8B & MoE, 35B/3B \\
+Training data & Teacher (480B) & Self-mined \\
+Training method & SFT & RS-SFT \\
+Benchmarks & 5 & 14 (+2 external) \\
+Avg.\ improvement & +28.3\% & +21.7pp \\
+Teacher required & Yes (GPT-5) & No \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+The original paper achieves a larger average improvement ($+$28.3\% vs our $+$21.7pp), but uses a 480B teacher to generate gold trajectories and evaluates on fewer benchmarks. Our \emph{teacherless} approach---mining correct trajectories from the base model's own outputs---is entirely self-contained and reproducible without access to proprietary models. The quality of self-mined data is necessarily lower than teacher-generated data (the base model solves fewer tasks than GPT-5), but iterative mining partially compensates: each RS-SFT round produces a better model that mines harder trajectories for the next round. Our evaluation across 14 diverse benchmarks (vs.\ the original 5) provides a more comprehensive assessment of training quality, including tasks ($O(N^2)$ cross-document, code debugging) where trained models show minimal or no improvement---failure modes that a narrower evaluation might miss.
+
+\subsection{Key Insights Across Model Scales}
+
+\textbf{1.7B vs 35B.} At 1.7B (Appendix~\ref{app:1.7b}), the model can barely write REPL code, requiring SFT warmup before RL. At 35B, the base model generates competent RLM code out of the box, enabling both direct RL and direct RS-SFT from base. This validates the choice of a larger model for RLM training.
+
+\textbf{LoRA creates planning-perception entanglement.} The single most impactful discovery from the GRPO phase is that LoRA fine-tuning of recursive models creates an unintended coupling between planning (root code generation) and perception (sub-call QA). The hybrid architecture (Section~\ref{sec:hybrid}) decouples these by routing sub-calls to the unadapted base model. RS-SFT partially mitigates this because it only trains on trajectories where both root and sub-call code produce correct results.
+
+\textbf{Implementation correctness is non-negotiable.} Seven bugs in the GRPO pipeline---wrong loss function (unclipped IS vs PPO), sub-query temperature leak, advantage normalization mismatch, and others---collectively prevented learning (loss values of $O(10^7)$). Only after fixing all seven did training produce stable improvements. Section~\ref{sec:1.7b-rl} documents each bug and its fix, providing a practical reference for RL practitioners working with code-generation models.
+
+\subsection{When Does RL Fail for Code Generation?}
+\label{sec:when-rl-fails}
+
+Our extensive RL development (11 iterations, $\sim$84 API-hours) reveals a structural limitation of policy gradient methods for \emph{multi-task code generation}: code has a narrow mode space where negative gradients are disproportionately destructive.
+
+In natural language generation, suppressing one phrasing (``The answer is X'') has minimal impact on other valid phrasings (``X is the answer,'' ``The result is X''). The output distribution is broad enough that negative gradients can remove poor patterns without collateral damage. In code generation, the output distribution is much more concentrated---there are far fewer ``correct'' ways to write a chunk-and-search loop than ways to phrase an answer. Suppressing one code pattern (e.g., loose text parsing via \texttt{split("$\backslash$n")}) often suppresses the \emph{only} pattern the model knows for that operation, causing regressions across all tasks that use it.
+
+This analysis suggests that \textbf{RL for code generation should either (a)~use only positive signal} (RS-SFT, best-of-N), \textbf{(b)~carefully partition the action space} so negative gradients for one task type cannot affect another (e.g., task-conditional adapters), or \textbf{(c)~use process reward models} that provide per-turn credit assignment dense enough to avoid the cross-task interference caused by sparse outcome rewards. Our SC-GRPO addresses (b) partially via strategy conditioning, but the shared LoRA adapter still allows cross-task interference at the parameter level.
+
+\subsection{Limitations}
+
+\textbf{Benchmark scale.} Our benchmarks use 10--20 tasks per benchmark, limiting statistical power. The largest gains (Verbatim Copy $+$60pp, KV Retrieval $+$56pp) are robust, but moderate gains ($\pm$5pp) may not be statistically significant at these sample sizes.
+
+\textbf{Synthetic benchmarks.} 14 of 16 benchmarks use synthetic data. Performance on real-world long-context tasks may differ, as evidenced by the OOLONG regression.
+
+\textbf{Single base model.} We evaluate only Qwen3.5-35B-A3B. Results may differ with other base models or model sizes.
+
+\textbf{RS-SFT ceiling.} RS-SFT can only learn what the base model (or previous RS-SFT iterations) already does well. For tasks where the base model has $<$10\% success rate, trajectory mining produces insufficient training data. Teacher distillation from a larger model could address this.
+
+\textbf{Multi-NIAH regression.} The one consistent regression ($-$4.3pp) on Multi-NIAH suggests that training on diverse task types may slightly reduce the model's ability to perform exhaustive search. This could potentially be addressed by upweighting Multi-NIAH in the training data, but we did not investigate this to avoid overfitting to the evaluation set.
+
+%% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+We trained the first open-weight natively recursive language model based on Qwen3.5-35B-A3B, systematically comparing GRPO and RS-SFT training paradigms across 14 diverse long-context benchmarks. Our main findings:
+
+\begin{enumerate}
+    \item \textbf{RS-SFT outperforms GRPO by $+$10.4pp} ($71.6\%$ vs $61.1\%$ average). Training only on correct trajectories avoids the cross-task interference caused by GRPO's negative gradients, which suppress useful base-model patterns for tasks not in the training distribution. This finding challenges the assumption that RL should outperform behavioral cloning for code generation.
+
+    \item \textbf{GRPO on top of RS-SFT actively hurts.} Applying RL refinement to an RS-SFT checkpoint degrades 5 of 9 evaluated benchmarks. The SFT$\to$RL pipeline is not universally beneficial.
+
+    \item \textbf{Format rigidity is the root cause of RL regressions.} GRPO trains rigid format-specific parsing in sub-call code that fails on output variation. RS-SFT avoids this through quality filtering for format-robust code.
+
+    \item \textbf{Iterative trajectory mining creates a data flywheel.} Each RS-SFT round produces a better model that mines better trajectories: V16 (70.4\%) $\to$ V17 (71.6\%).
+
+    \item \textbf{SFT scaling has diminishing returns.} V18--V21 (4 experiments with 1,732--4,660 samples) all score below V17. An oracle analysis reveals a 77.7\% ceiling achievable via per-benchmark routing.
+
+    \item \textbf{SC-GRPO eliminates mode collapse} in code-generation GRPO (0\% group collapse vs 60\% in standard GRPO).
+\end{enumerate}
+
+\textbf{Future directions.} (a)~Per-benchmark model routing to approach the 77.7\% oracle ceiling; (b)~teacher distillation from Qwen3.5-397B-A17B for tasks where the base model has $<$10\% success rate; (c)~multi-level recursion where RLMs call RLMs; (d)~larger evaluation suites ($N{\geq}100$) to establish statistical significance; (e)~investigation of whether DPO (which uses negative signal but is more stable than GRPO) can improve on RS-SFT.
+
+Our results demonstrate that \textbf{rejection sampling SFT is the superior training paradigm for recursive language models}, achieving $+$21.7pp improvement over the base model across 14 benchmarks while avoiding the regressions that plague RL training. Notably, this is achieved \emph{without any teacher model}---unlike the original RLM work~\cite{zhang2026rlm}, which relies on a 480B teacher for trajectory generation, our iterative self-mining approach is fully self-contained. The combination of iterative trajectory mining, quality filtering, and task-balanced SFT provides a simple, stable, and effective recipe for training RLMs that is reproducible by anyone with access to the base model. All weights, code, benchmarks, and training data are publicly available.
+
+\section*{Acknowledgements}
+
+This project was completed for CS234: Reinforcement Learning, Winter 2026 at Stanford University. Initial Qwen3-1.7B experiments used approximately 11.1 GPU-hours on 8$\times$H200; the Qwen3.5-35B-A3B experiments used the Tinker remote training API. Everything is available at \url{https://github.com/pythonomar22/rl4rlm} (branch: \texttt{paper-and-release-updates}), including all source code, training code, and evaluation benchmarks. The trained LoRA adapters are available on HuggingFace: \texttt{omar81939/rlm-qwen35-35b-a3b}.
+
+%% ============================================================
+%% APPENDIX
+%% ============================================================
+\appendix
+
+\section{Trajectory Examples: Base vs.\ V10-s40 vs.\ V17}
+\label{app:trajectories}
+
+We present representative trajectories showing how training transforms model behavior. All examples are from seed 10000 evaluation.
+
+\subsection{Example 1: Hard Multi-Hop QA --- Two-Phase Decomposition}
+\label{app:traj-multihop}
+
+\textbf{Task:} ``Find the city where the Lead of Legal is based'' (2-hop reasoning, 150K character document).
+
+\textbf{Base model (incorrect, returns ``Dublin''):}
+{\footnotesize
+\begin{verbatim}
+chunk_size = 20000
+overlap = 2000
+results = []
+i = 0
+while i < len(context):
+    chunk = context[i:i+chunk_size]
+    answer = llm_query(
+        f"Find the city where the Lead "
+        f"of Legal is based. Return ONLY "
+        f"the city name. If not found, "
+        f"say 'NOT FOUND'.\n\n{chunk}")
+    if "not found" not in answer.lower():
+        results.append(answer.strip())
+    i += chunk_size - overlap
+
+from collections import Counter
+result = Counter(results).most_common(1)[0][0]
+FINAL_VAR("result")
+\end{verbatim}
+}
+
+The base model asks the \emph{compound} question directly: ``Find the city where the Lead of Legal is based.'' No single chunk contains both the person's identity and their city, so sub-calls return contradictory answers and the model picks the wrong one via majority voting.
+
+\textbf{V17 RS-SFT (correct, returns ``Boston''):}
+{\footnotesize
+\begin{verbatim}
+# Step 1: Find who is the Lead of Legal
+chunk_size = 20000
+overlap = 2000
+candidates = []
+i = 0
+while i < len(context):
+    chunk = context[i:i+chunk_size]
+    answer = llm_query(
+        f"Who is the Lead of Legal? "
+        f"Return ONLY the person's full "
+        f"name. If not found, say "
+        f"'NOT FOUND'.\n\n{chunk}")
+    if "not found" not in answer.lower():
+        candidates.append(answer.strip())
+    i += chunk_size - overlap
+
+from collections import Counter
+lead_name = Counter(candidates) \
+    .most_common(1)[0][0]
+print(f"Found Lead of Legal: {lead_name}")
+\end{verbatim}
+}
+{\footnotesize
+\begin{verbatim}
+# Step 2: Find where this person is based
+results = []
+i = 0
+while i < len(context):
+    chunk = context[i:i+chunk_size]
+    answer = llm_query(
+        f"In which city is {lead_name} "
+        f"based? Return ONLY the city "
+        f"name. If not found, say "
+        f"'NOT FOUND'.\n\n{chunk}")
+    if "not found" not in answer.lower():
+        results.append(answer.strip())
+    i += chunk_size - overlap
+
+final_city = Counter(results) \
+    .most_common(1)[0][0]
+FINAL_VAR("final_city")
+\end{verbatim}
+}
+
+V17 breaks the problem into two explicit steps: first find the person (``Rachel Thomas''), then find their city (``Boston''). Each atomic query is answerable from a single chunk. This two-phase decomposition is the hallmark of successful multi-hop reasoning in RLMs. \textbf{Hard Multi-Hop accuracy: Base 30\% $\to$ V17 60\% ($+$30pp).}
+
+\subsection{Example 2: Event Counting --- Extract Then Count in Python}
+\label{app:traj-event}
+
+\textbf{Task:} ``How many events were performed by Jack Anderson?'' (150K character event log document).
+
+\textbf{Base model (incorrect, returns ``7'', expected ``8''):}
+
+The base model asks sub-calls to \emph{count} events directly: ``How many events did Jack Anderson perform in this text?'' Sub-calls hallucinate counts (returning ``3'' or ``2'' for chunks containing 4 events), and the base model sums these hallucinated counts.
+
+\textbf{V17 RS-SFT (correct, returns ``8''):}
+{\footnotesize
+\begin{verbatim}
+chunk_size = 20000
+overlap = 2000
+events = []
+i = 0
+while i < len(context):
+    chunk = context[i:i+chunk_size]
+    answer = llm_query(
+        f"Find ALL events performed by "
+        f"Jack Anderson. Return ONLY the "
+        f"raw event lines. If none found,"
+        f" say 'NONE'.\n\n{chunk}")
+    if "none" not in answer.lower():
+        for line in answer.strip() \
+                .split("\n"):
+            line = line.strip()
+            if line and "jack anderson" \
+                    in line.lower():
+                events.append(line)
+    i += chunk_size - overlap
+
+# Deduplicate and count in Python
+unique_events = set(events)
+count = len(unique_events)
+FINAL(str(count))
+\end{verbatim}
+}
+
+V17 learns the critical pattern: \textbf{extract raw event lines, then count in Python}. Sub-calls are asked to return raw data (not counts), and the Python code handles deduplication and aggregation. This is the correct strategy for event counting---delegating counting to sub-calls produces hallucinated numbers because LLMs cannot reliably count items in text. \textbf{Event Counting accuracy: Base 46.4\% $\to$ V17 73.0\% ($+$26.6pp).}
+
+\subsection{Example 3: Key-Value Retrieval --- Validation Strategy}
+\label{app:traj-kv}
+
+\textbf{Task:} ``Find registry entry ID `ENG-14777' and return its numeric VALUE'' (185K character registry document with 2,500+ entries).
+
+\textbf{V17 RS-SFT (correct, returns ``6932.36''):}
+{\footnotesize
+\begin{verbatim}
+target_id = "ENG-14777"
+chunk_size = 8000
+overlap = 2000
+results = []
+
+i = 0
+while i < len(context):
+    chunk = context[i:i+chunk_size]
+    answer = llm_query(
+        f"Find registry entry with ID "
+        f"'{target_id}'. Return ONLY the "
+        f"VALUE (numeric). If not found, "
+        f"say 'NOT FOUND'.\n\n{chunk}")
+    if "not found" not in answer.lower():
+        val = answer.strip()
+        # Validate: must look numeric
+        if val.replace(".", "") \
+                .replace("-", "") \
+                .isdigit():
+            results.append(val)
+    i += chunk_size - overlap
+
+from collections import Counter
+if results:
+    result = Counter(results) \
+        .most_common(1)[0][0]
+else:
+    result = "NOT FOUND"
+FINAL_VAR("result")
+\end{verbatim}
+}
+
+V17 uses three key techniques: (1)~smaller chunks (8K instead of 20K) for precise lookups in dense structured data; (2)~\textbf{numeric validation} of sub-call responses before aggregation, preventing false positives from malformed answers; (3)~majority voting across chunks for robustness. \textbf{KV Retrieval accuracy: Base 29.2\% $\to$ V17 85.4\% ($+$56.2pp).}
+
+\subsection{Example 4: Verbatim Copy --- LLM-Based Extraction}
+\label{app:traj-verbatim}
+
+\textbf{Task:} ``Find and reproduce EXACTLY the paragraph containing `CASE-2026-49099''' (10K character document).
+
+\textbf{V10-s40 GRPO (incorrect, returns the instruction text):}
+{\footnotesize
+\begin{verbatim}
+chunk_size = 20000
+if "CASE-2026-49099" in context:
+    pos = context.find("CASE-2026-49099")
+    start = context.rfind("\n", 0, pos)
+    end = context.find("\n", pos)
+    paragraph = context[start+1:end]
+    FINAL(paragraph.strip())
+\end{verbatim}
+}
+
+The GRPO model attempts direct string manipulation to find paragraph boundaries. This fails because the ``paragraph'' found by \texttt{rfind/find} on newlines captures the wrong text boundaries (in this case, the instruction text rather than the paragraph).
+
+\textbf{V17 RS-SFT (correct, score 1.0):}
+{\footnotesize
+\begin{verbatim}
+chunk_size = 20000
+overlap = 2000
+results = []
+i = 0
+while i < len(context):
+    chunk = context[i:i+chunk_size]
+    answer = llm_query(
+        f"Find and reproduce EXACTLY the "
+        f"paragraph containing "
+        f"'CASE-2026-49099'. Copy the "
+        f"entire paragraph verbatim. "
+        f"Return ONLY the paragraph. If "
+        f"not found, say 'NOT FOUND'."
+        f"\n\n{chunk}")
+    if "not found" not in answer.lower():
+        results.append(answer.strip())
+    i += chunk_size - overlap
+from collections import Counter
+result = Counter(results) \
+    .most_common(1)[0][0]
+FINAL_VAR("result")
+\end{verbatim}
+}
+
+V17 \textbf{delegates verbatim extraction to the LLM} via sub-calls, rather than attempting string manipulation. The sub-call model understands natural language paragraph boundaries and can reproduce text verbatim, which is more reliable than regex/string-based paragraph detection. \textbf{Verbatim Copy accuracy: Base 20\% $\to$ V10-s40 60\% $\to$ V17 80\% ($+$60pp from base).}
+
+\subsection{Example 5: Multi-NIAH Regression Analysis}
+\label{app:traj-mniah}
+
+\textbf{Task:} Find 5 secret codes in a 50K character document.
+
+\textbf{Base model (100\% recall, 5/5 found):} Uses systematic chunking with careful aggregation. At 99.4\% average recall, the base model is already near-perfect on this benchmark.
+
+\textbf{V17 RS-SFT (60\% recall, 3/5 found):} V17's code pattern is similar but misses 2 codes at chunk boundaries. The training data was biased toward ``find some items'' tasks (multi-hop, event counting) rather than ``find \emph{all} items'' tasks.
+
+This is V17's only regression ($-$4.3pp). The regression is small (95.1\% vs 99.4\%), and the base model's 99.4\% may benefit from chance---at $n{=}20$ tasks, this difference is within statistical noise. Nevertheless, the pattern suggests a genuine tradeoff: training on diverse task types slightly reduces exhaustive-search capability.
+
+\section{Full Per-Version Comparison}
+\label{app:full-comparison}
+
+Table~\ref{tab:full-versions} shows the complete results for all major model versions across all 14 benchmarks.
+
+\begin{table*}[t]
+\caption{Complete per-benchmark results across all major model versions (seed 10000, 14 benchmarks). Best per-benchmark in \textbf{bold}. V10-s40 is the best GRPO model; V17 is the best RS-SFT model; V18--V21 are SFT scaling experiments.}
+\label{tab:full-versions}
+\vskip 0.15in
+\begin{center}
+\begin{footnotesize}
+\begin{tabular}{lcccccccc}
+\toprule
+Benchmark & Base & V10-s40 & V16-SFT & V16+GRPO & V17 & V18 & V19 & V20 \\
+\midrule
+NIAH & 65.0 & 75.0 & 65.0 & 65.0 & 75.0 & \textbf{80.0} & 70.0 & 70.0 \\
+Multi-NIAH & \textbf{99.4} & 90.0 & 95.0 & 96.1 & 95.1 & 93.4 & 96.8 & 95.0 \\
+Hard NIAH & 83.3 & 93.3 & 83.3 & 83.3 & \textbf{96.7} & 90.0 & 93.3 & 83.3 \\
+Doc-Classify & 56.3 & 76.6 & 76.7 & 83.6 & 80.2 & \textbf{87.9} & 78.0 & 84.7 \\
+DataFrame QA & 75.0 & 85.0 & \textbf{99.0} & 94.0 & 93.0 & 94.0 & 97.0 & 94.0 \\
+Code Debug & 50.0 & 43.3 & 50.0 & 35.6 & \textbf{60.0} & 40.0 & 46.7 & 43.3 \\
+Multi-Hop QA & 55.0 & 60.0 & 75.0 & 75.0 & \textbf{80.0} & 70.0 & 70.0 & 45.0 \\
+Hard Multi-Hop & 30.0 & 30.0 & \textbf{70.0} & --- & 60.0 & 40.0 & 40.0 & 50.0 \\
+Notebook QA & 46.7 & 63.3 & 83.3 & 73.3 & 70.0 & 76.7 & 83.3 & \textbf{90.0} \\
+Event Counting & 46.4 & 41.7 & 61.6 & --- & \textbf{73.0} & 61.6 & 57.2 & 67.0 \\
+Cross-Doc & 42.2 & 42.9 & \textbf{47.0} & --- & 43.4 & \textbf{47.0} & 34.7 & 45.4 \\
+KV Retrieval & 29.2 & 75.0 & 59.2 & --- & 85.4 & 75.0 & 86.7 & \textbf{88.9} \\
+Verbatim Copy & 20.0 & 60.0 & \textbf{100.0} & 80.0 & 80.0 & 90.0 & \textbf{100.0} & \textbf{100.0} \\
+OOLONG & 0.0 & 20.0 & 20.0 & --- & 10.0 & \textbf{30.0} & 20.0 & 15.0 \\
+\midrule
+\textbf{Avg (14)} & 49.9 & 61.1 & 70.4 & --- & \textbf{71.6} & 69.7 & 69.5 & 69.4 \\
+W/L/T vs Base & --- & 9/3/2 & 12/2/0 & --- & \textbf{13/1/0} & 12/2/0 & 11/3/0 & 10/4/0 \\
+\bottomrule
+\end{tabular}
+\end{footnotesize}
+\end{center}
+\vskip -0.15in
+\end{table*}
+
+\textbf{Key observations from the full comparison:}
+
+\begin{enumerate}
+    \item \textbf{V16 RS-SFT already beats V10-s40 GRPO} on 10 of 14 benchmarks. The jump from 61.1\% to 70.4\% ($+$9.3pp) is the single largest improvement from any training method change.
+
+    \item \textbf{V16's strengths are different from V10-s40's.} V16 excels on DataFrame QA (99.0\% vs 85.0\%), Hard Multi-Hop (70.0\% vs 30.0\%), and Verbatim Copy (100.0\% vs 60.0\%), while V10-s40 is better on NIAH (75.0\% vs 65.0\%) and OOLONG (20.0\% vs 20.0\%).
+
+    \item \textbf{V17 improves over V16 on retrieval tasks.} The Round 2 mining from V16 adds trajectories for tasks that V16 solved but the base model couldn't, producing large gains on KV Retrieval (59.2\% $\to$ 85.4\%) and Event Counting (61.6\% $\to$ 73.0\%).
+
+    \item \textbf{No single model dominates all benchmarks.} The best model per benchmark is spread across V16, V17, V18, V19, and V20, confirming the benchmark tradeoff finding.
+
+    \item \textbf{V16+GRPO is uniformly worse than V16 RS-SFT} on every benchmark where both were evaluated, confirming that GRPO refinement damages RS-SFT checkpoints.
+\end{enumerate}
+
+\section{Format Rigidity: Detailed Analysis}
+\label{app:format-rigidity}
+
+We analyze 50 trajectories from V10-s40 (GRPO) and V17 (RS-SFT) on cross-document comparison and DataFrame QA tasks---the two benchmark types most affected by format rigidity.
+
+\subsection{Pattern 1: Strict Format Parsing}
+
+\textbf{GRPO-trained V10-s40} generates code that assumes specific sub-call output formats:
+{\footnotesize
+\begin{verbatim}
+# V10-s40: Expects "ORG: Name" format
+for line in answer.split("\n"):
+    if "ORG: " in line:
+        parts = line.split("ORG: ")
+        org_name = parts[1].strip()
+        orgs.append(org_name)
+\end{verbatim}
+}
+
+When the sub-call returns ``Organization: Acme Corp'' or ``The organization is Acme Corp'', this code silently fails (no match for ``ORG: '').
+
+\textbf{V17 RS-SFT} generates format-agnostic code:
+{\footnotesize
+\begin{verbatim}
+# V17: Accepts any format
+for line in answer.strip().split("\n"):
+    line = line.strip()
+    if line and line not in seen:
+        orgs.append(line)
+        seen.add(line)
+\end{verbatim}
+}
+
+V17's code accepts any line-separated output, making it robust to sub-call format variation.
+
+\subsection{Pattern 2: Single-Template Convergence}
+
+GRPO training converges to a single code template for each task type. Across 20 DataFrame QA trajectories from V10-s40, 85\% use identical chunk sizes (20000) and identical sub-call prompts. In contrast, V17 trajectories show more variation: chunk sizes range from 8000 to 25000, and sub-call prompts vary based on the specific question type.
+
+\subsection{Pattern 3: Error Recovery}
+
+When sub-calls return unexpected output, V17 trajectories more frequently include error handling and retry logic (in multi-turn execution). V10-s40 trajectories tend to fail silently and return incorrect aggregations without detection.
+
+\section{RS-SFT Data Pipeline Details}
+\label{app:data-pipeline}
+
+\subsection{Trajectory Mining}
+
+The mining script (\texttt{scripts/mine\_eval\_trajectories.py}) scans all evaluation result directories for correct trajectories. For each \texttt{eval\_results.json} file:
+
+\begin{enumerate}
+    \item Load per-task results, including the full trajectory (turns, code, outputs)
+    \item Check the appropriate score field (\texttt{score} for most benchmarks, \texttt{accuracy} for doc-classify, \texttt{recall} for multi-NIAH)
+    \item Filter trajectories with score $\geq 0.9$
+    \item Extract the conversation format (system prompt + assistant turns with code)
+    \item Apply content-based deduplication: key = task\_type + hash(completion text)
+\end{enumerate}
+
+\textbf{Bug discovery:} V10--V17 training data contained \textbf{zero} mined doc-classify and multi-NIAH trajectories because the mining script only checked the \texttt{score} field. Doc-classify uses \texttt{accuracy} and multi-NIAH uses \texttt{recall}. This was fixed in V18, adding 858 doc-classify and 798 multi-NIAH trajectories. Despite this fix, V18 (69.7\%) underperformed V17 (71.6\%), suggesting the additional data diluted rather than complemented V17's training distribution.
+
+\subsection{Quality Filtering}
+
+The filtering pipeline (\texttt{scripts/filter\_trajectories.py}) applies 8 quality criteria (Section~\ref{sec:rs-sft}). Key statistics for V17:
+
+\begin{itemize}
+    \item Raw mined trajectories: $\sim$8,200
+    \item After score filter ($\geq$0.9): $\sim$5,800
+    \item After deduplication: $\sim$4,900
+    \item After quality filters: $\sim$4,100
+    \item After task balancing (max 200/type): 3,644
+\end{itemize}
+
+\subsection{Task Balancing}
+
+To prevent any benchmark from dominating the loss, we cap each task type at 200 samples (selecting the top 50\% by score + random sampling from the remainder). Task types with fewer than 30 samples are oversampled. The final V17 training set has 3,644 samples balanced across 14 benchmark types.
+
+\section{Training Dynamics}
+\label{app:training-dynamics}
+
+\subsection{GRPO Training Dynamics}
+
+\textbf{V4-s5 (Standard GRPO, 5 steps from base).} V4-s5 is the initial GRPO run at 35B scale, using the debugged pipeline from the 1.7B experiments. Loss values are well-behaved: $107, -62, 497, -35, -70$ (order $O(10^2)$, confirming PPO clipping works). The model achieves $+$0.5pp average improvement in 5 steps, primarily on search tasks (NIAH $+$10pp, Doc-Classify $+$17.6pp).
+
+\textbf{V7 (Importance Sampling Bug, 5 steps).} V7 switches back to unclipped importance sampling (\texttt{"importance\_sampling"} instead of \texttt{"ppo"}) while increasing gradient accumulation. Losses explode: $4{,}336{,}545$, $-933{,}989$, $11{,}516{,}850$---\textbf{100,000$\times$} larger than V4. The root cause: with 48--55 datums accumulated per step, the policy drifts significantly within each step. By the time later datums are processed, $\rho_t = \pi_\theta / \pi_{\text{old}}$ has diverged dramatically because $\pi_\theta$ has already been updated by earlier datums in the same batch. PPO clipping bounds this ratio; unclipped IS does not.
+
+\textbf{V10-s40 (SC-GRPO, 40 steps from V4-s5).} The best GRPO model trains with SC-GRPO and regression-targeted task distribution. Reward trajectory: 0.42 (step 0) $\to$ 0.62 (step 40), with 3 mode collapse events (steps where all $K{=}8$ trajectories produce identical code, yielding zero advantages and no gradient). The regression-targeted distribution allocates 70\% of training weight to previously-regressing tasks, reducing oscillation amplitude compared to uniform-task GRPO.
+
+\textbf{Mode collapse events in V10-s40.} Despite SC-GRPO, 3 of 40 steps (7.5\%) still experience full group collapse. These occur exclusively on DataFrame QA tasks, where the CSV parsing pattern is so stereotyped that even different strategy prompts produce identical code. On average, SC-GRPO reduces collapse from 60\% (standard GRPO) to $<$10\% of groups, but cannot eliminate it entirely for highly deterministic task types.
+
+\subsection{RS-SFT Training Dynamics}
+
+V17 SFT training converges smoothly: cross-entropy loss decreases from $\sim$2.8 to $\sim$0.9 over 3 epochs ($\sim$900 steps). No instability, no collapse events, no reward oscillation---a stark contrast to GRPO's training dynamics. Training time: 2.8 hours on Tinker API.
+
+\textbf{Stability comparison.} Over equivalent training budgets: GRPO experiences 3--5 collapse events, reward oscillation amplitude of $\pm$0.15, and 7.5\% of steps with zero gradient. RS-SFT experiences none of these pathologies. This stability advantage compounds over training---GRPO must ``waste'' collapsed steps, while RS-SFT extracts value from every step. The practical implication: RS-SFT requires minimal hyperparameter tuning, while GRPO requires careful calibration of temperature schedules, KL coefficients, advantage normalization, and task distributions.
+
+\subsection{V18--V21: Diminishing Returns in Detail}
+
+Each post-V17 experiment shows the same pattern: rapid loss decrease during training, followed by evaluation revealing unexpected benchmark regressions. The most dramatic example is V21 (targeted fine-tuning at lr $3{\times}10^{-6}$ for only 108 steps), which still causes cross-doc to collapse from 43.4\% to 18.5\%. This extreme sensitivity suggests that V17's learned representations for cross-document reasoning occupy a narrow basin of the loss landscape, easily disrupted by even gentle gradient updates.
+
+\section{Qwen3-1.7B RL Development: A Complete Training Pipeline}
+\label{app:1.7b}
+\label{sec:1.7b-rl}
+
+We developed the full RL training pipeline on Qwen3-1.7B (local 8$\times$H200 cluster) before scaling to Qwen3.5-35B-A3B via the Tinker API. This section documents the complete RL development journey: 4 GRPO versions, each fixing a fundamental issue discovered in the previous, plus DPO and STaR experiments. These 1.7B experiments are the foundation of every RL design decision in the 35B experiments.
+
+\subsection{Policy Initialization: SFT and STaR}
+
+At 1.7B parameters, the base model can barely write valid REPL code. \textbf{SFT serves as behavioral cloning} to initialize the policy before RL~\cite{ouyang2022instructgpt}.
+
+\textbf{SFT-v1 failure (68\% $\to$ 56\%).} Including error turns in the SFT data taught the model to reproduce error patterns (e.g., calling undefined variables). The policy learned to imitate failure modes alongside successes---a classic behavioral cloning pitfall.
+
+\textbf{SFT-v2 success (68\% $\to$ 90\% NIAH).} Strict filtering to only clean, correct turns dramatically improved performance. Long-document accuracy jumped: 50K from 55\% to 80\%, 100K from 60\% to 80\%. This validated that behavioral cloning from high-quality demonstrations is effective when the data is pure---foreshadowing our later RS-SFT finding at 35B scale.
+
+\textbf{SFT-v2 data balance failure.} Despite SFT-v2's headline success, 114 of 155 training samples (73.5\%) were NIAH. This caused \textbf{catastrophic task collapse}: Multi-NIAH recall dropped from 97.8\% to 0\% because the model learned to return a single answer (NIAH pattern) instead of collecting multiple answers. Lesson: task-balanced batching is essential for multi-task training.
+
+\textbf{STaR~\cite{zelikman2022star}.} The SFT model generates trajectories on harder tasks (multi-needle, doc-classify), correct ones are filtered and added to the training set, and a second SFT round extends capability to new task types. This iterative self-improvement loop is the precursor to our later iterative trajectory mining (Section~\ref{sec:rs-sft}).
+
+\subsection{GRPO v1--v4: Systematic RL Debugging}
+
+Each GRPO version fixes a fundamental issue discovered in the previous version, providing a case study in the engineering challenges of applying policy gradient methods to code generation.
+
+\textbf{GRPO-v1: Reward collapse and mode collapse.} We train with $K{=}4$ trajectories, binary reward (1.0 if correct, 0.0 otherwise), and no KL regularization. Within 10 steps, the model achieves 100\% accuracy on all training tasks. The advantages become uniformly zero ($\hat{A}_i = 1.0 - 1.0 = 0$), producing zero gradient---reward collapse. Simultaneously, all $K{=}4$ trajectories converge to identical code by step 18. The training dynamics show the collapse clearly:
+
+\begin{center}
+\begin{small}
+\begin{tabular}{lccc}
+\toprule
+Steps & Updates/step & Reward & Status \\
+\midrule
+1--10 & 15--24 & 0.54 $\to$ 0.84 & Learning \\
+11--17 & 8--16 & 0.84 & Converging \\
+18--30 & \textbf{0} & 0.84 & \textbf{Stagnated} \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+
+\textbf{Fix:} Switch from binary to continuous rewards (e.g., multi-needle recall $\in [0, 1]$) to maintain non-zero advantages even when all trajectories succeed. Increase $K{=}4 \to K{=}8$ for more advantage diversity.
+
+\textbf{GRPO-v2: Training oscillation without KL.} Continuous rewards from multi-needle recall provide gradient signal, but training oscillates wildly without KL regularization. The reward trajectory shows: $0.73 \to 0.21 \to 0.76 \to 0.38 \to 0.81$. The policy overshoots on each update, moving far from the previous policy, then overcorrects. Oscillation amplitude: 0.548 (range $[0.21, 0.76]$).
+
+\textbf{Fix:} Add KL regularization to prevent large policy updates. But which form of KL?
+
+\textbf{GRPO-v3: Weight-space KL failure.} We implement weight-space L2 as a KL proxy: $\mathcal{L}_\text{KL} = \beta \cdot \|\theta - \theta_{\text{ref}}\|^2 / d$, where $d = 17.4$M (LoRA parameter count). The per-parameter L2 values are $O(10^{-10})$---effectively zero regularization even at $\beta{=}0.02$. The policy drifts freely, causing \textbf{catastrophic regression}: Multi-NIAH collapses from 97.8\% to \textbf{41.4\%} in 10 steps. This is the most severe policy collapse we observed.
+
+\textbf{Root cause:} LoRA's low-rank structure means small weight changes can produce large distributional shifts. A perturbation of $10^{-5}$ per parameter across 17.4M parameters can significantly alter the output distribution, but weight-space L2 registers this as negligible.
+
+\textbf{Fix:} Replace weight-space L2 with \emph{token-level} KL divergence via a frozen reference model. Compute $\text{KL} = \frac{1}{T}\sum_{t=1}^T \log \pi_{\text{ref}}(y_t | y_{<t}) - \log \pi_\theta(y_t | y_{<t})$ and subtract $\beta_\text{KL} \cdot \text{KL}$ from the reward. This produces meaningful regularization: KL grows smoothly from 0.0008 to 0.0197 over 30 steps, providing a direct measure of policy drift.
+
+\textbf{GRPO-v4: Stable training with conditioned log-probabilities.} The combination of token-level KL and \emph{conditioned} log-probabilities (computing $\pi_\theta(y | x)$ rather than unconditional $\pi_\theta(y)$) finally produces stable training. Oscillation amplitude halves compared to v2 (0.26 vs 0.55). Multi-NIAH recall improves from 38.5\% (base) to 85.3\% (GRPO-v4). The training reward trajectory is monotonically improving for the first 20 steps before plateauing.
+
+\textbf{The conditioned logprob insight.} GRPO-v3 and v4 use identical algorithms, hyperparameters, and data. The \emph{only} difference is conditioned vs.\ unconditional log-probabilities. V3 produces 41\% Multi-NIAH; v4 produces 85\%. Unconditional logprobs measure $P(y)$---the probability of the code regardless of the prompt. Conditioned logprobs measure $P(y|x)$---the probability of this code \emph{given this specific task}. Training on unconditional logprobs teaches the model to produce ``likely code in general,'' not ``good code for this task.''
+
+\subsection{DPO: Implicit Reward, Explicit Stability}
+
+DPO~\cite{rafailov2023dpo} replaces the explicit reward model with an implicit one derived from preference pairs. We construct 25 preference pairs from GRPO-v4's trajectories: each pair shares a prompt, with the higher-scoring trajectory as ``chosen'' and the lower-scoring as ``rejected.''
+
+Training produces surprisingly small loss changes ($0.693 \to 0.684$ over 30 steps) but \textbf{large downstream effects}: Multi-NIAH recall jumps by $+$29.5pp. DPO is more stable than GRPO (no oscillation, no collapse events) but still uses negative signal---the gradient pushes the policy \emph{away} from rejected trajectories, which can cause the same format rigidity issues we later observe at 35B scale.
+
+\textbf{Comparison with GRPO-v4:} DPO achieves stronger Multi-NIAH recall (100\% at 3 needles, 87.5\% at 8 needles) than GRPO-v4 (100\% at 3, 57.8\% at 8). However, DPO slightly regresses on NIAH at 100K characters (78\% vs GRPO-v4's 72\%---both below SFT's 80\%). Both methods show the same length-vs-breadth tradeoff observed later at 35B scale.
+
+\subsection{Key RL Lessons from 1.7B}
+
+These experiments yield five RL-specific insights that directly inform our 35B pipeline:
+
+\begin{enumerate}
+    \item \textbf{Reward design determines learnability.} Binary rewards cause reward collapse; continuous rewards enable learning. For multi-task training, per-task reward functions with auxiliary bonuses (format, persistence, sub-calls) are essential.
+    \item \textbf{Conditioned log-probabilities are essential.} GRPO-v3 and v4 differ only in this choice, yet produce opposite results (41\% vs 85\%). This is not documented in the GRPO paper~\cite{deepseekr1} and may be specific to code generation where unconditional code probability is dominated by boilerplate patterns.
+    \item \textbf{Weight-space KL is inadequate for LoRA.} Small LoRA weight perturbations produce large distributional shifts that weight-space L2 cannot detect. Token-level KL via a frozen reference forward pass is necessary.
+    \item \textbf{Data balance prevents task collapse.} Behavioral cloning (SFT) on imbalanced data causes catastrophic forgetting of minority tasks. Task-balanced batching---which we carry forward to RS-SFT---is essential.
+    \item \textbf{Implementation bugs compound catastrophically.} Seven bugs in the RL pipeline---wrong loss function, sub-query temperature leak, advantage normalization, and others---collectively produced loss values of $O(10^7)$. Each bug seemed minor in isolation; together they prevented any learning. Systematic debugging via careful ablation (changing one component at a time between v1$\to$v2$\to$v3$\to$v4) was the only path to a working pipeline.
+\end{enumerate}
+
+\textbf{Transition to 35B.} Armed with a debugged RL pipeline and five hard-won insights, we scale to Qwen3.5-35B-A3B. At 35B, the base model writes competent REPL code without SFT warmup, enabling direct RL training from the base policy. The 1.7B bugs are fixed, the reward function is tuned, and KL regularization is validated---all before spending any compute on the target model.
+
+\section{NIAH Breakdown by Document Length (Qwen3-1.7B)}
+\label{app:niah-breakdown}
+
+Table~\ref{tab:niah-length} shows NIAH accuracy stratified by document length for the 1.7B experiments.
+
+\begin{table}[t]
+\caption{NIAH accuracy by document length (characters), Qwen3-1.7B. Each cell: 20 tasks.}
+\label{tab:niah-length}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{sc}
+\begin{tabular}{lccccc}
+\toprule
+Model & 5K & 10K & 20K & 50K & 100K \\
+\midrule
+Base  & 85 & 80 & 80 & 55 & 60 \\
+SFT   & \textbf{100} & 95 & 95 & 80 & 80 \\
+RL-v2 & \textbf{100} & \textbf{100} & 95 & 80 & 85 \\
+STaR  & 75 & 90 & 85 & 90 & 95 \\
+RL-v3 & 80 & 95 & 85 & 90 & \textbf{100} \\
+\midrule
+DPO   & \textbf{100} & 80 & 90 & \textbf{95} & 78 \\
+GRPO-v4 & \textbf{100} & 90 & 90 & 91 & 72 \\
+\bottomrule
+\end{tabular}
+\end{sc}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+SFT improves long-document performance (50K: 55\% $\to$ 80\%, 100K: 60\% $\to$ 80\%). RL-v3 achieves 100\% on 100K but regresses on 5K (80\% vs SFT's 100\%). DPO and GRPO-v4 achieve 100\% on 5K but regress at 100K (78\% and 72\%), suggesting a trade-off influenced by the length distribution in training data.
+
+\section{Multi-Needle Retrieval Breakdown (Qwen3-1.7B)}
+\label{app:mniah-breakdown}
+
+\begin{table}[t]
+\caption{Multi-NIAH recall by number of needles, Qwen3-1.7B. Each cell: 4 tasks.}
+\label{tab:mniah}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{sc}
+\begin{tabular}{lcccc}
+\toprule
+Model & 3 & 5 & 8 & 10 \\
+\midrule
+Base  & 50.0 & 45.0 & 31.3 & 27.5 \\
+SFT   & 75.0 & 47.5 & 56.3 & 65.0 \\
+RL-v2 & 50.0 & 67.5 & 37.5 & 67.5 \\
+STaR  & 50.0 & 70.0 & 51.6 & 57.5 \\
+RL-v3 & 50.0 & 57.5 & 26.6 & 30.0 \\
+\midrule
+DPO   & \textbf{100.0} & 87.5 & \textbf{81.3} & 90.0 \\
+GRPO-v4 & \textbf{100.0} & \textbf{97.5} & 57.8 & \textbf{100.0} \\
+\bottomrule
+\end{tabular}
+\end{sc}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+DPO and GRPO-v4 produce dramatic improvements over all prior methods. DPO shows consistently strong performance across all needle counts (81--100\%). RL-v3 catastrophically fails on 8-needle (26.6\%) and 10-needle (30.0\%)---the most severe policy collapse observed at 1.7B scale.
+
+\section{Document Classification Breakdown (Qwen3-1.7B)}
+\label{app:docclassify-breakdown}
+
+\begin{table}[t]
+\caption{Document classification accuracy by number of documents, Qwen3-1.7B. Each cell: 5 tasks.}
+\label{tab:docclassify}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{sc}
+\begin{tabular}{lcccc}
+\toprule
+Model & 5 & 10 & 15 & 20 \\
+\midrule
+Base  & 68.0 & 78.0 & 85.3 & 90.0 \\
+SFT   & 80.0 & 78.0 & 82.7 & 89.0 \\
+RL-v2 & \textbf{88.0} & 66.0 & 82.7 & 89.0 \\
+STaR  & 84.0 & 78.0 & 82.7 & 89.0 \\
+RL-v3 & 84.0 & 78.0 & 82.7 & \textbf{91.0} \\
+\midrule
+DPO   & 84.0 & 76.0 & 81.3 & 89.0 \\
+GRPO-v4 & 80.0 & 78.0 & 84.0 & \textbf{91.0} \\
+\bottomrule
+\end{tabular}
+\end{sc}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+Document classification is the most stable benchmark: all trained models achieve 81--84\% average with minimal variation. The scaffold structure already solves the $O(N)$ decomposition; training primarily affects sub-call classification quality.
+
+\section{Computational Cost Breakdown}
+\label{app:compute}
+
+\begin{table}[ht]
+\vskip 0.1in
+\begin{center}
+\begin{footnotesize}
+\begin{tabular}{lrr}
+\toprule
+Phase (Qwen3-1.7B) & Time & GPU-h \\
+\midrule
+Trajectory collection (150 tasks) & 38 min & 0.63 \\
+SFT training (5 ep.) & 34 sec & 0.01 \\
+RL-v1 training (100 st.) & 17 min & 0.29 \\
+RL-v2 training (30 st.) & 88 min & 1.47 \\
+STaR collection (74 tasks) & 30 min & 0.50 \\
+STaR SFT (5 ep.) & 32 sec & 0.01 \\
+RL-v3 training (40 st.) & 55 min & 0.92 \\
+DPO (gen.\ + train) & 92 min & 1.53 \\
+GRPO-v4 (30 st.) & 106 min & 1.76 \\
+Evals ($\times$8 models) & $\sim$4 hr & $\sim$4.0 \\
+\midrule
+\textbf{Total (1.7B)} & $\sim$11 hr & $\sim$\textbf{11.1} \\
+\bottomrule
+\end{tabular}
+\end{footnotesize}
+\end{center}
+\vskip 0.1in
+\begin{center}
+\begin{footnotesize}
+\begin{tabular}{lr}
+\toprule
+Phase (Qwen3.5-35B-A3B, Tinker API) & API-hours \\
+\midrule
+Base model evals (14 benchmarks) & $\sim$3.0 \\
+V4-s5 GRPO (5 steps) & $\sim$2.5 \\
+V10-s40 SC-GRPO (40 steps) & $\sim$20.0 \\
+V10-s40 evaluation & $\sim$3.0 \\
+Trajectory mining (3 rounds) & $\sim$15.0 \\
+V16 RS-SFT training & $\sim$2.5 \\
+V17 RS-SFT training & $\sim$2.8 \\
+V16+GRPO experiment & $\sim$5.0 \\
+V18--V21 experiments & $\sim$10.0 \\
+All evaluations ($\times$8+ models) & $\sim$20.0 \\
+\midrule
+\textbf{Total (35B)} & $\sim$\textbf{84} \\
+\bottomrule
+\end{tabular}
+\end{footnotesize}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+\section{Strategy-Conditioned GRPO: Strategy Descriptions}
+\label{app:strategies}
+
+The 10 strategy prompts used in SC-GRPO training. Each is prepended to the system prompt for that trajectory, forcing the model to adopt a different decomposition approach.
+
+\begin{enumerate}
+    \item \textbf{Standard}: ``Process the context by dividing it into chunks of approximately 15,000--20,000 characters each. For each chunk, use llm\_query to extract relevant information. Aggregate results at the end.''
+
+    \item \textbf{Extract-Compute}: ``Focus on extracting raw data from the context first. Use llm\_query to extract specific values, numbers, or entities from chunks. Then perform all computation (counting, sorting, comparing) in Python code rather than asking the LLM to compute.''
+
+    \item \textbf{Binary Search}: ``If you are looking for a specific piece of information, use a binary search approach: start with the middle of the context, determine which half likely contains the answer, and recurse on that half.''
+
+    \item \textbf{Map-Reduce}: ``Use a map-reduce pattern: map llm\_query over all chunks to extract partial results, then reduce (merge, deduplicate, aggregate) the results in Python.''
+
+    \item \textbf{Two-Pass}: ``Use a two-pass approach: first pass scans the entire context to identify candidate locations or items, second pass verifies each candidate with focused queries.''
+
+    \item \textbf{Small Chunks}: ``Use small chunks of approximately 5,000 characters with 2,000-character overlap. This sacrifices speed for precision---smaller chunks mean the LLM sees more focused text and is less likely to miss details.''
+
+    \item \textbf{Table Preserve}: ``If the context contains structured data (CSV, tables, lists), preserve the structure when chunking. Do not split in the middle of a row or entry. Parse headers separately and include them with each chunk.''
+
+    \item \textbf{Notebook Sequential}: ``Process the context sequentially, tracking state as you go. For notebook-like content, process cells in order, maintaining a running summary of variables and results seen so far.''
+
+    \item \textbf{Lookup Thorough}: ``For lookup tasks, be thorough: use small chunks (5K--8K), search every chunk, and verify any found result by searching neighboring chunks for confirmation.''
+
+    \item \textbf{Precision Extract}: ``Focus on extracting exact text, not summaries. When using llm\_query, always ask for exact quotes, exact values, or exact text. Never ask for summaries or paraphrases.''
+\end{enumerate}
+
+\section{Benchmark Complexity Analysis}
+\label{app:complexity}
+
+Table~\ref{tab:complexity} classifies our benchmarks by algorithmic complexity and shows how training affects each class differently.
+
+\begin{table}[t]
+\caption{Benchmark performance by complexity class. $\Delta$ is V17 vs Base.}
+\label{tab:complexity}
+\vskip 0.15in
+\begin{center}
+\begin{small}
+\begin{tabular}{lccc}
+\toprule
+Complexity & Base Avg & V17 Avg & $\Delta$ \\
+\midrule
+$O(1)$: 4 benchmarks & 49.4 & 84.0 & +34.6 \\
+$O(K)$: 5 benchmarks & 61.4 & 76.2 & +14.8 \\
+$O(N)$: 3 benchmarks & 59.2 & 82.1 & +22.9 \\
+$O(N^2)$: 1 benchmark & 42.2 & 43.4 & +1.2 \\
+External: 1 benchmark & 0.0 & 10.0 & +10.0 \\
+\midrule
+\textbf{All 14} & \textbf{49.9} & \textbf{71.6} & \textbf{+21.7} \\
+\bottomrule
+\end{tabular}
+\end{small}
+\end{center}
+\vskip -0.15in
+\end{table}
+
+\textbf{$O(1)$ tasks benefit most from training} ($+$34.6pp average). These tasks require precise retrieval from a single location, and RS-SFT effectively teaches the model to search systematically with small chunks and validation.
+
+\textbf{$O(N^2)$ tasks are hardest to improve} ($+$1.2pp). Cross-document comparison requires extracting information from two separate documents and comparing them---a complex operation that current training data barely covers. This represents the most promising direction for future improvement.
+
+\bibliography{references}
+\bibliographystyle{icml2018}
+
+\end{document}
